@@ -9,10 +9,10 @@ import {
 	LogIn,
 	LogOut,
 	MessageCircle,
-	Plus,
 	Search,
 	User,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface NavbarProps {
@@ -29,6 +29,7 @@ export default function Navbar({
 	const [notifications] = useState(3); // Mock notification count
 	const [showUserMenu, setShowUserMenu] = useState(false);
 	const { user, isAuthenticated, setUser, setAuthenticated } = useAuthStore();
+	const router = useRouter();
 	const logoutMutation = useLogout();
 
 	const handleLogout = () => {
@@ -79,10 +80,14 @@ export default function Navbar({
 			<div className="flex items-center justify-between">
 				{/* Logo */}
 				<div className="flex items-center space-x-8">
-					<h1 className="text-2xl font-bold text-blue-600">Propmize</h1>
+					<h1
+						onClick={() => router.push("/")}
+						className="text-2xl font-bold text-blue-600">
+						Propmize
+					</h1>
 
 					{/* Navigation Tabs */}
-					<div className="hidden md:flex space-x-6">
+					{/* <div className="hidden md:flex space-x-6">
 						{navItems.map((item) => {
 							const Icon = item.icon;
 							const isActive = activeTab === item.id;
@@ -100,16 +105,12 @@ export default function Navbar({
 								</button>
 							);
 						})}
-					</div>
+					</div> */}
 				</div>
 
 				{/* Right Side Actions */}
 				<div className="flex items-center space-x-4">
 					{/* Add Property Button */}
-					<button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-						<Plus size={18} />
-						<span className="hidden sm:inline">Add Property</span>
-					</button>
 
 					{/* Notifications */}
 					<button className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full">
@@ -138,7 +139,9 @@ export default function Navbar({
 							{/* User Dropdown */}
 							{showUserMenu && (
 								<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-									<div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+									<div
+										onClick={() => router.push("/profile")}
+										className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
 										<div className="font-medium">{user?.name || "User"}</div>
 										<div className="text-gray-500">{user?.email}</div>
 									</div>

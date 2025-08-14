@@ -2,19 +2,10 @@
 
 import AuthModal from "@/components/custom/auth-modal/AuthModal";
 import Navbar from "@/components/custom/navbar/Navbar";
-import {
-	BookOpen,
-	Building,
-	Eye,
-	Heart,
-	HelpCircle,
-	LogOut,
-	Menu,
-	Phone,
-	RotateCcw,
-	User,
-	X,
-} from "lucide-react";
+import { useNavigation } from "@/hooks/useNavigation";
+import { iconMap } from "@/lib/routing/iconMap";
+import { buyerNavItems } from "@/lib/routing/routes";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
@@ -30,23 +21,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 		"properties" | "chat" | "analytics"
 	>("properties");
 	const pathname = usePathname();
-
-	const sidebarItems = [
-		{ icon: User, label: "My Profile", href: "/profile" },
-		{
-			icon: RotateCcw,
-			label: "Switch to Seller Mode",
-			href: "/switch-mode",
-			isHighlighted: true,
-		},
-		{ icon: Heart, label: "Saved Properties", href: "/saved" },
-		{ icon: Eye, label: "Recently Viewed", href: "/recent" },
-		{ icon: Phone, label: "Contacted Owners", href: "/contacted" },
-		{ icon: Building, label: "New Projects in My City", href: "/new-projects" },
-		{ icon: BookOpen, label: "Buyer's Guide and advice", href: "/guide" },
-		{ icon: HelpCircle, label: "Help & Support", href: "/support" },
-		{ icon: LogOut, label: "Logout", href: "/logout", isBottom: true },
-	];
+	const navigation = useNavigation();
 
 	return (
 		<div className="min-h-screen bg-gray-50">
@@ -84,14 +59,16 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 
 						<nav className="flex flex-col h-full">
 							<div className="flex-1 py-4">
-								{sidebarItems
+								{buyerNavItems
 									.filter((item) => !item.isBottom)
 									.map((item) => {
-										const isActive = pathname === item.href;
+										const isActive = pathname === item.route.path;
+										const IconComponent =
+											iconMap[item.icon as keyof typeof iconMap];
 										return (
 											<Link
-												key={item.href}
-												href={item.href}
+												key={item.route.path}
+												href={item.route.path}
 												onClick={() => setSidebarOpen(false)}
 												className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 transition-colors ${
 													isActive
@@ -100,26 +77,34 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 														? "bg-blue-50 text-blue-600 font-medium border-r-2 border-blue-600"
 														: ""
 												}`}>
-												<item.icon className="h-5 w-5 mr-3" />
-												{item.label}
+												{IconComponent && (
+													<IconComponent className="h-5 w-5 mr-3" />
+												)}
+												{item.route.name}
 											</Link>
 										);
 									})}
 							</div>
 
 							<div className="border-t py-4">
-								{sidebarItems
+								{buyerNavItems
 									.filter((item) => item.isBottom)
-									.map((item) => (
-										<Link
-											key={item.href}
-											href={item.href}
-											onClick={() => setSidebarOpen(false)}
-											className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 transition-colors">
-											<item.icon className="h-5 w-5 mr-3" />
-											{item.label}
-										</Link>
-									))}
+									.map((item) => {
+										const IconComponent =
+											iconMap[item.icon as keyof typeof iconMap];
+										return (
+											<Link
+												key={item.route.path}
+												href={item.route.path}
+												onClick={() => setSidebarOpen(false)}
+												className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 transition-colors">
+												{IconComponent && (
+													<IconComponent className="h-5 w-5 mr-3" />
+												)}
+												{item.route.name}
+											</Link>
+										);
+									})}
 							</div>
 						</nav>
 					</div>

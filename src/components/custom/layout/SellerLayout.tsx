@@ -1,20 +1,9 @@
 "use client";
 
-import {
-	Bell,
-	BookOpen,
-	Crown,
-	Diamond,
-	FileText,
-	HelpCircle,
-	Home,
-	LogOut,
-	Menu,
-	MessageSquare,
-	Plus,
-	RotateCcw,
-	User,
-} from "lucide-react";
+import { useNavigation } from "@/hooks/useNavigation";
+import { iconMap } from "@/lib/routing/iconMap";
+import { sellerBottomNavItems, sellerNavItems } from "@/lib/routing/routes";
+import { Bell, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
@@ -26,33 +15,7 @@ interface SellerLayoutProps {
 const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const pathname = usePathname();
-
-	const sidebarItems = [
-		{ icon: User, label: "My Profile", href: "/seller/profile" },
-		{
-			icon: RotateCcw,
-			label: "Switch to Buyer Dashboard",
-			href: "/switch-mode",
-			isHighlighted: true,
-		},
-		{ icon: Crown, label: "Seller Premium Plans", href: "/seller/plans" },
-		{ icon: BookOpen, label: "Guide & advice", href: "/seller/guide" },
-		{ icon: HelpCircle, label: "Help & Support", href: "/seller/support" },
-		{ icon: LogOut, label: "Logout", href: "/logout", isBottom: true },
-	];
-
-	const bottomNavItems = [
-		{ icon: Home, label: "Home", href: "/seller" },
-		{ icon: MessageSquare, label: "Leads & Inquiries", href: "/seller/leads" },
-		{
-			icon: Plus,
-			label: "New Listing",
-			href: "/seller/add-property",
-			isCenter: true,
-		},
-		{ icon: Diamond, label: "My Premium Plans", href: "/seller/premium" },
-		{ icon: FileText, label: "Analytics", href: "/seller/analytics" },
-	];
+	const navigation = useNavigation();
 
 	return (
 		<div className="min-h-screen bg-gray-50 pb-20">
@@ -97,21 +60,23 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 								<button
 									onClick={() => setSidebarOpen(false)}
 									className="p-2 rounded-md hover:bg-gray-100">
-									×
+									<X className="h-5 w-5 text-gray-500" />
 								</button>
 							</div>
 						</div>
 
 						<nav className="flex flex-col h-full">
 							<div className="flex-1 py-4">
-								{sidebarItems
+								{sellerNavItems
 									.filter((item) => !item.isBottom)
 									.map((item) => {
-										const isActive = pathname === item.href;
+										const isActive = pathname === item.route.path;
+										const IconComponent =
+											iconMap[item.icon as keyof typeof iconMap];
 										return (
 											<Link
-												key={item.href}
-												href={item.href}
+												key={item.route.path}
+												href={item.route.path}
 												onClick={() => setSidebarOpen(false)}
 												className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 ${
 													isActive
@@ -120,26 +85,34 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 														? "bg-green-50 text-green-600 font-medium border-r-2 border-green-600"
 														: ""
 												}`}>
-												<item.icon className="h-5 w-5 mr-3" />
-												{item.label}
+												{IconComponent && (
+													<IconComponent className="h-5 w-5 mr-3" />
+												)}
+												{item.route.name}
 											</Link>
 										);
 									})}
 							</div>
 
 							<div className="border-t py-4">
-								{sidebarItems
+								{sellerNavItems
 									.filter((item) => item.isBottom)
-									.map((item) => (
-										<Link
-											key={item.href}
-											href={item.href}
-											onClick={() => setSidebarOpen(false)}
-											className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100">
-											<item.icon className="h-5 w-5 mr-3" />
-											{item.label}
-										</Link>
-									))}
+									.map((item) => {
+										const IconComponent =
+											iconMap[item.icon as keyof typeof iconMap];
+										return (
+											<Link
+												key={item.route.path}
+												href={item.route.path}
+												onClick={() => setSidebarOpen(false)}
+												className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100">
+												{IconComponent && (
+													<IconComponent className="h-5 w-5 mr-3" />
+												)}
+												{item.route.name}
+											</Link>
+										);
+									})}
 							</div>
 						</nav>
 					</div>
@@ -152,29 +125,32 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 			{/* Bottom Navigation */}
 			<div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
 				<div className="flex items-center justify-around py-2">
-					{bottomNavItems.map((item) => {
-						const isActive = pathname === item.href;
+					{sellerBottomNavItems.map((item) => {
+						const isActive = pathname === item.route.path;
+						const IconComponent = iconMap[item.icon as keyof typeof iconMap];
 						return (
 							<Link
-								key={item.href}
-								href={item.href}
+								key={item.route.path}
+								href={item.route.path}
 								className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
-									item.isCenter
+									item.isHighlighted
 										? "bg-blue-600 text-white shadow-lg transform scale-110"
 										: isActive
 										? "text-blue-600 bg-blue-50"
 										: "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
 								}`}>
-								<item.icon
-									className={`h-6 w-6 mb-1 ${
-										item.isCenter ? "text-white" : ""
-									}`}
-								/>
+								{IconComponent && (
+									<IconComponent
+										className={`h-6 w-6 mb-1 ${
+											item.isHighlighted ? "text-white" : ""
+										}`}
+									/>
+								)}
 								<span
 									className={`text-xs font-medium ${
-										item.isCenter ? "text-white" : ""
+										item.isHighlighted ? "text-white" : ""
 									}`}>
-									{item.label}
+									{item.route.name}
 								</span>
 							</Link>
 						);

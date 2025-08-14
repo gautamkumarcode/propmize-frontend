@@ -1,6 +1,6 @@
 "use client";
 
-import BuyerLayout from "@/components/layout/BuyerLayout";
+import BuyerLayout from "@/components/custom/layout/BuyerLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {

@@ -1,6 +1,6 @@
 "use client";
 
-import SellerLayout from "@/components/layout/SellerLayout";
+import SellerLayout from "@/components/custom/layout/SellerLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

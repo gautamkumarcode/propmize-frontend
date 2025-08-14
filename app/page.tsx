@@ -1,5 +1,5 @@
-import Dashboard from "@/components/screens/dashboard/Dashboard";
+import LandingPage from "@/components/screens/landing/LandingPage";
 
 export default function HomePage() {
-	return <Dashboard />;
+	return <LandingPage />;
 }

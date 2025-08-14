@@ -1,6 +1,6 @@
 "use client";
 
-import SellerLayout from "@/components/layout/SellerLayout";
+import SellerLayout from "@/components/custom/layout/SellerLayout";
 import {
 	Building,
 	Eye,

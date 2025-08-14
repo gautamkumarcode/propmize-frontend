@@ -130,8 +130,8 @@ export default function AIPropertyChat({
 		}
 
 		try {
-			const chatData = await startChatMutation.mutateAsync();
-			setCurrentChatId(chatData.data._id);
+			// const chatData = await startChatMutation.mutateAsync();
+			// setCurrentChatId(chatData.data._id);
 		} catch (error: any) {
 			console.error("Failed to start AI chat:", error);
 			toast({
@@ -359,7 +359,7 @@ export default function AIPropertyChat({
 								(message: any): message is Message =>
 									typeof message._id === "string" && !!message._id
 							)
-							.map((message) => (
+							.map((message:any) => (
 								<div
 									key={message._id}
 									className={`flex ${

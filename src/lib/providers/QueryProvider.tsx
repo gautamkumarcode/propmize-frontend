@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createContext, ReactNode, useContext } from "react";
 import { queryClient } from "../react-query/queryClient";
 
@@ -17,13 +16,6 @@ export function QueryProvider({ children }: QueryProviderProps) {
 		<QueryClientProvider client={queryClient}>
 			<QueryContext.Provider value={queryClient}>
 				{children}
-				{/* Show React Query DevTools in development */}
-				{process.env.NODE_ENV === "development" && (
-					<ReactQueryDevtools
-						initialIsOpen={false}
-						buttonPosition="bottom-right"
-					/>
-				)}
 			</QueryContext.Provider>
 		</QueryClientProvider>
 	);
