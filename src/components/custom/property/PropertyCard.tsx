@@ -141,10 +141,14 @@ export default function PropertyCard({
 						<div className="flex items-center text-xs text-gray-500">
 							<Calendar className="h-3 w-3 mr-1" />
 							<span>
-								{new Date(property.createdAt).toLocaleDateString("en-IN", {
-									day: "numeric",
-									month: "short",
-								})}
+								{(() => {
+									const date = new Date(property.createdAt);
+									const day = date.getDate();
+									const month = date.toLocaleDateString("en-IN", {
+										month: "short",
+									});
+									return `${day} ${month}`;
+								})()}
 							</span>
 						</div>
 						<div className="flex items-center text-xs text-gray-500">

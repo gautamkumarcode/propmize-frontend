@@ -364,10 +364,12 @@ export default function AIChatWindow({
 					</Card>
 
 					<div className="text-xs text-gray-500 mt-1 text-right">
-						{new Date(msg.timestamp).toLocaleTimeString([], {
-							hour: "2-digit",
-							minute: "2-digit",
-						})}
+						{(() => {
+							const date = new Date(msg.timestamp);
+							const hours = date.getHours().toString().padStart(2, "0");
+							const minutes = date.getMinutes().toString().padStart(2, "0");
+							return `${hours}:${minutes}`;
+						})()}
 					</div>
 				</div>
 

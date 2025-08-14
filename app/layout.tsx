@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import { Providers } from "../src/lib/providers/Providers";
 import "./globals.css";
 
@@ -28,6 +29,19 @@ export default function RootLayout({
 		<html lang="en">
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+				<NextTopLoader
+					color="#2563eb"
+					initialPosition={0.08}
+					crawlSpeed={200}
+					height={3}
+					crawl={true}
+					easing="ease"
+					speed={200}
+					showSpinner={false}
+					// disable circle loader
+
+					zIndex={1600}
+				/>
 				<Providers>{children}</Providers>
 			</body>
 		</html>

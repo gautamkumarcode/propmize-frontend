@@ -39,10 +39,9 @@ export default function ConversationsSidebar({
 		} else if (diffHours < 24) {
 			return `${diffHours}h ago`;
 		} else {
-			return messageDate.toLocaleDateString("en-IN", {
-				day: "2-digit",
-				month: "short",
-			});
+			const day = messageDate.getDate().toString().padStart(2, "0");
+			const month = messageDate.toLocaleDateString("en-IN", { month: "short" });
+			return `${day} ${month}`;
 		}
 	};
 

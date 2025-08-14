@@ -179,7 +179,18 @@ export default function AIAssistantPage({
 												</div>
 												<div className="text-sm text-gray-600">
 													{chat.analytics.messageCount} messages • Last updated{" "}
-													{new Date(chat.updatedAt).toLocaleDateString()}
+													{(() => {
+														const date = new Date(chat.updatedAt);
+														const day = date
+															.getDate()
+															.toString()
+															.padStart(2, "0");
+														const month = (date.getMonth() + 1)
+															.toString()
+															.padStart(2, "0");
+														const year = date.getFullYear();
+														return `${day}/${month}/${year}`;
+													})()}
 												</div>
 												{chat.relatedProperties.length > 0 && (
 													<div className="text-xs text-blue-600 mt-1">

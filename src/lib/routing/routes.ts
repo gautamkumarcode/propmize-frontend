@@ -31,12 +31,26 @@ export const routes: Record<string, Route> = {
 		layout: "buyer",
 		protected: false,
 	},
+	navigation: {
+		path: "/navigation",
+		name: "All Pages",
+		description: "Overview of all available pages and navigation",
+		layout: "buyer",
+		protected: false,
+	},
 
 	// Buyer routes
 	profile: {
 		path: "/profile",
 		name: "My Profile",
 		description: "User profile and account settings",
+		layout: "buyer",
+		protected: true,
+	},
+	buyerProfile: {
+		path: "/buyer/profile",
+		name: "Buyer Profile",
+		description: "Buyer profile and account settings",
 		layout: "buyer",
 		protected: true,
 	},
@@ -60,6 +74,13 @@ export const routes: Record<string, Route> = {
 		description: "Properties where you contacted owners",
 		layout: "buyer",
 		protected: true,
+	},
+	aiAssistant: {
+		path: "/buyer/ai-assistant",
+		name: "AI Assistant",
+		description: "AI-powered property search assistant",
+		layout: "buyer",
+		protected: false,
 	},
 	switchMode: {
 		path: "/",
@@ -179,10 +200,11 @@ export const getPublicRoutes = (): Route[] => {
 
 // Navigation items for different layouts
 export const buyerNavItems: NavigationItem[] = [
-	{ route: routes.profile, icon: "User" },
+	{ route: routes.buyerDashboard, icon: "Home" },
+	// { route: routes.buyerProfile, icon: "User" },
 	{
 		route: {
-			path: "/switch-mode",
+			path: "/seller",
 			name: "Switch to Seller Mode",
 			description: "Switch mode",
 			layout: "buyer",
@@ -209,10 +231,10 @@ export const buyerNavItems: NavigationItem[] = [
 ];
 
 export const sellerNavItems: NavigationItem[] = [
-	{ route: routes.sellerProfile, icon: "User" },
+	// { route: routes.sellerProfile, icon: "User" },
 	{
 		route: {
-			path: "/switch-mode",
+			path: "/buyer/dashboard",
 			name: "Switch to Buyer Dashboard",
 			description: "Switch mode",
 			layout: "seller",
@@ -241,4 +263,12 @@ export const sellerBottomNavItems: NavigationItem[] = [
 	{ route: routes.addProperty, icon: "Plus", isHighlighted: true },
 	{ route: routes.sellerPremium, icon: "Diamond" },
 	{ route: routes.sellerAnalytics, icon: "FileText" },
+];
+
+export const buyerBottomNavItems: NavigationItem[] = [
+	{ route: routes.buyerDashboard, icon: "Home" },
+	{ route: routes.saved, icon: "Heart" },
+	{ route: routes.aiAssistant, icon: "MessageSquare", isHighlighted: true },
+	{ route: routes.newProjects, icon: "Building" },
+	{ route: routes.profile, icon: "User" },
 ];

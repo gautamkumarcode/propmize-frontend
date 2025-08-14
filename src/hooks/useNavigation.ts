@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 export const useNavigation = () => {
 	const pathname = usePathname();
 	const router = useRouter();
-	const { isAuthenticated, user } = useAuthStore();
+	const { isAuthenticated, user, userMode } = useAuthStore();
 
 	// Get current route information
 	const currentRoute = getRouteByPath(pathname);
@@ -39,7 +39,11 @@ export const useNavigation = () => {
 	// Quick navigation functions
 	const goToDashboard = () => navigateTo("/buyer/dashboard");
 	const goBuyerDashboard = () => navigateTo("/buyer/dashboard");
-	const goToProfile = () => navigateTo("/profile");
+	const goToProfile = () => {
+		const profilePath =
+			userMode === "seller" ? "/seller/profile" : "/buyer/profile";
+		navigateTo(profilePath);
+	};
 	const goToSaved = () => navigateTo("/saved");
 	const goToRecent = () => navigateTo("/recent");
 	const goToContacted = () => navigateTo("/contacted");

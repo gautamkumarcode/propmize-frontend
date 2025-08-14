@@ -125,7 +125,18 @@ export default function Saved() {
 											<div className="flex items-center justify-between">
 												<p className="text-xs text-gray-500">
 													Saved on{" "}
-													{new Date(property.savedDate).toLocaleDateString()}
+													{(() => {
+														const date = new Date(property.savedDate);
+														const day = date
+															.getDate()
+															.toString()
+															.padStart(2, "0");
+														const month = (date.getMonth() + 1)
+															.toString()
+															.padStart(2, "0");
+														const year = date.getFullYear();
+														return `${day}/${month}/${year}`;
+													})()}
 												</p>
 												<Button
 													size="sm"

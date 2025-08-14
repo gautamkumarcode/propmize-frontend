@@ -359,7 +359,7 @@ export default function AIPropertyChat({
 								(message: any): message is Message =>
 									typeof message._id === "string" && !!message._id
 							)
-							.map((message:any) => (
+							.map((message: any) => (
 								<div
 									key={message._id}
 									className={`flex ${
@@ -399,10 +399,18 @@ export default function AIPropertyChat({
 														? "text-blue-200"
 														: "text-gray-500"
 												}`}>
-												{new Date(message.createdAt).toLocaleTimeString([], {
-													hour: "2-digit",
-													minute: "2-digit",
-												})}
+												{(() => {
+													const date = new Date(message.createdAt);
+													const hours = date
+														.getHours()
+														.toString()
+														.padStart(2, "0");
+													const minutes = date
+														.getMinutes()
+														.toString()
+														.padStart(2, "0");
+													return `${hours}:${minutes}`;
+												})()}
 											</p>
 										</div>
 

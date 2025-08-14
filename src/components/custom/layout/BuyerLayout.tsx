@@ -2,10 +2,10 @@
 
 import AuthModal from "@/components/custom/auth-modal/AuthModal";
 import Navbar from "@/components/custom/navbar/Navbar";
-import { useNavigation } from "@/hooks/useNavigation";
+import Breadcrumb from "@/components/custom/navigation/Breadcrumb";
 import { iconMap } from "@/lib/routing/iconMap";
-import { buyerNavItems } from "@/lib/routing/routes";
-import { Menu, X } from "lucide-react";
+import { buyerBottomNavItems, buyerNavItems } from "@/lib/routing/routes";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
@@ -21,26 +21,18 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 		"properties" | "chat" | "analytics"
 	>("properties");
 	const pathname = usePathname();
-	const navigation = useNavigation();
 
 	return (
-		<div className="min-h-screen bg-gray-50">
+		<div className="min-h-screen bg-gray-50 pb-20">
 			{/* Enhanced Navbar */}
 			<Navbar
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
 				onShowAuthModal={() => setShowAuthModal(true)}
+				mode="buyer"
 			/>
 
 			{/* Mobile Menu Button - Only visible on mobile */}
-			<div className="md:hidden bg-white px-4 py-2 border-b border-gray-200">
-				<button
-					onClick={() => setSidebarOpen(true)}
-					className="flex items-center space-x-2 text-gray-700 hover:text-blue-600">
-					<Menu className="h-5 w-5" />
-					<span className="text-sm font-medium">Browse Categories</span>
-				</button>
-			</div>
 
 			{/* Sidebar Overlay */}
 			{sidebarOpen && (
@@ -113,8 +105,47 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 
 			{/* Main Content */}
 			<main>
-				<div className="container mx-auto px-4 py-6 max-w-7xl">{children}</div>
+				<div className="container mx-auto px-4 py-6 max-w-7xl">
+					<Breadcrumb />
+					{children}
+				</div>
 			</main>
+
+			{/* Bottom Navigation - Mobile Only */}
+			<div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg md:hidden">
+				<div className="flex items-center justify-around py-2">
+					{buyerBottomNavItems.map((item) => {
+						const isActive = pathname === item.route.path;
+						const IconComponent = iconMap[item.icon as keyof typeof iconMap];
+						return (
+							<Link
+								key={item.route.path}
+								href={item.route.path}
+								className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+									item.isHighlighted
+										? "bg-blue-600 text-white shadow-lg transform scale-110"
+										: isActive
+										? "text-blue-600 bg-blue-50"
+										: "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+								}`}>
+								{IconComponent && (
+									<IconComponent
+										className={`h-6 w-6 mb-1 ${
+											item.isHighlighted ? "text-white" : ""
+										}`}
+									/>
+								)}
+								<span
+									className={`text-xs font-medium ${
+										item.isHighlighted ? "text-white" : ""
+									}`}>
+									{item.route.name}
+								</span>
+							</Link>
+						);
+					})}
+				</div>
+			</div>
 
 			{/* Auth Modal */}
 			<AuthModal

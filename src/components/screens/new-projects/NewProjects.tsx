@@ -273,14 +273,34 @@ export default function NewProjects() {
 													<div className="flex items-center">
 														<Calendar className="w-4 h-4 mr-1" />
 														Launch:{" "}
-														{new Date(project.launchDate).toLocaleDateString()}
+														{(() => {
+															const date = new Date(project.launchDate);
+															const day = date
+																.getDate()
+																.toString()
+																.padStart(2, "0");
+															const month = (date.getMonth() + 1)
+																.toString()
+																.padStart(2, "0");
+															const year = date.getFullYear();
+															return `${day}/${month}/${year}`;
+														})()}
 													</div>
 													<div className="flex items-center">
 														<Building className="w-4 h-4 mr-1" />
 														Possession:{" "}
-														{new Date(
-															project.possessionDate
-														).toLocaleDateString()}
+														{(() => {
+															const date = new Date(project.possessionDate);
+															const day = date
+																.getDate()
+																.toString()
+																.padStart(2, "0");
+															const month = (date.getMonth() + 1)
+																.toString()
+																.padStart(2, "0");
+															const year = date.getFullYear();
+															return `${day}/${month}/${year}`;
+														})()}
 													</div>
 												</div>
 												<div className="flex items-center space-x-3">

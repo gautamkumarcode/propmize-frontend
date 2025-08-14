@@ -1,6 +1,7 @@
 "use client";
 
 import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import SellerLayout from "@/components/custom/layout/SellerLayout";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,12 +10,15 @@ import { toast } from "@/hooks/use-toast";
 import { useProfile, useUpdateProfile } from "@/lib/react-query/hooks/useAuth";
 import { useAuthStore } from "@/store/app-store";
 import {
+	Building2,
+	Crown,
 	Edit3,
 	Loader2,
 	Mail,
 	MapPin,
 	Phone,
 	Shield,
+	TrendingUp,
 	User,
 	Verified,
 } from "lucide-react";
@@ -22,12 +26,15 @@ import { useEffect, useState } from "react";
 
 export default function Profile() {
 	const [isEditing, setIsEditing] = useState(false);
-	const { user, isAuthenticated } = useAuthStore();
+	const { user, isAuthenticated, userMode } = useAuthStore();
 	const { data: profileData, isLoading, error } = useProfile();
 	const updateProfileMutation = useUpdateProfile();
 
 	// Use profile data from API or fallback to store data
 	const profile = profileData || user;
+
+	// Determine which layout to use based on current mode
+	const Layout = userMode === "seller" ? SellerLayout : BuyerLayout;
 
 	const [formData, setFormData] = useState({
 		name: "",
@@ -70,7 +77,7 @@ export default function Profile() {
 
 	if (!isAuthenticated) {
 		return (
-			<BuyerLayout>
+			<Layout>
 				<div className="min-h-screen bg-gray-50 flex items-center justify-center">
 					<div className="text-center">
 						<h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -78,38 +85,38 @@ export default function Profile() {
 						</h2>
 					</div>
 				</div>
-			</BuyerLayout>
+			</Layout>
 		);
 	}
 
 	if (isLoading) {
 		return (
-			<BuyerLayout>
+			<Layout>
 				<div className="min-h-screen bg-gray-50 flex items-center justify-center">
 					<div className="text-center">
 						<Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
 						<p className="text-gray-600">Loading profile...</p>
 					</div>
 				</div>
-			</BuyerLayout>
+			</Layout>
 		);
 	}
 
 	if (error) {
 		return (
-			<BuyerLayout>
+			<Layout>
 				<div className="min-h-screen bg-gray-50 flex items-center justify-center">
 					<div className="text-center text-red-600">
 						<p className="text-lg font-semibold">Failed to load profile</p>
 						<p className="text-sm">Please try again later</p>
 					</div>
 				</div>
-			</BuyerLayout>
+			</Layout>
 		);
 	}
 
 	return (
-		<BuyerLayout>
+		<Layout>
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-6">
@@ -156,6 +163,66 @@ export default function Profile() {
 								</Button>
 							</div>
 						</div>
+
+						{/* Mode-specific Stats */}
+						<Card className="p-6">
+							<h2 className="text-xl font-semibold mb-4">
+								{userMode === "seller" ? "Seller Dashboard" : "Buyer Activity"}
+							</h2>
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+								{userMode === "seller" ? (
+									// Seller-specific stats
+									<>
+										<div className="text-center p-4 bg-blue-50 rounded-lg">
+											<Building2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+											<div className="text-2xl font-bold text-gray-900">
+												{(profile as any)?.properties?.length || 0}
+											</div>
+											<div className="text-sm text-gray-600">Properties Listed</div>
+										</div>
+										<div className="text-center p-4 bg-green-50 rounded-lg">
+											<TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-2" />
+											<div className="text-2xl font-bold text-gray-900">
+												{(profile as any)?.totalViews || 0}
+											</div>
+											<div className="text-sm text-gray-600">Total Property Views</div>
+										</div>
+										<div className="text-center p-4 bg-purple-50 rounded-lg">
+											<Crown className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+											<div className="text-2xl font-bold text-gray-900">
+												{(profile as any)?.plan || "Basic"}
+											</div>
+											<div className="text-sm text-gray-600">Current Plan</div>
+										</div>
+									</>
+								) : (
+									// Buyer-specific stats
+									<>
+										<div className="text-center p-4 bg-red-50 rounded-lg">
+											<User className="w-8 h-8 text-red-600 mx-auto mb-2" />
+											<div className="text-2xl font-bold text-gray-900">
+												{(profile as any)?.savedProperties?.length || 0}
+											</div>
+											<div className="text-sm text-gray-600">Saved Properties</div>
+										</div>
+										<div className="text-center p-4 bg-blue-50 rounded-lg">
+											<TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+											<div className="text-2xl font-bold text-gray-900">
+												{(profile as any)?.viewedProperties?.length || 0}
+											</div>
+											<div className="text-sm text-gray-600">Properties Viewed</div>
+										</div>
+										<div className="text-center p-4 bg-green-50 rounded-lg">
+											<Phone className="w-8 h-8 text-green-600 mx-auto mb-2" />
+											<div className="text-2xl font-bold text-gray-900">
+												{(profile as any)?.contactedOwners?.length || 0}
+											</div>
+											<div className="text-sm text-gray-600">Owners Contacted</div>
+										</div>
+									</>
+								)}
+							</div>
+						</Card>
 
 						{/* Profile Details */}
 						<Card className="p-6">
@@ -301,6 +368,6 @@ export default function Profile() {
 					</div>
 				</div>
 			</div>
-		</BuyerLayout>
+		</Layout>
 	);
 }

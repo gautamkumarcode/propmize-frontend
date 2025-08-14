@@ -6,8 +6,8 @@ const ProfilePage = dynamic(() => import("../../profile/Profile"), {
 	ssr: true,
 });
 
-const SellerProfileHOC = (props: Props) => {
+const BuyerProfileHOC = (props: Props) => {
 	return <ProfilePage />;
 };
 
-export default SellerProfileHOC;
+export default BuyerProfileHOC;

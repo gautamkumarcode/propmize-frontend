@@ -1,9 +1,11 @@
 "use client";
 
+import AuthModal from "@/components/custom/auth-modal/AuthModal";
+import Navbar from "@/components/custom/navbar/Navbar";
 import { useNavigation } from "@/hooks/useNavigation";
 import { iconMap } from "@/lib/routing/iconMap";
 import { sellerBottomNavItems, sellerNavItems } from "@/lib/routing/routes";
-import { Bell, Menu, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
@@ -14,41 +16,22 @@ interface SellerLayoutProps {
 
 const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [activeTab, setActiveTab] = useState<
+		"properties" | "chat" | "analytics"
+	>("properties");
 	const pathname = usePathname();
 	const navigation = useNavigation();
 
 	return (
 		<div className="min-h-screen bg-gray-50 pb-20">
-			{/* Header */}
-			<header className="bg-white shadow-sm border-b">
-				<div className="flex items-center justify-between px-4 py-3">
-					<div className="flex items-center">
-						<button
-							onClick={() => setSidebarOpen(true)}
-							className="p-2 rounded-md hover:bg-gray-100">
-							<Menu className="h-6 w-6 text-gray-600" />
-						</button>
-					</div>
-
-					<div className="flex-1 text-center">
-						<Link href="/seller" className="block">
-							<h1 className="text-xl font-bold text-gray-900">
-								E-State Platform
-							</h1>
-							<p className="text-sm text-gray-500">Seller Dashboard</p>
-						</Link>
-					</div>
-
-					<div className="flex items-center">
-						<button className="relative p-2 rounded-md hover:bg-gray-100">
-							<Bell className="h-6 w-6 text-gray-600" />
-							<span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-								5
-							</span>
-						</button>
-					</div>
-				</div>
-			</header>
+			{/* Enhanced Navbar */}
+			<Navbar
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
+				onShowAuthModal={() => setShowAuthModal(true)}
+				mode="seller"
+			/>
 
 			{/* Sidebar Overlay */}
 			{sidebarOpen && (
@@ -122,8 +105,8 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 			{/* Main Content */}
 			<main className="container mx-auto px-4 py-6">{children}</main>
 
-			{/* Bottom Navigation */}
-			<div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+			{/* Bottom Navigation - Mobile Only */}
+			<div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg md:hidden">
 				<div className="flex items-center justify-around py-2">
 					{sellerBottomNavItems.map((item) => {
 						const isActive = pathname === item.route.path;
@@ -157,6 +140,12 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 					})}
 				</div>
 			</div>
+
+			{/* Auth Modal */}
+			<AuthModal
+				isOpen={showAuthModal}
+				onClose={() => setShowAuthModal(false)}
+			/>
 		</div>
 	);
 };

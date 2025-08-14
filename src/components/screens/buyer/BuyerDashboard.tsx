@@ -3,13 +3,18 @@
 import BuyerLayout from "@/components/custom/layout/BuyerLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigation } from "@/hooks/useNavigation";
 import {
 	Bot,
+	Building,
+	Eye,
 	Filter,
 	Heart,
+	HelpCircle,
 	MessageSquare,
 	Search,
 	TrendingUp,
+	User,
 } from "lucide-react";
 import { useState } from "react";
 import AIAssistantPage from "../dashboard/AIAssistantPage";
@@ -18,6 +23,7 @@ export default function BuyerDashboard() {
 	const [showAIAssistant, setShowAIAssistant] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedType, setSelectedType] = useState<string>("all");
+	const navigation = useNavigation();
 
 	const propertyTypes = ["all", "apartment", "house", "villa", "commercial"];
 
@@ -50,15 +56,43 @@ export default function BuyerDashboard() {
 			title: "Saved Properties",
 			description: "View your bookmarked properties",
 			icon: Heart,
-			action: () => console.log("Saved properties"),
+			action: () => navigation.goToSaved(),
 			color: "bg-red-500 hover:bg-red-600",
 		},
 		{
-			title: "Chat with Owners",
-			description: "Direct communication with property owners",
-			icon: MessageSquare,
-			action: () => console.log("Chat"),
+			title: "Recently Viewed",
+			description: "See properties you viewed recently",
+			icon: Eye,
+			action: () => navigation.goToRecent(),
 			color: "bg-purple-500 hover:bg-purple-600",
+		},
+		{
+			title: "Contacted Owners",
+			description: "Properties where you contacted owners",
+			icon: MessageSquare,
+			action: () => navigation.goToContacted(),
+			color: "bg-indigo-500 hover:bg-indigo-600",
+		},
+		{
+			title: "New Projects",
+			description: "Latest projects in your city",
+			icon: Building,
+			action: () => navigation.goToNewProjects(),
+			color: "bg-orange-500 hover:bg-orange-600",
+		},
+		{
+			title: "My Profile",
+			description: "Manage your account and preferences",
+			icon: User,
+			action: () => navigation.goToProfile(),
+			color: "bg-gray-500 hover:bg-gray-600",
+		},
+		{
+			title: "Help & Support",
+			description: "Get help and support",
+			icon: HelpCircle,
+			action: () => navigation.goToSupport(),
+			color: "bg-teal-500 hover:bg-teal-600",
 		},
 	];
 
@@ -126,10 +160,20 @@ export default function BuyerDashboard() {
 
 				{/* Quick Actions */}
 				<div>
-					<h2 className="text-xl font-semibold text-gray-900 mb-4">
-						Quick Actions
-					</h2>
-					<div className="grid md:grid-cols-2 gap-4">
+					<div className="flex items-center justify-between mb-4">
+						<h2 className="text-xl font-semibold text-gray-900">
+							Quick Actions
+						</h2>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => navigation.navigateTo("/navigation")}
+							className="text-blue-600 border-blue-300 hover:bg-blue-50">
+							<Search className="h-4 w-4 mr-2" />
+							View All Pages
+						</Button>
+					</div>
+					<div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 						{quickActions.map((action, index) => {
 							const IconComponent = action.icon;
 							return (
@@ -145,12 +189,12 @@ export default function BuyerDashboard() {
 												className={`p-2 rounded-lg ${action.color} text-white`}>
 												<IconComponent className="h-6 w-6" />
 											</div>
-											<div>
+											<div className="flex-1">
 												<CardTitle className="text-lg">
 													{action.title}
 												</CardTitle>
 												{action.featured && (
-													<span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
+													<span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full mt-1 inline-block">
 														✨ Featured
 													</span>
 												)}
