@@ -25,8 +25,9 @@ const publicRoutes = ["/", "/guide", "/support", "/new-projects"];
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
-	// Check if the user is authenticated (you might want to check cookies/tokens here)
+	// Check if the user is authenticated (check for the actual token cookie that backend sets)
 	const isAuthenticated =
+		request.cookies.has("token") ||
 		request.cookies.has("auth-token") ||
 		request.cookies.has("next-auth.session-token");
 

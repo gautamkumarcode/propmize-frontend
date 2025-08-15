@@ -1,8 +1,7 @@
 import NewProjectsHOC from "@/components/screens/new-projects/NewProjectsHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+const page = () => {
 	return <NewProjectsHOC />;
 };
 

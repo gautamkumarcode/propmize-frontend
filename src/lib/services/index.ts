@@ -1,7 +1,6 @@
 // Export all services
 export { AnalyticsService } from "./analyticsService";
 export { AuthService } from "./authService";
-export { ChatService } from "./chatService";
 export { LeadService } from "./leadService";
 export { NotificationService } from "./notificationService";
 export { PaymentService } from "./paymentService";
@@ -11,7 +10,6 @@ export { UserService } from "./userService";
 
 // Re-export types from services
 export type { AnalyticsData } from "./analyticsService";
-export type { Conversation, Message } from "./chatService";
 export type {
 	Notification,
 	NotificationPreferences,
@@ -23,3 +21,4 @@ export type {
 	SupportResponse,
 	SupportTicket,
 } from "./supportService";
+

@@ -230,8 +230,6 @@ export const initializeServices = () => {
 			credentials: JSON.parse(config.googleCloud.serviceAccountKey || "{}"),
 		});
 	}
-
-	console.log("Services initialized:", Object.keys(services));
 };
 
 // Export services for use throughout the application

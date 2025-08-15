@@ -1,8 +1,8 @@
 import SavedHOC from "@/components/screens/saved/SavedHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+
+const page = () => {
 	return <SavedHOC />;
 };
 

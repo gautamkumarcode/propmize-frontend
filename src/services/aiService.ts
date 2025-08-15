@@ -1,172 +1,165 @@
-// AI Response Service
-export interface PropertySuggestion {
-	id: string;
-	title: string;
-	location: string;
-	price: number;
-	beds: number;
-	baths: number;
-	area: string;
-	type: string;
-	image: string;
-}
-
+// AI Service Types and Interfaces for Frontend
 export interface ChatMessage {
 	id: string;
 	content: string;
 	sender: "user" | "ai";
 	timestamp: Date;
-	isPropertySuggestion?: boolean;
-	properties?: PropertySuggestion[];
+	suggestions?: string[];
+	propertyInfo?: PropertyInfo[];
+	actions?: {
+		type: string;
+		label: string;
+		value?: string;
+		data?: Record<string, unknown>;
+	}[];
+	aiMetadata?: {
+		model?: string;
+		tokensUsed?: number;
+		responseTime?: number;
+		confidence?: number;
+	};
 }
 
-export const generateAIResponse = (query: string): ChatMessage => {
-	const lowerQuery = query.toLowerCase();
+export interface PropertyInfo {
+	id: string;
+	title: string;
+	price: string;
+	location: string;
+	type: string;
+	size: string;
+	image: string;
+}
 
-	// Sample property data
-	const propertyDatabase = {
-		apartments: [
-			{
-				id: "1",
-				title: "Modern 2BHK in Tech Park Vicinity",
-				location: "Whitefield, Bangalore",
-				price: 4500000,
-				beds: 2,
-				baths: 2,
-				area: "1,200 sq ft",
-				type: "Apartment",
-				image: "/api/placeholder/300/200",
-			},
-			{
-				id: "2",
-				title: "Luxury 2BHK with Amenities",
-				location: "Electronic City, Bangalore",
-				price: 3800000,
-				beds: 2,
-				baths: 2,
-				area: "1,100 sq ft",
-				type: "Apartment",
-				image: "/api/placeholder/300/200",
-			},
-		],
-		investment: [
-			{
-				id: "3",
-				title: "Pre-Launch Premium Project",
-				location: "Gurgaon Sector 83",
-				price: 8500000,
-				beds: 3,
-				baths: 3,
-				area: "1,800 sq ft",
-				type: "Investment",
-				image: "/api/placeholder/300/200",
-			},
-		],
-		commercial: [
-			{
-				id: "4",
-				title: "Premium Office Space",
-				location: "Bandra Kurla Complex, Mumbai",
-				price: 25000000,
-				beds: 0,
-				baths: 2,
-				area: "2,500 sq ft",
-				type: "Commercial",
-				image: "/api/placeholder/300/200",
-			},
-		],
+export interface PropertySuggestion {
+	id: string;
+	title: string;
+	price: number;
+	location:
+		| string
+		| {
+				city?: string;
+				area?: string;
+		  };
+	type: string;
+	area?: string;
+	size?: string;
+	images?: string[];
+	image?: string;
+}
+
+export interface AISearchFilters {
+	minPrice?: number;
+	maxPrice?: number;
+	bedrooms?: number;
+	bathrooms?: number;
+	propertyType?: string;
+	location?: string;
+	amenities?: string[];
+}
+
+export interface AISearchResult {
+	properties: PropertySuggestion[];
+	aiResponse: string;
+	suggestions: string[];
+	totalResults: number;
+	searchId?: string;
+	metadata?: {
+		searchDuration: number;
+		filters: AISearchFilters;
+		source: string;
+		confidence: number;
 	};
+}
 
-	// Apartment/2BHK queries
-	if (lowerQuery.includes("2bhk") || lowerQuery.includes("apartment")) {
-		return {
-			id: Date.now().toString(),
-			content:
-				"I found some excellent 2BHK apartments that match your criteria! Here are the top recommendations:",
-			sender: "ai",
-			timestamp: new Date(),
-			isPropertySuggestion: true,
-			properties: propertyDatabase.apartments,
-		};
-	}
-
-	// Investment queries
-	if (lowerQuery.includes("investment") || lowerQuery.includes("invest")) {
-		return {
-			id: Date.now().toString(),
-			content:
-				"Based on market trends and growth potential, here are the best investment opportunities in your preferred locations:",
-			sender: "ai",
-			timestamp: new Date(),
-			isPropertySuggestion: true,
-			properties: propertyDatabase.investment,
-		};
-	}
-
-	// Commercial queries
-	if (lowerQuery.includes("commercial") || lowerQuery.includes("office")) {
-		return {
-			id: Date.now().toString(),
-			content:
-				"I've found some prime commercial properties perfect for your business needs:",
-			sender: "ai",
-			timestamp: new Date(),
-			isPropertySuggestion: true,
-			properties: propertyDatabase.commercial,
-		};
-	}
-
-	// Budget queries
-	if (
-		lowerQuery.includes("under") ||
-		lowerQuery.includes("budget") ||
-		lowerQuery.includes("cr") ||
-		lowerQuery.includes("lakh")
-	) {
-		return {
-			id: Date.now().toString(),
-			content:
-				"I'll help you find properties within your budget. Here are some great options that match your price range:",
-			sender: "ai",
-			timestamp: new Date(),
-			isPropertySuggestion: true,
-			properties: propertyDatabase.apartments,
-		};
-	}
-
-	// Location-based queries
-	if (
-		lowerQuery.includes("bangalore") ||
-		lowerQuery.includes("mumbai") ||
-		lowerQuery.includes("delhi") ||
-		lowerQuery.includes("gurgaon")
-	) {
-		return {
-			id: Date.now().toString(),
-			content:
-				"I've found some excellent properties in your preferred location. Here are the top recommendations:",
-			sender: "ai",
-			timestamp: new Date(),
-			isPropertySuggestion: true,
-			properties: [
-				...propertyDatabase.apartments,
-				...propertyDatabase.investment,
-			],
-		};
-	}
-
-	// Generic response
-	return {
-		id: Date.now().toString(),
-		content: `I understand you're looking for "${query}". Let me analyze your requirements and search our extensive property database. Based on current market trends and your preferences, I can help you find the perfect property. Would you like me to show you some specific options, or would you prefer to refine your search criteria first?`,
-		sender: "ai",
-		timestamp: new Date(),
-		isPropertySuggestion: false,
+export interface AIConversationContext {
+	propertySearch?: {
+		location?: string;
+		priceRange?: { min: number; max: number };
+		propertyType?: string;
+		bedrooms?: number;
+		bathrooms?: number;
+		amenities?: string[];
 	};
+	userPreferences?: {
+		budget?: number;
+		preferredLocations?: string[];
+		propertyTypes?: string[];
+		mustHaveAmenities?: string[];
+	};
+	conversationType?:
+		| "property-search"
+		| "general-inquiry"
+		| "recommendation"
+		| "support";
+}
+
+// Utility functions for AI service
+export const formatCurrency = (amount: number): string => {
+	if (amount >= 10000000) {
+		return `₹${(amount / 10000000).toFixed(1)} Cr`;
+	} else if (amount >= 100000) {
+		return `₹${(amount / 100000).toFixed(1)} L`;
+	} else {
+		return `₹${amount.toLocaleString()}`;
+	}
 };
 
-export const simulateTypingDelay = (): Promise<void> => {
-	return new Promise((resolve) => {
-		setTimeout(resolve, 1500 + Math.random() * 1000); // 1.5-2.5 seconds
-	});
+export const extractSearchIntent = (
+	message: string
+): {
+	location?: string;
+	budget?: { min?: number; max?: number };
+	propertyType?: string;
+	bedrooms?: number;
+} => {
+	const result: {
+		location?: string;
+		budget?: { min?: number; max?: number };
+		propertyType?: string;
+		bedrooms?: number;
+	} = {};
+
+	// Extract location
+	const locationRegex =
+		/\b(mumbai|delhi|bangalore|chennai|kolkata|hyderabad|pune|ahmedabad|gurgaon|noida|thane|bandra|andheri|powai|worli)\b/gi;
+	const locationMatch = message.match(locationRegex);
+	if (locationMatch) {
+		result.location = locationMatch[0].toLowerCase();
+	}
+
+	// Extract budget
+	const budgetRegex = /(\d+)\s*(lakh|crore|l|cr)/gi;
+	const budgetMatch = message.match(budgetRegex);
+	if (budgetMatch) {
+		const amount = parseFloat(budgetMatch[0]);
+		const unit = budgetMatch[0].toLowerCase();
+		if (unit.includes("cr")) {
+			result.budget = { max: amount * 10000000 };
+		} else if (unit.includes("l")) {
+			result.budget = { max: amount * 100000 };
+		}
+	}
+
+	// Extract property type
+	if (/\b(apartment|flat)\b/gi.test(message)) {
+		result.propertyType = "apartment";
+	} else if (/\b(villa|house)\b/gi.test(message)) {
+		result.propertyType = "villa";
+	} else if (/\b(office|commercial)\b/gi.test(message)) {
+		result.propertyType = "commercial";
+	}
+
+	// Extract bedrooms
+	const bedroomRegex = /(\d+)\s*(bhk|bedroom)/gi;
+	const bedroomMatch = message.match(bedroomRegex);
+	if (bedroomMatch) {
+		result.bedrooms = parseInt(bedroomMatch[0]);
+	}
+
+	return result;
+};
+
+export default {
+	formatCurrency,
+	extractSearchIntent,
 };

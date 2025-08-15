@@ -8,6 +8,28 @@ import {
 } from "../../types/api";
 import { QueryKeys } from "../queryClient";
 
+// Define proper error interface for HTTP errors
+interface HttpError {
+	response?: {
+		status: number;
+		data?: {
+			message?: string;
+			error?: string;
+		};
+	};
+	message?: string;
+}
+
+// Type guard to check if error is an HttpError
+function isHttpError(error: unknown): error is HttpError {
+	return (
+		typeof error === 'object' &&
+		error !== null &&
+		'response' in error &&
+		typeof (error as HttpError).response?.status === 'number'
+	);
+}
+
 export const useLogin = () => {
 	const queryClient = useQueryClient();
 
@@ -54,11 +76,11 @@ export const useLogin = () => {
 				);
 			}, 500);
 		},
-		onError: (error: any) => {
-			console.error(
-				"Login failed:",
-				error.response?.data?.message || "Login failed"
-			);
+		onError: (error: unknown) => {
+			const errorMessage = isHttpError(error) && error.response?.data?.message
+				? error.response.data.message
+				: "Login failed";
+			console.error("Login failed:", errorMessage);
 			console.error("Full error:", error);
 		},
 	});
@@ -83,11 +105,11 @@ export const useRegister = () => {
 			// Force refetch of profile to ensure UI updates
 			queryClient.refetchQueries({ queryKey: QueryKeys.profile });
 		},
-		onError: (error: any) => {
-			console.error(
-				"Registration failed:",
-				error.response?.data?.message || "Registration failed"
-			);
+		onError: (error: unknown) => {
+			const errorMessage = isHttpError(error) && error.response?.data?.message
+				? error.response.data.message
+				: "Registration failed";
+			console.error("Registration failed:", errorMessage);
 		},
 	});
 };
@@ -103,7 +125,7 @@ export const useLogout = () => {
 
 			console.log("Successfully logged out");
 		},
-		onError: (error: any) => {
+		onError: (error: unknown) => {
 			console.error("Logout failed");
 			// Still clear cache even if API call fails
 			queryClient.clear();
@@ -132,13 +154,13 @@ export const useProfile = () => {
 			return data.data;
 		},
 		staleTime: 5 * 60 * 1000, // 5 minutes (reduced from 10)
-		retry: (failureCount, error: any) => {
+		retry: (failureCount, error: unknown) => {
 			console.log("Profile query retry:", {
 				failureCount,
-				error: error?.response?.status,
+				error: isHttpError(error) ? error.response?.status : 'Unknown error',
 			});
 			// Don't retry if it's an auth error (401/403)
-			if (error?.response?.status === 401 || error?.response?.status === 403) {
+			if (isHttpError(error) && (error.response?.status === 401 || error.response?.status === 403)) {
 				return false;
 			}
 			return failureCount < 2; // Retry up to 2 times for other errors
@@ -152,10 +174,11 @@ export const useForgotPassword = () => {
 		onSuccess: () => {
 			console.log("Password reset link sent to your email");
 		},
-		onError: (error: any) => {
-			console.error(
-				error.response?.data?.message || "Failed to send reset link"
-			);
+		onError: (error: unknown) => {
+			const errorMessage = isHttpError(error) && error.response?.data?.message
+				? error.response.data.message
+				: "Failed to send reset link";
+			console.error(errorMessage);
 		},
 	});
 };

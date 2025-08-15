@@ -19,7 +19,16 @@ export interface AIChatMessage {
 			| "request-info"
 			| "save-property"
 			| "contact-agent";
-		data: any;
+		data: {
+			propertyId?: string;
+			scheduledTime?: string;
+			contactInfo?: {
+				name?: string;
+				phone?: string;
+				email?: string;
+			};
+			message?: string;
+		};
 	}>;
 	feedback?: {
 		rating: 1 | 2 | 3 | 4 | 5;
@@ -80,7 +89,12 @@ export interface AIChat {
 				| "viewing-scheduled"
 				| "contact-made";
 			timestamp: string;
-			data?: any;
+			data?: {
+				propertyId?: string;
+				leadId?: string;
+				contactMethod?: string;
+				scheduledTime?: string;
+			};
 		}>;
 	};
 	isActive: boolean;
@@ -129,6 +143,8 @@ export interface PropertySuggestion {
 	area?: string;
 	images?: string[];
 	image?: string;
+
+	size?: string; // Added size property to fix the error
 }
 
 export interface AISearchQuery {
@@ -149,7 +165,17 @@ export interface AISearchResponse {
 	suggestions: string[];
 	totalResults: number;
 	metadata?: {
-		searchQuery?: any;
+		searchQuery?: {
+			query: string;
+			filters?: {
+				minPrice?: number;
+				maxPrice?: number;
+				propertyType?: string;
+				location?: string;
+				bedrooms?: number;
+				bathrooms?: number;
+			};
+		};
 		avgPrice?: number;
 		topLocations?: string[];
 	};

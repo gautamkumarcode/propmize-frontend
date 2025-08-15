@@ -1,8 +1,7 @@
 import RecentHOC from "@/components/screens/recent/RecentHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+const page = () => {
 	return <RecentHOC />;
 };
 

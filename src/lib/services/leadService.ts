@@ -124,7 +124,7 @@ export class LeadService {
 	/**
 	 * Delete a lead
 	 */
-	static async deleteLead(leadId: string): Promise<ApiResponse> {
+	static async deleteLead(leadId: string): Promise<ApiResponse<Lead>> {
 		const response = await apiClient.delete(`/leads/${leadId}`);
 		return response.data;
 	}
@@ -137,7 +137,7 @@ export class LeadService {
 			period?: "week" | "month" | "quarter" | "year";
 			propertyId?: string;
 		} = {}
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<unknown>> {
 		const params = new URLSearchParams();
 
 		Object.entries(filters).forEach(([key, value]) => {

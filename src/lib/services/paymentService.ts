@@ -117,7 +117,7 @@ export class PaymentService {
 	/**
 	 * Cancel a pending payment
 	 */
-	static async cancelPayment(paymentId: string): Promise<ApiResponse> {
+	static async cancelPayment(paymentId: string): Promise<ApiResponse<Payment>> {
 		const response = await apiClient.post(`/payments/${paymentId}/cancel`);
 		return response.data;
 	}
@@ -153,7 +153,7 @@ export class PaymentService {
 	static async requestRefund(
 		paymentId: string,
 		reason: string
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<Payment>> {
 		const response = await apiClient.post(`/payments/${paymentId}/refund`, {
 			reason,
 		});

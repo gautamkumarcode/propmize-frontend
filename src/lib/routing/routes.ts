@@ -24,8 +24,8 @@ export const routes: Record<string, Route> = {
 		layout: "public",
 		protected: false,
 	},
-	buyerDashboard: {
-		path: "/buyer/dashboard",
+	buyerAssistant: {
+		path: "/buyer/assistant",
 		name: "Dashboard",
 		description: "Buyer dashboard with AI assistant",
 		layout: "buyer",
@@ -40,13 +40,7 @@ export const routes: Record<string, Route> = {
 	},
 
 	// Buyer routes
-	profile: {
-		path: "/profile",
-		name: "My Profile",
-		description: "User profile and account settings",
-		layout: "buyer",
-		protected: true,
-	},
+
 	buyerProfile: {
 		path: "/buyer/profile",
 		name: "Buyer Profile",
@@ -200,7 +194,7 @@ export const getPublicRoutes = (): Route[] => {
 
 // Navigation items for different layouts
 export const buyerNavItems: NavigationItem[] = [
-	{ route: routes.buyerDashboard, icon: "Home" },
+	{ route: routes.buyerAssistant, icon: "Home" },
 	// { route: routes.buyerProfile, icon: "User" },
 	{
 		route: {
@@ -234,7 +228,7 @@ export const sellerNavItems: NavigationItem[] = [
 	// { route: routes.sellerProfile, icon: "User" },
 	{
 		route: {
-			path: "/buyer/dashboard",
+			path: "/buyer/assistant",
 			name: "Switch to Buyer Dashboard",
 			description: "Switch mode",
 			layout: "seller",
@@ -266,9 +260,9 @@ export const sellerBottomNavItems: NavigationItem[] = [
 ];
 
 export const buyerBottomNavItems: NavigationItem[] = [
-	{ route: routes.buyerDashboard, icon: "Home" },
+	{ route: routes.buyerAssistant, icon: "Home" },
 	{ route: routes.saved, icon: "Heart" },
 	{ route: routes.aiAssistant, icon: "MessageSquare", isHighlighted: true },
 	{ route: routes.newProjects, icon: "Building" },
-	{ route: routes.profile, icon: "User" },
+	{ route: routes.buyerProfile, icon: "User" },
 ];

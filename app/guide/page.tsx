@@ -1,8 +1,8 @@
 import GuideHOC from "@/components/screens/guide/GuideHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+
+const page = () => {
 	return <GuideHOC />;
 };
 

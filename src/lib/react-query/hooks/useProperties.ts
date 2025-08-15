@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { PropertyService } from "../../services/propertyService";
-import { useSocket } from "../../socket/mockSocketContext";
+import { useSocket } from "../../socket/socketContext";
 import {
 	ApiResponse,
 	Property,
@@ -14,6 +14,28 @@ import {
 	PropertyFilters,
 } from "../../types/api";
 import { QueryKeys } from "../queryClient";
+
+// Define proper error interface for HTTP errors
+interface HttpError {
+	response?: {
+		status: number;
+		data?: {
+			message?: string;
+			error?: string;
+		};
+	};
+	message?: string;
+}
+
+// Type guard to check if error is an HttpError
+function isHttpError(error: unknown): error is HttpError {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"response" in error &&
+		typeof (error as HttpError).response?.status === "number"
+	);
+}
 
 // Get all properties with filters
 export const useProperties = (filters: PropertyFilters = {}) => {
@@ -111,7 +133,10 @@ export const useSearchProperties = (
 	filters: PropertyFilters = {}
 ) => {
 	return useQuery({
-		queryKey: QueryKeys.searchProperties(query, filters),
+		queryKey: QueryKeys.searchProperties(
+			query,
+			filters as Record<string, unknown>
+		),
 		queryFn: () => PropertyService.searchProperties(query, filters),
 		select: (data) => data.data,
 		enabled: !!query,
@@ -139,13 +164,13 @@ export const useCreateProperty = () => {
 			// Invalidate and refetch
 			queryClient.invalidateQueries({ queryKey: QueryKeys.properties });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myProperties });
-
-			console.log("Property created successfully!");
 		},
-		onError: (error: any) => {
+		onError: (error: unknown) => {
 			console.error(
 				"Failed to create property:",
-				error.response?.data?.message
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
 			);
 		},
 	});
@@ -166,7 +191,8 @@ export const useUpdateProperty = () => {
 			// Update the specific property in cache
 			queryClient.setQueryData(
 				QueryKeys.property(variables.id),
-				(old: any) => ({ ...old, data: data.data })
+				(old: ApiResponse<Property> | undefined) =>
+					old ? { ...old, data: data.data } : data
 			);
 
 			// Invalidate related queries
@@ -175,10 +201,12 @@ export const useUpdateProperty = () => {
 
 			console.log("Property updated successfully!");
 		},
-		onError: (error: any) => {
+		onError: (error: unknown) => {
 			console.error(
 				"Failed to update property:",
-				error.response?.data?.message
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
 			);
 		},
 	});
@@ -200,10 +228,12 @@ export const useDeleteProperty = () => {
 
 			console.log("Property deleted successfully!");
 		},
-		onError: (error: any) => {
+		onError: (error: unknown) => {
 			console.error(
 				"Failed to delete property:",
-				error.response?.data?.message
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
 			);
 		},
 	});
@@ -221,8 +251,13 @@ export const useToggleLike = () => {
 			// You might also want to update the property's like count in the cache
 			console.log("Property like toggled successfully!");
 		},
-		onError: (error: any) => {
-			console.error("Failed to toggle like:", error.response?.data?.message);
+		onError: (error: unknown) => {
+			console.error(
+				"Failed to toggle like:",
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
+			);
 		},
 	});
 };
@@ -239,10 +274,12 @@ export const useReportProperty = () => {
 		onSuccess: () => {
 			console.log("Property reported successfully!");
 		},
-		onError: (error: any) => {
+		onError: (error: unknown) => {
 			console.error(
 				"Failed to report property:",
-				error.response?.data?.message
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
 			);
 		},
 	});
@@ -269,21 +306,27 @@ export function useRealTimeProperties() {
 			setUpdatedProperty(property);
 
 			// Update specific property in cache
-			queryClient.setQueryData(["property", property._id], (old: any) => {
-				if (!old) return old;
-				return { ...old, data: property };
-			});
+			queryClient.setQueryData(
+				["property", property._id],
+				(old: ApiResponse<Property> | undefined) => {
+					if (!old) return old;
+					return { ...old, data: property };
+				}
+			);
 
 			// Update property in all lists
-			queryClient.setQueriesData({ queryKey: ["properties"] }, (old: any) => {
-				if (!old) return old;
-				return {
-					...old,
-					data: old.data.map((p: Property) =>
-						p._id === property._id ? property : p
-					),
-				};
-			});
+			queryClient.setQueriesData(
+				{ queryKey: ["properties"] },
+				(old: ApiResponse<Property[]> | undefined) => {
+					if (!old) return old;
+					return {
+						...old,
+						data: old.data.map((p: Property) =>
+							p._id === property._id ? property : p
+						),
+					};
+				}
+			);
 		};
 
 		const handlePropertyDeleted = (propertyId: string) => {
@@ -291,13 +334,16 @@ export function useRealTimeProperties() {
 			queryClient.removeQueries({ queryKey: ["property", propertyId] });
 
 			// Update all lists to remove deleted property
-			queryClient.setQueriesData({ queryKey: ["properties"] }, (old: any) => {
-				if (!old) return old;
-				return {
-					...old,
-					data: old.data.filter((p: Property) => p._id !== propertyId),
-				};
-			});
+			queryClient.setQueriesData(
+				{ queryKey: ["properties"] },
+				(old: ApiResponse<Property[]> | undefined) => {
+					if (!old) return old;
+					return {
+						...old,
+						data: old.data.filter((p: Property) => p._id !== propertyId),
+					};
+				}
+			);
 		};
 
 		socket.on("property:created", handleNewProperty);

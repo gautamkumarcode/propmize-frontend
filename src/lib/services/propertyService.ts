@@ -111,7 +111,7 @@ export class PropertyService {
 	/**
 	 * Delete a property
 	 */
-	static async deleteProperty(id: string): Promise<ApiResponse> {
+	static async deleteProperty(id: string): Promise<ApiResponse<Property>> {
 		const response = await apiClient.delete(`/properties/${id}`);
 		return response.data;
 	}
@@ -192,7 +192,7 @@ export class PropertyService {
 	/**
 	 * Like/Unlike a property
 	 */
-	static async toggleLike(propertyId: string): Promise<ApiResponse> {
+	static async toggleLike(propertyId: string): Promise<ApiResponse<Property>> {
 		const response = await apiClient.post(`/properties/${propertyId}/like`);
 		return response.data;
 	}
@@ -211,7 +211,7 @@ export class PropertyService {
 	static async reportProperty(
 		propertyId: string,
 		reason: string
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<Property>> {
 		const response = await apiClient.post(`/properties/${propertyId}/report`, {
 			reason,
 		});
@@ -221,7 +221,7 @@ export class PropertyService {
 	/**
 	 * Get property analytics (for sellers)
 	 */
-	static async getPropertyAnalytics(propertyId: string): Promise<ApiResponse> {
+	static async getPropertyAnalytics(propertyId: string): Promise<ApiResponse<unknown>> {
 		const response = await apiClient.get(`/properties/${propertyId}/analytics`);
 		return response.data;
 	}

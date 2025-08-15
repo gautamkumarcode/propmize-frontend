@@ -43,7 +43,7 @@ export class UserService {
 	static async changePassword(
 		currentPassword: string,
 		newPassword: string
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<unknown>> {
 		const response = await apiClient.put("/users/change-password", {
 			currentPassword,
 			newPassword,
@@ -54,7 +54,7 @@ export class UserService {
 	/**
 	 * Delete account
 	 */
-	static async deleteAccount(password: string): Promise<ApiResponse> {
+	static async deleteAccount(password: string): Promise<ApiResponse<unknown>> {
 		const response = await apiClient.delete("/users/profile", {
 			data: { password },
 		});
@@ -64,7 +64,7 @@ export class UserService {
 	/**
 	 * Get user statistics (for sellers)
 	 */
-	static async getUserStats(): Promise<ApiResponse> {
+	static async getUserStats(): Promise<ApiResponse<unknown>> {
 		const response = await apiClient.get("/users/stats");
 		return response.data;
 	}
@@ -72,7 +72,7 @@ export class UserService {
 	/**
 	 * Get user's activity feed
 	 */
-	static async getActivityFeed(): Promise<ApiResponse> {
+	static async getActivityFeed(): Promise<ApiResponse<unknown>> {
 		const response = await apiClient.get("/users/activity");
 		return response.data;
 	}
@@ -85,7 +85,7 @@ export class UserService {
 		sms: boolean;
 		push: boolean;
 		marketing: boolean;
-	}): Promise<ApiResponse> {
+	}): Promise<ApiResponse<unknown>> {
 		const response = await apiClient.put("/users/notifications", preferences);
 		return response.data;
 	}

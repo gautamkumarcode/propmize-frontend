@@ -1,5 +1,27 @@
 import { QueryClient } from "@tanstack/react-query";
 
+// Define proper error interface for HTTP errors
+interface HttpError {
+	response?: {
+		status: number;
+		data?: {
+			message?: string;
+			error?: string;
+		};
+	};
+	message?: string;
+}
+
+// Type guard to check if error is an HttpError
+function isHttpError(error: unknown): error is HttpError {
+	return (
+		typeof error === 'object' &&
+		error !== null &&
+		'response' in error &&
+		typeof (error as HttpError).response?.status === 'number'
+	);
+}
+
 // Create query client with default options
 export const queryClient = new QueryClient({
 	defaultOptions: {
@@ -8,20 +30,40 @@ export const queryClient = new QueryClient({
 			staleTime: 5 * 60 * 1000,
 			// 10 minutes garbage collection time
 			gcTime: 10 * 60 * 1000, // formerly cacheTime
-			// Retry failed requests 3 times
-			retry: 3,
-			// Retry with exponential backoff
-			retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+			// Reduce retries to prevent rate limiting
+			retry: (failureCount: number, error: unknown) => {
+				// Don't retry rate limit errors
+				if (isHttpError(error) && error.response?.status === 429) return false;
+				// Don't retry client errors (4xx)
+				if (isHttpError(error) && error.response?.status && 
+					error.response.status >= 400 && 
+					error.response.status < 500
+				) return false;
+				// Only retry server errors up to 1 time
+				return failureCount < 1;
+			},
+			// Increase retry delay to prevent rapid requests
+			retryDelay: (attemptIndex: number) =>
+				Math.min(3000 * 2 ** attemptIndex, 30000), // Increased base delay from 2000 to 3000
 			// Don't refetch on window focus in development
-			refetchOnWindowFocus: process.env.NODE_ENV === "production",
+			refetchOnWindowFocus: false, // Disabled to reduce API calls
 			// Don't refetch on reconnect by default
-			refetchOnReconnect: true,
+			refetchOnReconnect: false, // Disabled to reduce API calls
 		},
 		mutations: {
-			// Retry mutations once
-			retry: 1,
-			// Retry after 1 second
-			retryDelay: 1000,
+			// Don't retry mutations to prevent duplicate requests
+			retry: (failureCount: number, error: unknown) => {
+				// Never retry rate limit errors
+				if (isHttpError(error) && error.response?.status === 429) return false;
+				// Never retry client errors
+				if (isHttpError(error) && error.response?.status && 
+					error.response.status >= 400 && 
+					error.response.status < 500
+				) return false;
+				return false; // Don't retry mutations by default
+			},
+			// Longer delay for mutations
+			retryDelay: 3000,
 		},
 	},
 });
@@ -43,12 +85,10 @@ export const QueryKeys = {
 		state
 			? ["properties", "location", city, state]
 			: ["properties", "location", city],
-	searchProperties: (query: string, filters?: any) => [
-		"properties",
-		"search",
-		query,
-		filters,
-	],
+	searchProperties: (
+		query: string,
+		filters?: Record<string, unknown> | null
+	) => ["properties", "search", query, filters],
 	propertyAnalytics: (id: string, period?: string) =>
 		period
 			? ["properties", id, "analytics", period]
@@ -76,6 +116,12 @@ export const QueryKeys = {
 	messages: (conversationId: string) =>
 		["chat", "messages", conversationId] as const,
 	unreadCount: ["chat", "unread-count"] as const,
+
+	// AI Chat
+	aiChats: ["ai-chats"] as const,
+	aiChat: (id: string) => ["ai-chat", id] as const,
+	aiChatAnalytics: (id: string) => ["ai-chat-analytics", id] as const,
+	aiPropertySearch: ["ai-property-search"] as const,
 
 	// Payments
 	payments: ["payments"] as const,

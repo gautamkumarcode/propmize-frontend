@@ -48,7 +48,7 @@ export class AuthService {
 	/**
 	 * User logout
 	 */
-	static async logout(): Promise<ApiResponse> {
+	static async logout(): Promise<ApiResponse<null>> {
 		try {
 			await apiClient.post("/auth/logout");
 		} catch (error) {
@@ -68,7 +68,14 @@ export class AuthService {
 	static async refreshToken(): Promise<ApiResponse<{ accessToken: string }>> {
 		const refreshToken = safeLocalStorage.getItem("refreshToken");
 
-		if (!refreshToken) {
+		if (
+			!refreshToken ||
+			refreshToken === "null" ||
+			refreshToken === "undefined"
+		) {
+			// Clean up invalid tokens
+			safeLocalStorage.removeItem("accessToken");
+			safeLocalStorage.removeItem("refreshToken");
 			throw new Error("No refresh token available");
 		}
 
@@ -94,7 +101,7 @@ export class AuthService {
 	/**
 	 * Forgot password
 	 */
-	static async forgotPassword(email: string): Promise<ApiResponse> {
+	static async forgotPassword(email: string): Promise<ApiResponse<null>> {
 		const response = await apiClient.post("/auth/forgot-password", { email });
 		return response.data;
 	}
@@ -105,7 +112,7 @@ export class AuthService {
 	static async resetPassword(
 		token: string,
 		password: string
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<null>	> {
 		const response = await apiClient.post("/auth/reset-password", {
 			token,
 			password,
@@ -116,7 +123,7 @@ export class AuthService {
 	/**
 	 * Verify email
 	 */
-	static async verifyEmail(token: string): Promise<ApiResponse> {
+	static async verifyEmail(token: string): Promise<ApiResponse<null>> {
 		const response = await apiClient.post("/auth/verify-email", { token });
 		return response.data;
 	}
@@ -124,7 +131,7 @@ export class AuthService {
 	/**
 	 * Resend verification email
 	 */
-	static async resendVerification(): Promise<ApiResponse> {
+	static async resendVerification(): Promise<ApiResponse<null>> {
 		const response = await apiClient.post("/auth/resend-verification");
 		return response.data;
 	}
@@ -134,18 +141,27 @@ export class AuthService {
 	 */
 	static isAuthenticated(): boolean {
 		const token = safeLocalStorage.getItem("accessToken");
+		const hasValidToken = !!token && token !== "null" && token !== "undefined";
+
+		// Clean up invalid tokens
+		if (!hasValidToken && token) {
+			safeLocalStorage.removeItem("accessToken");
+			safeLocalStorage.removeItem("refreshToken");
+		}
+
 		console.log("AuthService.isAuthenticated check:", {
-			hasToken: !!token,
-			token: token ? token.substring(0, 20) + "..." : "null",
+			hasToken: hasValidToken,
+			token: hasValidToken ? token.substring(0, 20) + "..." : token,
 		});
-		return !!token;
+		return hasValidToken;
 	}
 
 	/**
 	 * Get stored access token
 	 */
 	static getAccessToken(): string | null {
-		return safeLocalStorage.getItem("accessToken");
+		const token = safeLocalStorage.getItem("accessToken");
+		return token && token !== "null" && token !== "undefined" ? token : null;
 	}
 
 	/**

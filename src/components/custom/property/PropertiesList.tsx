@@ -2,15 +2,17 @@
 
 import { Loader2 } from "lucide-react";
 import {
-    useInfiniteProperties,
-    useRealTimeProperties,
+	useInfiniteProperties,
+	useRealTimeProperties,
 } from "../../../lib/react-query/hooks/useProperties";
 import { Property } from "../../../types";
 import { Button } from "../../ui/button";
 import PropertyCard from "./PropertyCard";
 
 interface PropertiesListProps {
-	filters?: any;
+	filters?: {
+		[key: string]: any;
+	};
 	className?: string;
 	showLoadMore?: boolean;
 }
@@ -121,7 +123,7 @@ export default function PropertiesList({
 			{!hasNextPage && properties.length > 0 && (
 				<div className="text-center py-8">
 					<p className="text-gray-500 text-sm">
-						You've reached the end of the properties list
+						You&apos;ve reached the end of the properties list
 					</p>
 				</div>
 			)}

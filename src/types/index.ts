@@ -110,7 +110,7 @@ export interface Notification {
 	title: string;
 	message: string;
 	isRead: boolean;
-	metadata?: any;
+	metadata?: NotificationMetadata;
 	createdAt: Date;
 }
 
@@ -248,4 +248,47 @@ export interface PropertyState {
 	filters: PropertyFilters;
 	isLoading: boolean;
 	error: string | null;
+}
+
+// AI Chat Action Types
+export type AIActionType =
+	| "schedule-viewing"
+	| "request-info"
+	| "save-property"
+	| "contact-agent";
+
+export interface AIAction {
+	type: AIActionType;
+	propertyId?: string;
+	data?: {
+		propertyId?: string;
+		scheduledTime?: string;
+		contactInfo?: {
+			name?: string;
+			phone?: string;
+			email?: string;
+		};
+		message?: string;
+	};
+}
+
+// Notification metadata types
+export interface NotificationMetadata {
+	propertyId?: string;
+	leadId?: string;
+	paymentId?: string;
+	actionUrl?: string;
+	additionalData?: Record<string, string | number | boolean>;
+}
+
+// API Error type
+export interface APIError {
+	response?: {
+		status: number;
+		data?: {
+			message?: string;
+			error?: string;
+		};
+	};
+	message?: string;
 }

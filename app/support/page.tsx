@@ -1,8 +1,8 @@
 import SupportHOC from "@/components/screens/support/SupportHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+
+const page = () => {
 	return <SupportHOC />;
 };
 

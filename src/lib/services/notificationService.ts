@@ -70,7 +70,7 @@ export class NotificationService {
 	/**
 	 * Mark notification as read
 	 */
-	static async markAsRead(notificationId: string): Promise<ApiResponse> {
+	static async markAsRead(notificationId: string): Promise<ApiResponse<Notification>> {
 		const response = await apiClient.put(
 			`/notifications/${notificationId}/read`
 		);
@@ -80,7 +80,7 @@ export class NotificationService {
 	/**
 	 * Mark all notifications as read
 	 */
-	static async markAllAsRead(): Promise<ApiResponse> {
+	static async markAllAsRead(): Promise<ApiResponse<Notification[]>> {
 		const response = await apiClient.put("/notifications/mark-all-read");
 		return response.data;
 	}
@@ -90,7 +90,7 @@ export class NotificationService {
 	 */
 	static async deleteNotification(
 		notificationId: string
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<Notification>> {
 		const response = await apiClient.delete(`/notifications/${notificationId}`);
 		return response.data;
 	}
@@ -98,7 +98,7 @@ export class NotificationService {
 	/**
 	 * Clear all notifications
 	 */
-	static async clearAllNotifications(): Promise<ApiResponse> {
+	static async clearAllNotifications(): Promise<ApiResponse<Notification[]>> {
 		const response = await apiClient.delete("/notifications/clear-all");
 		return response.data;
 	}
@@ -129,7 +129,7 @@ export class NotificationService {
 	 */
 	static async subscribePush(
 		subscription: PushSubscription
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<Notification>> {
 		const response = await apiClient.post("/notifications/push/subscribe", {
 			subscription: subscription.toJSON(),
 		});
@@ -139,7 +139,7 @@ export class NotificationService {
 	/**
 	 * Unsubscribe from push notifications
 	 */
-	static async unsubscribePush(): Promise<ApiResponse> {
+	static async unsubscribePush(): Promise<ApiResponse<Notification>> {
 		const response = await apiClient.post("/notifications/push/unsubscribe");
 		return response.data;
 	}
@@ -149,7 +149,7 @@ export class NotificationService {
 	 */
 	static async sendTestNotification(
 		type: "email" | "sms" | "push"
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<Notification>> {
 		const response = await apiClient.post("/notifications/test", { type });
 		return response.data;
 	}

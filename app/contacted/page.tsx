@@ -1,8 +1,8 @@
 import ContactedHOC from "@/components/screens/contacted/ContactedHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+
+const page = () => {
 	return <ContactedHOC />;
 };
 

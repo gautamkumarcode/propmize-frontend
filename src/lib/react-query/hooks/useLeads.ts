@@ -1,7 +1,29 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LeadService } from "../../services/leadService";
-import { LeadCreateData } from "../../types/api";
+import { ApiResponse, Lead, LeadCreateData } from "../../types/api";
 import { QueryKeys } from "../queryClient";
+
+// Define proper error interface for HTTP errors
+interface HttpError {
+	response?: {
+		status: number;
+		data?: {
+			message?: string;
+			error?: string;
+		};
+	};
+	message?: string;
+}
+
+// Type guard to check if error is an HttpError
+function isHttpError(error: unknown): error is HttpError {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"response" in error &&
+		typeof (error as HttpError).response?.status === "number"
+	);
+}
 
 // Get seller's leads
 export const useMyLeads = (
@@ -89,8 +111,13 @@ export const useCreateLead = () => {
 
 			console.log("Lead created successfully!");
 		},
-		onError: (error: any) => {
-			console.error("Failed to create lead:", error.response?.data?.message);
+		onError: (error: unknown) => {
+			console.error(
+				"Failed to create lead:",
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
+			);
 		},
 	});
 };
@@ -112,7 +139,8 @@ export const useUpdateLeadStatus = () => {
 			// Update the specific lead in cache
 			queryClient.setQueryData(
 				QueryKeys.lead(variables.leadId),
-				(old: any) => ({ ...old, data: data.data })
+				(old: ApiResponse<Lead> | undefined) =>
+					old ? { ...old, data: data.data } : data
 			);
 
 			// Invalidate lead lists
@@ -121,10 +149,12 @@ export const useUpdateLeadStatus = () => {
 
 			console.log("Lead status updated successfully!");
 		},
-		onError: (error: any) => {
+		onError: (error: unknown) => {
 			console.error(
 				"Failed to update lead status:",
-				error.response?.data?.message
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
 			);
 		},
 	});
@@ -140,13 +170,19 @@ export const useAddLeadNotes = () => {
 			// Update the specific lead in cache
 			queryClient.setQueryData(
 				QueryKeys.lead(variables.leadId),
-				(old: any) => ({ ...old, data: data.data })
+				(old: ApiResponse<Lead> | undefined) =>
+					old ? { ...old, data: data.data } : data
 			);
 
 			console.log("Lead notes added successfully!");
 		},
-		onError: (error: any) => {
-			console.error("Failed to add lead notes:", error.response?.data?.message);
+		onError: (error: unknown) => {
+			console.error(
+				"Failed to add lead notes:",
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
+			);
 		},
 	});
 };
@@ -166,8 +202,13 @@ export const useDeleteLead = () => {
 
 			console.log("Lead deleted successfully!");
 		},
-		onError: (error: any) => {
-			console.error("Failed to delete lead:", error.response?.data?.message);
+		onError: (error: unknown) => {
+			console.error(
+				"Failed to delete lead:",
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
+			);
 		},
 	});
 };
@@ -195,8 +236,13 @@ export const useExportLeads = () => {
 
 			console.log("Leads exported successfully!");
 		},
-		onError: (error: any) => {
-			console.error("Failed to export leads:", error.response?.data?.message);
+		onError: (error: unknown) => {
+			console.error(
+				"Failed to export leads:",
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
+			);
 		},
 	});
 };

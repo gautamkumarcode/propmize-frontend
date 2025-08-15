@@ -9,13 +9,16 @@ import { toast } from "@/hooks/use-toast";
 import apiClient from "@/lib/api";
 import { useAuthStore } from "@/store/app-store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 export interface AuthModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	initialTab?: "login" | "register";
+	redirectTo?: string; // Add redirect URL parameter
 }
 
 interface LoginData {
@@ -34,10 +37,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
 	isOpen,
 	onClose,
 	initialTab = "login",
+	redirectTo,
 }) => {
 	const [activeTab, setActiveTab] = useState<"login" | "register">(initialTab);
 	const queryClient = useQueryClient();
-	const { login } = useAuthStore();
+	const { login, setUserMode } = useAuthStore();
+	const router = useRouter();
 
 	const [loginForm, setLoginForm] = useState<LoginData>({
 		email: "",
@@ -50,6 +55,24 @@ const AuthModal: React.FC<AuthModalProps> = ({
 		phone: "",
 		password: "",
 	});
+
+	// Handle redirect after successful authentication
+	const handlePostAuthRedirect = () => {
+		if (redirectTo) {
+			// Set user mode based on redirect URL
+			if (redirectTo.startsWith("/seller")) {
+				setUserMode("seller");
+			} else if (redirectTo.startsWith("/buyer")) {
+				setUserMode("buyer");
+			}
+
+			// Navigate to the intended destination after a brief delay
+			setTimeout(() => {
+				router.push(redirectTo);
+			}, 100);
+		}
+		onClose();
+	};
 
 	// Login mutation
 	const loginMutation = useMutation({
@@ -66,12 +89,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
 				title: "Login successful",
 				description: `Welcome back, ${user.name}!`,
 			});
-			onClose();
+			handlePostAuthRedirect();
 		},
-		onError: (error: any) => {
+		onError: (error: AxiosError) => {
+			const errorMessage =
+				(error.response?.data as { error?: string })?.error ||
+				typeof error.response?.data === "string"
+					? (error.response?.data as string)
+					: "Invalid email or password";
 			toast({
 				title: "Login failed",
-				description: error.response?.data?.error || "Invalid email or password",
+				description: errorMessage,
 				variant: "destructive",
 			});
 		},
@@ -92,12 +120,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
 				title: "Registration successful",
 				description: `Welcome to Propmize, ${user.name}!`,
 			});
-			onClose();
+			handlePostAuthRedirect();
 		},
-		onError: (error: any) => {
+		onError: (error: AxiosError) => {
 			toast({
 				title: "Registration failed",
-				description: error.response?.data?.error || "Registration failed",
+				description:
+					typeof error.response?.data === "object" &&
+					error.response?.data !== null &&
+					"error" in error.response.data
+						? (error.response.data as { error: string }).error
+						: "Registration failed",
 				variant: "destructive",
 			});
 		},

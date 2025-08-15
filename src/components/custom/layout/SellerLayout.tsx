@@ -17,6 +17,7 @@ interface SellerLayoutProps {
 const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [showAuthModal, setShowAuthModal] = useState(false);
+	const [authRedirectTo, setAuthRedirectTo] = useState<string | undefined>();
 	const [activeTab, setActiveTab] = useState<
 		"properties" | "chat" | "analytics"
 	>("properties");
@@ -29,7 +30,10 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 			<Navbar
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
-				onShowAuthModal={() => setShowAuthModal(true)}
+				onShowAuthModal={(redirectTo) => {
+					setAuthRedirectTo(redirectTo);
+					setShowAuthModal(true);
+				}}
 				mode="seller"
 			/>
 
@@ -106,8 +110,8 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 			<main className="container mx-auto px-4 py-6">{children}</main>
 
 			{/* Bottom Navigation - Mobile Only */}
-			<div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg md:hidden">
-				<div className="flex items-center justify-around py-2">
+			<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden z-50">
+				<div className="flex items-center justify-around py-1">
 					{sellerBottomNavItems.map((item) => {
 						const isActive = pathname === item.route.path;
 						const IconComponent = iconMap[item.icon as keyof typeof iconMap];
@@ -115,22 +119,22 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 							<Link
 								key={item.route.path}
 								href={item.route.path}
-								className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+								className={`flex flex-col items-center py-2 px-2 min-w-0 flex-1 transition-all duration-200 ${
 									item.isHighlighted
-										? "bg-blue-600 text-white shadow-lg transform scale-110"
+										? "bg-blue-600 text-white rounded-xl mx-1 shadow-md"
 										: isActive
-										? "text-blue-600 bg-blue-50"
-										: "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+										? "text-blue-600"
+										: "text-gray-500 hover:text-blue-600"
 								}`}>
 								{IconComponent && (
 									<IconComponent
-										className={`h-6 w-6 mb-1 ${
+										className={`h-5 w-5 mb-1 ${
 											item.isHighlighted ? "text-white" : ""
 										}`}
 									/>
 								)}
 								<span
-									className={`text-xs font-medium ${
+									className={`text-[10px] font-medium leading-tight text-center ${
 										item.isHighlighted ? "text-white" : ""
 									}`}>
 									{item.route.name}
@@ -144,7 +148,11 @@ const SellerLayout: React.FC<SellerLayoutProps> = ({ children }) => {
 			{/* Auth Modal */}
 			<AuthModal
 				isOpen={showAuthModal}
-				onClose={() => setShowAuthModal(false)}
+				onClose={() => {
+					setShowAuthModal(false);
+					setAuthRedirectTo(undefined);
+				}}
+				redirectTo={authRedirectTo}
 			/>
 		</div>
 	);

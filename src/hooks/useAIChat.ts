@@ -1,13 +1,57 @@
 import { useAuth } from "@/lib/providers/AuthProvider";
-import { AIChatService, AIMessage } from "@/services/aiChatService";
+import {
+	AIChatContext,
+	aiChatService,
+	AIMessage,
+} from "@/services/aiChatService";
+import { APIError } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "./use-toast";
 
-// Custom hook for AI Chat functionality
+// Enhanced interface to support guest info
+interface UserInfo {
+	id: string;
+	type: "guest" | "user";
+	isGuest: boolean;
+	name?: string;
+	email?: string;
+}
+
+// Custom hook for AI Chat functionality (supports both guests and authenticated users)
 export const useAIChat = () => {
 	const queryClient = useQueryClient();
 	const { user } = useAuth();
 	const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+	const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+	// Determine if user is guest on mount
+	useEffect(() => {
+		if (user) {
+			// User is authenticated
+			setUserInfo({
+				id: user.id,
+				type: "user",
+				isGuest: false,
+				name: user.name,
+				email: user.email,
+			});
+		} else {
+			// User is guest - generate guest ID
+			let guestId = localStorage.getItem("propmize_guest_id");
+			if (!guestId) {
+				const timestamp = Date.now();
+				const random = Math.random().toString(36).substring(2);
+				guestId = `guest_${timestamp}_${random}`;
+				localStorage.setItem("propmize_guest_id", guestId);
+			}
+			setUserInfo({
+				id: guestId,
+				type: "guest",
+				isGuest: true,
+			});
+		}
+	}, [user]);
 
 	// Start new AI chat session
 	const startChatMutation = useMutation({
@@ -20,12 +64,32 @@ export const useAIChat = () => {
 				| "general-inquiry"
 				| "recommendation"
 				| "support";
-			context?: any;
-		}) => AIChatService.startAIChat(conversationType, context),
+			context?: AIChatContext;
+		}) => aiChatService.startAIChat(conversationType, context),
 		onSuccess: (data) => {
 			setCurrentChatId(data.data._id);
+			if (data.userInfo) setUserInfo(data.userInfo);
 			queryClient.invalidateQueries({ queryKey: ["ai-chats"] });
 		},
+		onError: (error: APIError) => {
+			console.error("Failed to start chat:", error);
+			// Handle rate limiting errors
+			if (error?.response?.status === 429) {
+				// Don't attempt to retry automatically for rate limits
+				toast({
+					title: "Rate limit exceeded",
+					description: "Please wait before starting a new chat.",
+					variant: "destructive",
+				});
+			} else {
+				toast({
+					title: "Failed to start chat",
+					description: "Please try again in a moment.",
+					variant: "destructive",
+				});
+			}
+		},
+		retry: false, // Disable automatic retry for chat creation
 	});
 
 	// Send message mutation
@@ -37,13 +101,32 @@ export const useAIChat = () => {
 		}: {
 			chatId: string;
 			message: string;
-			context?: any;
-		}) => AIChatService.sendMessage(chatId, message, context),
+			context?: AIChatContext;
+		}) => aiChatService.sendMessage(chatId, message, context),
 		onSuccess: (data, variables) => {
+			if (data.data?.userInfo) setUserInfo(data.data.userInfo);
 			queryClient.invalidateQueries({
 				queryKey: ["ai-chat", variables.chatId],
 			});
 		},
+		onError: (error: APIError) => {
+			console.error("Failed to send message:", error);
+			// Handle rate limiting errors
+			if (error?.response?.status === 429) {
+				toast({
+					title: "Rate limit exceeded",
+					description: "Please wait before sending another message.",
+					variant: "destructive",
+				});
+			} else {
+				toast({
+					title: "Failed to send message",
+					description: "Please try again in a moment.",
+					variant: "destructive",
+				});
+			}
+		},
+		retry: false, // Disable automatic retry for message sending
 	});
 
 	// Submit message feedback
@@ -60,13 +143,13 @@ export const useAIChat = () => {
 				helpful: boolean;
 				comment?: string;
 			};
-		}) => AIChatService.submitMessageFeedback(chatId, messageId, feedback),
+		}) => aiChatService.submitMessageFeedback(chatId, messageId, feedback),
 	});
 
 	// End session mutation
 	const endSessionMutation = useMutation({
-		mutationFn: (chatId: string) => AIChatService.endSession(chatId),
-		onSuccess: (data, chatId) => {
+		mutationFn: (chatId: string) => aiChatService.endSession(chatId),
+		onSuccess: (data, chatId: string) => {
 			queryClient.invalidateQueries({ queryKey: ["ai-chat", chatId] });
 			queryClient.invalidateQueries({ queryKey: ["ai-chats"] });
 		},
@@ -86,13 +169,18 @@ export const useAIChat = () => {
 				completedGoal: boolean;
 				goalDescription?: string;
 			};
-		}) => AIChatService.submitSessionFeedback(chatId, feedback),
+		}) => aiChatService.submitSessionFeedback(chatId, feedback),
 	});
 
 	// Update chat context
 	const updateContextMutation = useMutation({
-		mutationFn: ({ chatId, context }: { chatId: string; context: any }) =>
-			AIChatService.updateChatContext(chatId, context),
+		mutationFn: ({
+			chatId,
+			context,
+		}: {
+			chatId: string;
+			context: AIChatContext;
+		}) => aiChatService.updateChatContext(chatId, context),
 		onSuccess: (data, variables) => {
 			queryClient.invalidateQueries({
 				queryKey: ["ai-chat", variables.chatId],
@@ -121,9 +209,19 @@ export const useAIChat = () => {
 export const useAIChatData = (chatId: string | null) => {
 	return useQuery({
 		queryKey: ["ai-chat", chatId],
-		queryFn: () => (chatId ? AIChatService.getAIChat(chatId) : null),
+		queryFn: () => (chatId ? aiChatService.getAIChat(chatId) : null),
 		enabled: !!chatId,
 		staleTime: 30000, // Consider data fresh for 30 seconds
+		refetchOnWindowFocus: false, // Prevent refetching on window focus
+		refetchOnReconnect: false, // Prevent refetching on reconnect
+		retry: (failureCount: number, error: unknown) => {
+			// Don't retry rate limit errors
+			if (error && typeof error === "object" && "response" in error) {
+				const httpError = error as { response?: { status?: number } };
+				if (httpError.response?.status === 429) return false;
+			}
+			return failureCount < 1;
+		},
 	});
 };
 
@@ -135,7 +233,7 @@ export const useAIChats = (
 ) => {
 	return useQuery({
 		queryKey: ["ai-chats", page, limit, status],
-		queryFn: () => AIChatService.getUserAIChats(page, limit, status),
+		queryFn: () => aiChatService.getUserAIChats(page, limit, status),
 		staleTime: 60000, // Consider data fresh for 1 minute
 	});
 };
@@ -144,7 +242,7 @@ export const useAIChats = (
 export const useAIChatAnalytics = (chatId: string | null) => {
 	return useQuery({
 		queryKey: ["ai-chat-analytics", chatId],
-		queryFn: () => (chatId ? AIChatService.getChatAnalytics(chatId) : null),
+		queryFn: () => (chatId ? aiChatService.getChatAnalytics(chatId) : null),
 		enabled: !!chatId,
 		staleTime: 300000, // Consider data fresh for 5 minutes
 	});
@@ -169,7 +267,8 @@ export const useAIPropertySearch = () => {
 				};
 			};
 			chatId?: string;
-		}) => AIChatService.searchProperties(searchQuery, chatId),
+		}) =>
+			aiChatService.searchProperties(searchQuery.query, searchQuery.filters),
 	});
 };
 
@@ -178,7 +277,7 @@ export const useAIChatState = (initialChatId?: string) => {
 	const [chatId, setChatId] = useState<string | null>(initialChatId || null);
 	const [messages, setMessages] = useState<AIMessage[]>([]);
 	const [isTyping, setIsTyping] = useState(false);
-	const [context, setContext] = useState<any>({});
+	const [context, setContext] = useState<AIChatContext>({});
 
 	const { data: chatData, isLoading } = useAIChatData(chatId);
 	const aiChat = useAIChat();
@@ -197,7 +296,7 @@ export const useAIChatState = (initialChatId?: string) => {
 				| "general-inquiry"
 				| "recommendation"
 				| "support" = "property-search",
-			initialContext?: any
+			initialContext?: AIChatContext
 		) => {
 			try {
 				const result = await aiChat.startChatAsync({
@@ -206,7 +305,8 @@ export const useAIChatState = (initialChatId?: string) => {
 				});
 				setChatId(result.data._id);
 				setMessages(result.data.messages || []);
-				setContext(result.data.context);
+				// Note: AIChat interface doesn't have context property, so we'll handle this differently
+				setContext(initialContext || {});
 				return result.data;
 			} catch (error) {
 				console.error("Error starting AI chat:", error);
@@ -217,7 +317,7 @@ export const useAIChatState = (initialChatId?: string) => {
 	);
 
 	const sendMessage = useCallback(
-		async (message: string, additionalContext?: any) => {
+		async (message: string, additionalContext?: AIChatContext) => {
 			if (!chatId) return;
 
 			try {
@@ -241,10 +341,10 @@ export const useAIChatState = (initialChatId?: string) => {
 	);
 
 	const updateChatContext = useCallback(
-		(newContext: any) => {
+		(newContext: AIChatContext) => {
 			if (!chatId) return;
 
-			setContext((prev: any) => ({ ...prev, ...newContext }));
+			setContext((prev: AIChatContext) => ({ ...prev, ...newContext }));
 			aiChat.updateContext({
 				chatId,
 				context: newContext,
@@ -259,16 +359,12 @@ export const useAIChatState = (initialChatId?: string) => {
 		messages,
 		isTyping,
 		context,
-		chatData: chatData?.data,
-		isLoading: isLoading || aiChat.isStartingChat,
+		isLoading,
 		isSendingMessage: aiChat.isSendingMessage,
 		startNewChat,
 		sendMessage,
-		updateContext: updateChatContext,
-		endSession: () => chatId && aiChat.endSession(chatId),
-		submitFeedback: (messageId: string, feedback: any) =>
-			chatId && aiChat.submitFeedback({ chatId, messageId, feedback }),
-		submitSessionFeedback: (feedback: any) =>
-			chatId && aiChat.submitSessionFeedback({ chatId, feedback }),
+		updateChatContext,
+		submitFeedback: aiChat.submitFeedback,
+		endSession: aiChat.endSession,
 	};
 };

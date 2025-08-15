@@ -1,8 +1,8 @@
 import BuyerProfileHOC from "@/components/screens/buyer/profile/BuyerProfileHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+
+const page = () => {
 	return <BuyerProfileHOC />;
 };
 

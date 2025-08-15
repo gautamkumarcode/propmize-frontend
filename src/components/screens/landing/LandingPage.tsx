@@ -23,7 +23,7 @@ export default function LandingPage() {
 		// Add a small delay for better UX
 		setTimeout(() => {
 			if (mode === "buyer") {
-				router.push("/buyer/dashboard");
+				router.push("/buyer/assistant");
 			} else {
 				router.push("/seller");
 			}

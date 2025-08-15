@@ -1,8 +1,8 @@
 import SellerPlansHOC from "@/components/screens/seller/plans/SellerPlansHOC";
 
-type Props = {};
 
-const page = (props: Props) => {
+
+const page = () => {
 	return <SellerPlansHOC />;
 };
 

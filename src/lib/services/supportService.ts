@@ -163,7 +163,7 @@ export class SupportService {
 	/**
 	 * Close a ticket
 	 */
-	static async closeTicket(ticketId: string): Promise<ApiResponse> {
+	static async closeTicket(ticketId: string): Promise<ApiResponse<SupportTicket>> {
 		const response = await apiClient.put(`/support/tickets/${ticketId}/close`);
 		return response.data;
 	}
@@ -171,7 +171,7 @@ export class SupportService {
 	/**
 	 * Reopen a closed ticket
 	 */
-	static async reopenTicket(ticketId: string): Promise<ApiResponse> {
+	static async reopenTicket(ticketId: string): Promise<ApiResponse<SupportTicket>> {
 		const response = await apiClient.put(`/support/tickets/${ticketId}/reopen`);
 		return response.data;
 	}
@@ -183,7 +183,7 @@ export class SupportService {
 		ticketId: string,
 		rating: number,
 		feedback?: string
-	): Promise<ApiResponse> {
+	): Promise<ApiResponse<SupportTicket>> {
 		const response = await apiClient.post(`/support/tickets/${ticketId}/rate`, {
 			rating,
 			feedback,
@@ -247,7 +247,7 @@ export class SupportService {
 		subject: string;
 		message: string;
 		type: "inquiry" | "feedback" | "partnership" | "other";
-	}): Promise<ApiResponse> {
+	}): Promise<ApiResponse<SupportTicket>> {
 		const response = await apiClient.post("/support/contact", formData);
 		return response.data;
 	}
