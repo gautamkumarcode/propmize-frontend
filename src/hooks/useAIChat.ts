@@ -274,7 +274,10 @@ export const useAIPropertySearch = () => {
 
 // Custom hook for managing AI chat state
 export const useAIChatState = (initialChatId?: string) => {
-	const [chatId, setChatId] = useState<string | null>(initialChatId || null);
+	const [chatId, setChatId] = useState(
+		() => initialChatId || localStorage.getItem("ai_current_chat") || null
+	);
+
 	const [messages, setMessages] = useState<AIMessage[]>([]);
 	const [isTyping, setIsTyping] = useState(false);
 	const [context, setContext] = useState<AIChatContext>({});
@@ -282,6 +285,14 @@ export const useAIChatState = (initialChatId?: string) => {
 	const { data: chatData, isLoading } = useAIChatData(chatId);
 	const aiChat = useAIChat();
 
+	useEffect(() => {
+		if (chatId) {
+			localStorage.setItem("ai_current_chat", chatId);
+		} else {
+			localStorage.removeItem("ai_current_chat");
+		}
+	}, [chatId]);
+	
 	// Update messages when chat data changes
 	useEffect(() => {
 		if (chatData?.data?.messages) {

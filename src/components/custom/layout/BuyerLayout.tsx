@@ -133,13 +133,14 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 								}`}>
 								{IconComponent && (
 									<IconComponent
+										size={20}
 										className={`h-5 w-5 mb-1 ${
 											item.isHighlighted ? "text-white" : ""
 										}`}
 									/>
 								)}
 								<span
-									className={`text-[10px] font-medium leading-tight text-center ${
+									className={`text-[10px] font-medium leading-tight text-center  ${
 										item.isHighlighted ? "text-white" : ""
 									}`}>
 									{item.route.name}

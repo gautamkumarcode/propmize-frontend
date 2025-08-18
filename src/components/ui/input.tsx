@@ -15,7 +15,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 		ref
 	) => {
 		const baseStyles =
-			"flex h-12 w-full rounded-xl border bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300";
+			"flex h-12 w-full rounded-xl border bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none  disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300";
 
 		const variants = {
 			default:
@@ -78,7 +78,7 @@ const SearchInput = React.forwardRef<
 		ref={ref}
 		variant="estate"
 		className={cn(
-			"h-14 rounded-2xl bg-white/90 backdrop-blur-md shadow-lg border-2 border-slate-200/60 hover:shadow-xl focus:shadow-2xl placeholder:text-slate-500 text-base",
+			"h-14 rounded-2xl bg-white/90 backdrop-blur-md shadow-lg border-2 border-slate-200/60 hover:shadow-xl focus:shadow-2xl placeholder:text-blue-500 text-base",
 			className
 		)}
 		{...props}
@@ -101,3 +101,4 @@ const PremiumInput = React.forwardRef<
 PremiumInput.displayName = "PremiumInput";
 
 export { Input, PremiumInput, SearchInput };
+

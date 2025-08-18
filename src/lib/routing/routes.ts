@@ -26,7 +26,7 @@ export const routes: Record<string, Route> = {
 	},
 	buyerAssistant: {
 		path: "/buyer/assistant",
-		name: "Dashboard",
+		name: "Assistant",
 		description: "Buyer dashboard with AI assistant",
 		layout: "buyer",
 		protected: false,
@@ -43,14 +43,14 @@ export const routes: Record<string, Route> = {
 
 	buyerProfile: {
 		path: "/buyer/profile",
-		name: "Buyer Profile",
+		name: "Profile",
 		description: "Buyer profile and account settings",
 		layout: "buyer",
 		protected: true,
 	},
 	saved: {
 		path: "/saved",
-		name: "Saved Properties",
+		name: "Saved",
 		description: "Properties saved for later viewing",
 		layout: "buyer",
 		protected: true,
@@ -64,18 +64,12 @@ export const routes: Record<string, Route> = {
 	},
 	contacted: {
 		path: "/contacted",
-		name: "Contacted Owners",
+		name: "Contacted",
 		description: "Properties where you contacted owners",
 		layout: "buyer",
 		protected: true,
 	},
-	aiAssistant: {
-		path: "/buyer/ai-assistant",
-		name: "AI Assistant",
-		description: "AI-powered property search assistant",
-		layout: "buyer",
-		protected: false,
-	},
+
 	switchMode: {
 		path: "/",
 		name: "Switch Mode",
@@ -108,7 +102,7 @@ export const routes: Record<string, Route> = {
 	// Seller routes
 	seller: {
 		path: "/seller",
-		name: "Seller Dashboard",
+		name: " Dashboard",
 		description: "Seller dashboard with listings and analytics",
 		layout: "seller",
 		protected: true,
@@ -212,16 +206,6 @@ export const buyerNavItems: NavigationItem[] = [
 	{ route: routes.newProjects, icon: "Building" },
 	{ route: routes.guide, icon: "BookOpen" },
 	{ route: routes.support, icon: "HelpCircle" },
-	{
-		route: {
-			path: "/logout",
-			name: "Logout",
-			description: "Logout",
-			layout: "buyer",
-		},
-		icon: "LogOut",
-		isBottom: true,
-	},
 ];
 
 export const sellerNavItems: NavigationItem[] = [
@@ -239,16 +223,6 @@ export const sellerNavItems: NavigationItem[] = [
 	{ route: routes.sellerPlans, icon: "Crown" },
 	{ route: routes.sellerGuide, icon: "BookOpen" },
 	{ route: routes.sellerSupport, icon: "HelpCircle" },
-	{
-		route: {
-			path: "/logout",
-			name: "Logout",
-			description: "Logout",
-			layout: "seller",
-		},
-		icon: "LogOut",
-		isBottom: true,
-	},
 ];
 
 export const sellerBottomNavItems: NavigationItem[] = [
@@ -260,9 +234,10 @@ export const sellerBottomNavItems: NavigationItem[] = [
 ];
 
 export const buyerBottomNavItems: NavigationItem[] = [
-	{ route: routes.buyerAssistant, icon: "Home" },
+	{ route: routes.contacted, icon: "Phone" },
 	{ route: routes.saved, icon: "Heart" },
-	{ route: routes.aiAssistant, icon: "MessageSquare", isHighlighted: true },
+	// Use a unique route for chat/messages, or remove duplicate
+	{ route: routes.buyerAssistant, icon: "MessageSquare", isHighlighted: true },
 	{ route: routes.newProjects, icon: "Building" },
 	{ route: routes.buyerProfile, icon: "User" },
 ];

@@ -37,8 +37,7 @@ export const useNavigation = () => {
 	};
 
 	// Quick navigation functions
-	const goToDashboard = () => navigateTo("/buyer/dashboard");
-	const goBuyerDashboard = () => navigateTo("/buyer/dashboard");
+	const goBuyerDashboard = () => navigateTo("/buyer/assistant");
 	const goToProfile = () => {
 		const profilePath =
 			userMode === "seller" ? "/seller/profile" : "/buyer/profile";
@@ -96,7 +95,6 @@ export const useNavigation = () => {
 		router,
 
 		// Quick navigation
-		goToDashboard,
 		goBuyerDashboard,
 		goToProfile,
 		goToSaved,

@@ -1,6 +1,7 @@
 "use client";
 
 import SellerLayout from "@/components/custom/layout/SellerLayout";
+import useNavigation from "@/hooks/useNavigation";
 import {
 	Building,
 	Eye,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 
 export default function SellerDashboard() {
+	const { goToAddProperty } = useNavigation();
 	const stats = [
 		{
 			title: "Total Listings",
@@ -218,7 +220,9 @@ export default function SellerDashboard() {
 						Quick Actions
 					</h2>
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-						<button className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg text-left transition-colors">
+						<button
+							onClick={() => goToAddProperty()}
+							className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg text-left transition-colors">
 							<Building className="h-8 w-8 text-blue-600 mb-2" />
 							<p className="font-medium text-gray-900">Add New Property</p>
 							<p className="text-sm text-gray-600">

@@ -22,37 +22,28 @@ import {
 	MapPin,
 	Phone,
 	Send,
-	Star,
-	ThumbsDown,
-	ThumbsUp,
 	User,
-	X,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 interface AIChatWindowProps {
 	initialChatId?: string;
-	conversationType?:
-		| "property-search"
-		| "general-inquiry"
-		| "recommendation"
-		| "support";
-	initialContext?: { userId: string; location: string };
 	onPropertyClick?: (propertyId: string) => void;
 	onActionClick?: (action: AIAction) => void;
+	onNewChat?: () => void;
 }
 
 export default function AIChatWindow({
 	initialChatId,
-	conversationType = "property-search",
-	initialContext,
+
 	onPropertyClick,
 	onActionClick,
+	onNewChat,
+	
 }: AIChatWindowProps) {
 	const [message, setMessage] = useState("");
-	const [showFeedback, setShowFeedback] = useState<string | null>(null);
-	const [feedbackRating, setFeedbackRating] = useState<number>(0);
-	const [feedbackComment, setFeedbackComment] = useState("");
+
+	const [isNewChat, setIsNewChat] = useState(false);
 
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -60,35 +51,44 @@ export default function AIChatWindow({
 		chatId,
 		messages,
 		isTyping,
-		context,
 		isLoading,
 		isSendingMessage,
 		startNewChat,
 		sendMessage,
-		submitFeedback,
-		endSession,
+
+		setChatId: setAIChatId,
 	} = useAIChatState(initialChatId);
+
+	// Initialize chat only once
+	useEffect(() => {
+		if (initialChatId) {
+			setAIChatId(initialChatId);
+			setIsNewChat(false);
+		} else if (!chatId && !isLoading) {
+			setIsNewChat(true);
+		}
+	}, [initialChatId, chatId, isLoading]);
 
 	// Auto scroll to bottom
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages, isTyping]);
 
-	// Initialize chat only if initialChatId is provided (don't auto-create new chats)
-	useEffect(() => {
-		if (initialChatId && !chatId && !isLoading) {
-			// Only load existing chat, don't create new one
-			return;
+	const handleStartNewChat = async () => {
+		try {
+			await startNewChat();
+			setIsNewChat(false);
+			if (onNewChat) onNewChat();
+		} catch (error) {
+			console.error("Error starting new chat:", error);
 		}
-	}, [initialChatId, chatId, isLoading]);
+	};
 
 	const handleSendMessage = async () => {
 		if (!message.trim()) return;
 
-		// Check if chat exists, if not show error
-		if (!chatId) {
-			console.error("No chat session available. Please start a new chat.");
-			return;
+		if (isNewChat || !chatId) {
+			await handleStartNewChat();
 		}
 
 		const messageText = message;
@@ -98,7 +98,7 @@ export default function AIChatWindow({
 			await sendMessage(messageText);
 		} catch (error) {
 			console.error("Error sending message:", error);
-			setMessage(messageText); // Restore message on error
+			setMessage(messageText);
 		}
 	};
 
@@ -107,28 +107,6 @@ export default function AIChatWindow({
 			e.preventDefault();
 			handleSendMessage();
 		}
-	};
-
-	const handleFeedback = async (
-		messageId: string,
-		helpful: boolean,
-		rating?: number
-	) => {
-		if (!chatId) return;
-
-		await submitFeedback({
-			chatId,
-			messageId,
-			feedback: {
-				rating: (rating || (helpful ? 5 : 1)) as 1 | 2 | 3 | 4 | 5,
-				helpful,
-				comment: feedbackComment || undefined,
-			},
-		});
-
-		setShowFeedback(null);
-		setFeedbackRating(0);
-		setFeedbackComment("");
 	};
 
 	const handlePropertyAction = (action: AIAction, propertyId?: string) => {
@@ -168,7 +146,6 @@ export default function AIChatWindow({
 								{msg.content}
 							</p>
 
-							{/* Property Suggestions */}
 							{msg.properties && msg.properties.length > 0 && (
 								<div className="mt-3 space-y-3">
 									<p
@@ -185,7 +162,11 @@ export default function AIChatWindow({
 												<CardContent className="p-2 md:p-3">
 													<div className="flex gap-2 md:gap-3">
 														<img
-															src={property.image || "/api/placeholder/80/60"}
+															src={
+																property?.images && property.images[0]
+																	? property.images[0]
+																	: "/api/placeholder/80/60"
+															}
 															alt={property.title}
 															className="w-16 h-12 md:w-20 md:h-15 object-cover rounded flex-shrink-0"
 														/>
@@ -260,7 +241,6 @@ export default function AIChatWindow({
 								</div>
 							)}
 
-							{/* Action Suggestions */}
 							{msg.actions && msg.actions.length > 0 && (
 								<div className="mt-3 space-y-2">
 									<p
@@ -306,7 +286,6 @@ export default function AIChatWindow({
 								</div>
 							)}
 
-							{/* Quick Reply Suggestions */}
 							{msg.suggestions && msg.suggestions.length > 0 && (
 								<div className="mt-3 space-y-2">
 									<p
@@ -331,83 +310,6 @@ export default function AIChatWindow({
 											</Button>
 										))}
 									</div>
-								</div>
-							)}
-
-							{/* Message Feedback */}
-							{isAI && msg._id && (
-								<div
-									className={`mt-3 pt-2 ${
-										isUser
-											? "border-t border-blue-500/30"
-											: "border-t border-gray-200"
-									}`}>
-									{showFeedback === msg._id ? (
-										<div className="space-y-2">
-											<div className="flex items-center justify-between">
-												<span className="text-xs text-gray-500">
-													Rate this response:
-												</span>
-												<button
-													onClick={() => setShowFeedback(null)}
-													className="text-gray-400 hover:text-gray-600">
-													<X className="w-4 h-4" />
-												</button>
-											</div>
-											<div className="flex items-center gap-1">
-												{[1, 2, 3, 4, 5].map((star: number) => (
-													<button
-														key={star}
-														onClick={() => setFeedbackRating(star)}
-														className={`text-lg ${
-															feedbackRating >= star
-																? "text-yellow-400"
-																: "text-gray-300"
-														}`}>
-														<Star className="w-4 h-4 md:w-5 md:h-5 fill-current" />
-													</button>
-												))}
-											</div>
-											<textarea
-												placeholder="Optional feedback..."
-												value={feedbackComment}
-												onChange={(e) => setFeedbackComment(e.target.value)}
-												className="w-full text-xs border rounded p-2 mt-1 resize-none"
-												rows={2}
-											/>
-											<Button
-												size="sm"
-												onClick={() =>
-													handleFeedback(msg._id!, true, feedbackRating)
-												}
-												className="text-xs h-8 w-full">
-												Submit Feedback
-											</Button>
-										</div>
-									) : (
-										<div className="flex items-center gap-2 flex-wrap">
-											<span className="text-xs text-gray-500">
-												Was this helpful?
-											</span>
-											<div className="flex items-center gap-2">
-												<button
-													onClick={() => handleFeedback(msg._id!, true)}
-													className="text-green-500 hover:text-green-600">
-													<ThumbsUp className="w-4 h-4" />
-												</button>
-												<button
-													onClick={() => handleFeedback(msg._id!, false)}
-													className="text-red-500 hover:text-red-600">
-													<ThumbsDown className="w-4 h-4" />
-												</button>
-												<button
-													onClick={() => setShowFeedback(msg._id!)}
-													className="text-blue-500 hover:text-blue-600 text-xs ml-1">
-													Rate
-												</button>
-											</div>
-										</div>
-									)}
 								</div>
 							)}
 						</CardContent>
@@ -440,7 +342,9 @@ export default function AIChatWindow({
 				<div className="flex flex-col items-center">
 					<Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-blue-500 mb-2" />
 					<span className="text-sm text-gray-600 text-center">
-						Starting AI assistant...
+						{initialChatId
+							? "Loading chat session..."
+							: "Starting AI assistant..."}
 					</span>
 				</div>
 			</div>
@@ -449,105 +353,66 @@ export default function AIChatWindow({
 
 	return (
 		<div className="flex-1 flex flex-col h-full">
-			{/* Chat Header */}
-			<div className="border-b p-2 md:p-3 flex-shrink-0 bg-white">
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2">
-						<Bot className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
-						<Badge variant="secondary" className="text-xs capitalize">
-							{conversationType.replace("-", " ")}
-						</Badge>
-					</div>
-					{chatId && (
-						<Button
-							size="sm"
-							variant="outline"
-							onClick={() => chatId && endSession(chatId)}
-							className="text-xs h-7 md:h-8">
-							End Session
-						</Button>
-					)}
-				</div>
-
-				{/* Context Display */}
-				{context?.propertySearch && (
-					<div className="mt-2 p-2 bg-blue-50 rounded text-xs">
-						<p className="font-medium">Search Context:</p>
-						<div className="flex flex-wrap gap-1 md:gap-2 mt-1">
-							{context.propertySearch.location && (
-								<Badge variant="outline" className="text-xs">
-									{context.propertySearch.location}
-								</Badge>
-							)}
-							{context.propertySearch.priceRange && (
-								<Badge variant="outline" className="text-xs">
-									₹{context.propertySearch.priceRange.min} - ₹
-									{context.propertySearch.priceRange.max}
-								</Badge>
-							)}
-							{context.propertySearch.propertyType && (
-								<Badge variant="outline" className="text-xs">
-									{context.propertySearch.propertyType}
-								</Badge>
-							)}
-						</div>
-					</div>
-				)}
-			</div>
-
 			{/* Messages */}
 			<div className="flex-1 overflow-y-auto overscroll-contain">
 				<div className="p-2 md:p-4 space-y-0">
-					{!chatId && !isLoading ? (
+					{/* New chat state */}
+					{isNewChat && !isLoading && (
 						<div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center px-4">
 							<div className="w-12 h-12 md:w-16 md:h-16 mb-4 bg-blue-50 rounded-full flex items-center justify-center">
 								<Bot className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
 							</div>
 							<h3 className="font-medium mb-2 text-sm md:text-base">
-								Ready to Start!
+								Start a new conversation
 							</h3>
 							<p className="text-xs md:text-sm text-gray-600 max-w-xs mb-4">
-								Your AI assistant is ready to help. Click the "Start Chat"
-								button to begin your property search journey.
+								Your AI assistant is ready to help with your property search.
 							</p>
-						</div>
-					) : messages.length === 0 && !isTyping && chatId ? (
-						<div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center px-4">
-							<div className="w-12 h-12 md:w-16 md:h-16 mb-4 bg-blue-50 rounded-full flex items-center justify-center">
-								<Bot className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
-							</div>
-							<h3 className="font-medium mb-2 text-sm md:text-base">
-								Welcome to AI Property Assistant!
-							</h3>
-							<p className="text-xs md:text-sm text-gray-600 max-w-xs mb-4">
-								I&apos;m here to help you find the perfect property. Ask me
-								anything about properties, locations, or get recommendations.
-							</p>
+							<Button onClick={handleStartNewChat} className="mb-4">
+								Start Chat
+							</Button>
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
 								{[
 									"Show me 3BHK apartments in Mumbai",
 									"What are trending areas in Bangalore?",
 									"I need a property near good schools",
 									"Compare Gurgaon vs Noida",
-								].map((suggestion: string, idx: number) => (
+								].map((suggestion, idx) => (
 									<Button
 										key={idx}
 										size="sm"
 										variant="outline"
-										onClick={() => setMessage(suggestion)}
+										onClick={() => {
+											setMessage(suggestion);
+											handleStartNewChat().then(() => handleSendMessage());
+										}}
 										className="text-xs h-8 px-2 text-left">
 										<span className="truncate">{suggestion}</span>
 									</Button>
 								))}
 							</div>
 						</div>
-					) : null}
+					)}
 
-					{chatId &&
-						messages.map((msg: AIMessage, idx: number) =>
-							renderMessage(msg, idx)
-						)}
+					{/* Empty chat state (after starting but no messages yet) */}
+					{!isNewChat && messages.length === 0 && !isTyping && (
+						<div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center px-4">
+							<div className="w-12 h-12 md:w-16 md:h-16 mb-4 bg-blue-50 rounded-full flex items-center justify-center">
+								<Bot className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
+							</div>
+							<h3 className="font-medium mb-2 text-sm md:text-base">
+								Welcome back!
+							</h3>
+							<p className="text-xs md:text-sm text-gray-600 max-w-xs mb-4">
+								Continue your property search or ask a new question.
+							</p>
+						</div>
+					)}
 
+					{/* Render messages */}
+					{!isNewChat && messages.map((msg, idx) => renderMessage(msg, idx))}
+
+					{/* Typing indicator */}
 					{isTyping && (
 						<div className="flex gap-2 md:gap-3 mb-4 px-2 md:px-0">
 							<div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
@@ -582,16 +447,16 @@ export default function AIChatWindow({
 						onChange={(e) => setMessage(e.target.value)}
 						onKeyPress={handleKeyPress}
 						placeholder={
-							!chatId
+							isNewChat
 								? "Click 'Start Chat' button to begin chatting..."
 								: "Ask me about properties, locations, or get recommendations..."
 						}
-						className="pr-10 text-sm md:text-base h-10 md:h-12"
-						disabled={isSendingMessage || !chatId}
+						className="pr-10 text-sm md:text-base h-10 md:h-12 focus:ring-0 focus:outline-none"
+						disabled={isSendingMessage || isNewChat}
 					/>
 					<Button
 						onClick={handleSendMessage}
-						disabled={!message.trim() || isSendingMessage || !chatId}
+						disabled={!message.trim() || isSendingMessage || isNewChat}
 						size="icon"
 						className="absolute right-1 top-1/2 transform -translate-y-1/2 w-8 h-8 md:w-10 md:h-10">
 						{isSendingMessage ? (
