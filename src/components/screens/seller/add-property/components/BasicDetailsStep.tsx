@@ -2,6 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
 	FormControl,
 	FormField,
 	FormItem,
@@ -9,15 +15,29 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ChevronDown } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { PropertyFormData } from "../validation/propertySchema";
 
 interface StepProps {
 	form: UseFormReturn<PropertyFormData>;
-	nextStep: () => void;
 }
 
-export default function BasicDetailsStep({ form, nextStep }: StepProps) {
+export default function BasicDetailsStep({ form }: StepProps) {
+	const propertyTypes = [
+		{ value: "apartment", label: "Apartment" },
+		{ value: "house", label: "House" },
+		{ value: "villa", label: "Villa" },
+		{ value: "plot", label: "Plot" },
+		{ value: "commercial", label: "Commercial" },
+		{ value: "office", label: "Office" },
+	];
+	const listingTypes = [
+		{ value: "sale", label: "Sale" },
+		{ value: "rent", label: "Rent" },
+		{ value: "lease", label: "Lease" },
+	];
+
 	return (
 		<div className="space-y-6">
 			<FormField
@@ -54,14 +74,30 @@ export default function BasicDetailsStep({ form, nextStep }: StepProps) {
 				render={({ field }) => (
 					<FormItem>
 						<FormLabel>Property Type</FormLabel>
-						<select {...field} className="border rounded p-2 w-full">
-							<option value="apartment">Apartment</option>
-							<option value="house">House</option>
-							<option value="villa">Villa</option>
-							<option value="plot">Plot</option>
-							<option value="commercial">Commercial</option>
-							<option value="office">Office</option>
-						</select>
+						<FormControl>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant="outline"
+										className="w-full flex justify-between">
+										<span>
+											{propertyTypes.find((pt) => pt.value === field.value)
+												?.label || "Select Type"}
+										</span>
+										<ChevronDown className="w-4 h-4 text-muted-foreground" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent className="w-full min-w-[180px]">
+									{propertyTypes.map((pt) => (
+										<DropdownMenuItem
+											key={pt.value}
+											onSelect={() => field.onChange(pt.value)}>
+											{pt.label}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</FormControl>
 						<FormMessage />
 					</FormItem>
 				)}
@@ -73,21 +109,34 @@ export default function BasicDetailsStep({ form, nextStep }: StepProps) {
 				render={({ field }) => (
 					<FormItem>
 						<FormLabel>Listing Type</FormLabel>
-						<select {...field} className="border rounded p-2 w-full">
-							<option value="sale">Sale</option>
-							<option value="rent">Rent</option>
-							<option value="lease">Lease</option>
-						</select>
+						<FormControl>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant="outline"
+										className="w-full flex justify-between">
+										<span>
+											{listingTypes.find((lt) => lt.value === field.value)
+												?.label || "Select Listing"}
+										</span>
+										<ChevronDown className="w-4 h-4 text-muted-foreground" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent className="w-full min-w-[180px]">
+									{listingTypes.map((lt) => (
+										<DropdownMenuItem
+											key={lt.value}
+											onSelect={() => field.onChange(lt.value)}>
+											{lt.label}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</FormControl>
 						<FormMessage />
 					</FormItem>
 				)}
 			/>
-
-			<div className="flex justify-end">
-				<Button type="button" onClick={nextStep}>
-					Next
-				</Button>
-			</div>
 		</div>
 	);
 }

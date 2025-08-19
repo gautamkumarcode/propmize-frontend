@@ -1,3 +1,4 @@
+import { PropertyFormData } from "@/components/screens/seller/add-property/validation/propertySchema";
 import {
 	useInfiniteQuery,
 	useMutation,
@@ -158,7 +159,7 @@ export const useCreateProperty = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (propertyData: PropertyCreateData) =>
+		mutationFn: (propertyData: PropertyFormData) =>
 			PropertyService.createProperty(propertyData),
 		onSuccess: (data) => {
 			// Invalidate and refetch

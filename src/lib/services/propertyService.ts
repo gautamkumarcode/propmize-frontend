@@ -1,3 +1,4 @@
+import { PropertyFormData } from "@/components/screens/seller/add-property/validation/propertySchema";
 import apiClient from "../api";
 import {
 	ApiResponse,
@@ -50,7 +51,7 @@ export class PropertyService {
 	 * Create a new property
 	 */
 	static async createProperty(
-		propertyData: PropertyCreateData
+		propertyData: PropertyFormData
 	): Promise<ApiResponse<Property>> {
 		// Create FormData for file upload
 		const formData = new FormData();
@@ -221,7 +222,9 @@ export class PropertyService {
 	/**
 	 * Get property analytics (for sellers)
 	 */
-	static async getPropertyAnalytics(propertyId: string): Promise<ApiResponse<unknown>> {
+	static async getPropertyAnalytics(
+		propertyId: string
+	): Promise<ApiResponse<unknown>> {
 		const response = await apiClient.get(`/properties/${propertyId}/analytics`);
 		return response.data;
 	}

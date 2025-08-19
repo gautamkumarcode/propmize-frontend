@@ -1,5 +1,4 @@
-export type PropertyFormData = {
-	_id?: string;
+export type PropertyFormDataType = {
 	title: string;
 	description: string;
 	propertyType:
@@ -41,17 +40,7 @@ export type PropertyFormData = {
 			longitude: number;
 		};
 	};
-	status?: "active" | "sold" | "rented" | "inactive" | "pending";
-	featured?: boolean;
-	premium?: boolean;
-	views?: number;
-	approvalStatus?: "pending" | "approved" | "rejected";
-	rejectionReason?: string;
-	seo: {
-		metaTitle?: string;
-		metaDescription?: string;
-		slug: string;
-	};
+
 	pricing: {
 		basePrice: number;
 		maintenanceCharges?: number;
@@ -64,22 +53,11 @@ export type PropertyFormData = {
 		possessionDate?: Date;
 		leaseDuration?: number;
 	};
-	legalInfo: {
-		ownershipType: "freehold" | "leasehold";
-		approvedBy?: string[];
-		rera?: {
-			number: string;
-			approved: boolean;
-		};
-		documents?: string[];
-	};
+
 	nearbyPlaces?: {
 		schools?: { name: string; distance: number }[];
 		hospitals?: { name: string; distance: number }[];
 		malls?: { name: string; distance: number }[];
 		transport?: { name: string; distance: number }[];
 	};
-	createdAt?: Date;
-	updatedAt?: Date;
-	expiresAt?: Date;
 };
