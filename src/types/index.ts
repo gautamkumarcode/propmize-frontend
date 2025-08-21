@@ -9,7 +9,14 @@ export interface User {
 	isVerified: boolean;
 	createdAt: Date;
 	updatedAt: Date;
-	location?: string;
+	address?: {
+		street?: string;
+		city?: string;
+		state?: string;
+		country?: string;
+		zipCode?: string;
+	};
+
 	verified?: boolean;
 }
 

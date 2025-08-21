@@ -24,13 +24,20 @@ interface StepProps {
 }
 
 const priceUnits = ["Hundred", "Thousand", "Lakh", "Crore"];
-const priceFields = [
-	{ name: "basePrice", label: "Base Price", min: 0 },
-	{ name: "maintenanceCharges", label: "Maintenance Charges", min: 0 },
-	{ name: "securityDeposit", label: "Security Deposit", min: 0 },
-];
 
 export default function PricingLegalStep({ form }: StepProps) {
+	const listingType = form.watch("listingType");
+
+	// Fields to be rendered based on listing type
+	const priceFields = [{ name: "basePrice", label: "Base Price", min: 0 }];
+
+	if (listingType === "rent" || listingType === "lease") {
+		priceFields.push(
+			{ name: "maintenanceCharges", label: "Maintenance Charges", min: 0 },
+			{ name: "securityDeposit", label: "Security Deposit", min: 0 }
+		);
+	}
+
 	return (
 		<div className="space-y-6">
 			{/* Pricing Fields */}

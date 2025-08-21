@@ -35,10 +35,13 @@ export const queryClient = new QueryClient({
 				// Don't retry rate limit errors
 				if (isHttpError(error) && error.response?.status === 429) return false;
 				// Don't retry client errors (4xx)
-				if (isHttpError(error) && error.response?.status && 
-					error.response.status >= 400 && 
+				if (
+					isHttpError(error) &&
+					error.response?.status &&
+					error.response.status >= 400 &&
 					error.response.status < 500
-				) return false;
+				)
+					return false;
 				// Only retry server errors up to 1 time
 				return failureCount < 1;
 			},
@@ -52,14 +55,17 @@ export const queryClient = new QueryClient({
 		},
 		mutations: {
 			// Don't retry mutations to prevent duplicate requests
-			retry: (failureCount: number, error: unknown) => {
+			retry: (error: unknown) => {
 				// Never retry rate limit errors
 				if (isHttpError(error) && error.response?.status === 429) return false;
 				// Never retry client errors
-				if (isHttpError(error) && error.response?.status && 
-					error.response.status >= 400 && 
+				if (
+					isHttpError(error) &&
+					error.response?.status &&
+					error.response.status >= 400 &&
 					error.response.status < 500
-				) return false;
+				)
+					return false;
 				return false; // Don't retry mutations by default
 			},
 			// Longer delay for mutations

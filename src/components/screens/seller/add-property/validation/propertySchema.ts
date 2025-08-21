@@ -2,8 +2,14 @@ import { z } from "zod";
 
 // ✅ Fixed Schema aligned with PropertyFormData
 export const propertySchema = z.object({
-	title: z.string().min(3, "Title is required"),
-	description: z.string().min(10, "Description should be more detailed"),
+	title: z
+		.string()
+		.min(10, "Title must be between 10 and 200 characters")
+		.max(200, "Title must be between 10 and 200 characters"),
+	description: z
+		.string()
+		.min(50, "Description must be between 50 and 2000 characters")
+		.max(2000, "Description must be between 50 and 2000 characters"),
 
 	propertyType: z.enum([
 		"apartment",
@@ -15,10 +21,10 @@ export const propertySchema = z.object({
 	]),
 	listingType: z.enum(["sale", "rent", "lease"]),
 
-	currency: z.string().default("INR"),
+	currency: z.enum(["INR", "USD", "EUR"]),
 
 	area: z.object({
-		value: z.string().min(1, "Area is required"),
+		value: z.string().min(1, "Area must be a positive number"),
 		unit: z.enum(["sqft", "sqm", "acre", "hectare"]),
 	}),
 
@@ -29,55 +35,44 @@ export const propertySchema = z.object({
 	furnished: z.enum(["furnished", "semi-furnished", "unfurnished"]),
 	floor: z.string().optional(),
 	totalFloors: z.string().optional(),
-	age: z.string().min(0),
+	age: z.string().min(0).optional().or(z.literal("")),
 
 	images: z.array(z.any()).min(1, "At least one image file is required"),
 	videos: z.array(z.any()).optional(),
 
-	amenities: z.array(z.string()),
+	amenities: z.array(z.string()).optional(),
 
 	address: z.object({
-		street: z.string(),
-		area: z.string(),
-		city: z.string(),
-		state: z.string(),
-		zipCode: z.string(),
-		country: z.string(),
+		street: z.string().min(1, "Street address is required"),
+		area: z.string().min(1, "Area is required"),
+		city: z.string().min(1, "City is required"),
+		state: z.string().min(1, "State is required"),
+		zipCode: z.string().min(1, "Zip code is required"),
+		country: z.string().min(1, "Country is required"),
 		landmark: z.string().optional(),
-		coordinates: z
-			.object({
-				latitude: z.number(),
-				longitude: z.number(),
-			})
-			.optional(),
 	}),
 
 	pricing: z.object({
 		basePrice: z.object({
-			value: z.string().min(0),
+			value: z.string().min(1, "Price must be a positive number"),
+
 			unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]).default("Lakh"),
 		}),
 
 		maintenanceCharges: z
 			.object({
-				value: z.string().optional(),
-				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]).default("Lakh"),
+				value: z.string().min(1, "Price must be a positive number").optional(),
+				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]),
 			})
 			.optional(),
 		securityDeposit: z
 			.object({
-				value: z.string().optional(),
-				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]).default("Lakh"),
+				value: z.string().min(1, "Price must be a positive number").optional(),
+				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]),
 			})
 			.optional(),
 
 		priceNegotiable: z.boolean(),
-	}),
-
-	availability: z.object({
-		immediatelyAvailable: z.boolean(),
-		possessionDate: z.date().optional(),
-		leaseDuration: z.number().optional(),
 	}),
 
 	nearbyPlaces: z
@@ -157,7 +152,11 @@ export const propertySchema = z.object({
 		.optional(),
 
 	notes: z.string().optional(),
-	// Removed duplicate pricing object
+	legalInfo: z
+		.object({
+			ownershipType: z.string().min(1, "Invalid ownership type"),
+		})
+		.optional(),
 });
 
 export type PropertyFormData = z.infer<typeof propertySchema>;

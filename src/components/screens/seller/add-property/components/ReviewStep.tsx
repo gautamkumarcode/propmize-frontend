@@ -14,10 +14,9 @@ import { PropertyFormData } from "../validation/propertySchema";
 
 interface StepProps {
 	form: UseFormReturn<PropertyFormData>;
-	prevStep: () => void;
 }
 
-export default function ReviewStep({ form, prevStep }: StepProps) {
+export default function ReviewStep({ form }: StepProps) {
 	const values = form.getValues();
 
 	return (
@@ -245,27 +244,6 @@ export default function ReviewStep({ form, prevStep }: StepProps) {
 				</div>
 
 				{/* Availability */}
-				<div className="bg-white rounded-xl shadow p-6">
-					<h3 className="font-semibold text-lg mb-4">Availability</h3>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-						<div>
-							<span className="font-medium">Immediately Available:</span>{" "}
-							{values.availability?.immediatelyAvailable ? "Yes" : "No"}
-						</div>
-						<div>
-							<span className="font-medium">Possession Date:</span>{" "}
-							{values.availability?.possessionDate
-								? new Date(
-										values.availability.possessionDate
-								  ).toLocaleDateString()
-								: "-"}
-						</div>
-						<div>
-							<span className="font-medium">Lease Duration:</span>{" "}
-							{values.availability?.leaseDuration ?? "-"}
-						</div>
-					</div>
-				</div>
 
 				{/* Nearby Places */}
 				<div className="bg-white rounded-xl shadow p-6">
@@ -322,17 +300,6 @@ export default function ReviewStep({ form, prevStep }: StepProps) {
 				</div>
 
 				{/* Coordinates */}
-				{values.address?.coordinates && (
-					<div className="bg-white rounded-xl shadow p-6">
-						<h3 className="font-semibold text-lg mb-4">Location Coordinates</h3>
-						<div className="text-sm">
-							<span className="font-medium">Latitude:</span>{" "}
-							{values.address.coordinates.latitude} <br />
-							<span className="font-medium">Longitude:</span>{" "}
-							{values.address.coordinates.longitude}
-						</div>
-					</div>
-				)}
 
 				{/* Step Actions */}
 			</div>

@@ -33,28 +33,26 @@ interface RegisterData {
 	password: string;
 }
 
+interface OtpStep {
+	phone: string;
+	otp: string;
+	isOtpSent: boolean;
+}
+
 const AuthModal: React.FC<AuthModalProps> = ({
 	isOpen,
 	onClose,
-	initialTab = "login",
 	redirectTo,
 }) => {
-	const [activeTab, setActiveTab] = useState<"login" | "register">(initialTab);
 	const queryClient = useQueryClient();
 	const { login, setUserMode } = useAuthStore();
 	const router = useRouter();
-
-	const [loginForm, setLoginForm] = useState<LoginData>({
-		email: "",
-		password: "",
-	});
-
-	const [registerForm, setRegisterForm] = useState<RegisterData>({
-		name: "",
-		email: "",
+	const [step, setStep] = useState<OtpStep>({
 		phone: "",
-		password: "",
+		otp: "",
+		isOtpSent: false,
 	});
+	const [loading, setLoading] = useState(false);
 
 	// Handle redirect after successful authentication
 	const handlePostAuthRedirect = () => {
@@ -136,47 +134,73 @@ const AuthModal: React.FC<AuthModalProps> = ({
 		},
 	});
 
-	const handleLogin = (e: React.FormEvent) => {
+	// Send OTP mutation
+	const handleSendOtp = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!loginForm.email || !loginForm.password) {
+		if (!step.phone) {
 			toast({
 				title: "Validation Error",
-				description: "Please fill in all fields",
+				description: "Enter phone number",
 				variant: "destructive",
 			});
 			return;
 		}
-		loginMutation.mutate(loginForm);
+		setLoading(true);
+		try {
+			await apiClient.post("/auth/send-otp", { phone: step.phone });
+			setStep((prev) => ({ ...prev, isOtpSent: true }));
+			toast({
+				title: "OTP sent",
+				description: "Check your SMS for the OTP.",
+			});
+		} catch (error: any) {
+			toast({
+				title: "Error",
+				description: error?.response?.data?.error || "Failed to send OTP",
+				variant: "destructive",
+			});
+		}
+		setLoading(false);
 	};
 
-	const handleRegister = (e: React.FormEvent) => {
+	// Verify OTP mutation
+	const handleVerifyOtp = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (
-			!registerForm.name ||
-			!registerForm.email ||
-			!registerForm.phone ||
-			!registerForm.password
-		) {
+		if (!step.otp) {
 			toast({
 				title: "Validation Error",
-				description: "Please fill in all fields",
+				description: "Enter OTP",
 				variant: "destructive",
 			});
 			return;
 		}
-
-		// Phone validation
-		const phoneRegex = /^\+?[\d\s-()]{10,}$/;
-		if (!phoneRegex.test(registerForm.phone)) {
+		setLoading(true);
+		try {
+			const response = await apiClient.post("/auth/verify-otp", {
+				phone: step.phone,
+				otp: step.otp,
+			});
+			const { user, tokens } = response.data.data;
+			login(user, tokens.accessToken, tokens.refreshToken);
+			queryClient.invalidateQueries({ queryKey: ["user"] });
 			toast({
-				title: "Validation Error",
-				description: "Please enter a valid phone number",
+				title: "Login successful",
+				description: `Welcome, ${user.name || user.phone}!`,
+			});
+			if (redirectTo) {
+				if (redirectTo.startsWith("/seller")) setUserMode("seller");
+				else if (redirectTo.startsWith("/buyer")) setUserMode("buyer");
+				setTimeout(() => router.push(redirectTo), 100);
+			}
+			onClose();
+		} catch (error: any) {
+			toast({
+				title: "Error",
+				description: error?.response?.data?.error || "Invalid OTP",
 				variant: "destructive",
 			});
-			return;
 		}
-
-		registerMutation.mutate(registerForm);
+		setLoading(false);
 	};
 
 	if (!isOpen) return null;
@@ -191,145 +215,52 @@ const AuthModal: React.FC<AuthModalProps> = ({
 							className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-100">
 							<X className="h-5 w-5" />
 						</button>
-						<CardTitle className="text-center">
-							{activeTab === "login" ? "Welcome Back" : "Join E-State"}
-						</CardTitle>
-						<div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
-							<button
-								onClick={() => setActiveTab("login")}
-								className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
-									activeTab === "login"
-										? "bg-white text-gray-900 shadow-sm"
-										: "text-gray-500 hover:text-gray-700"
-								}`}>
-								Login
-							</button>
-							<button
-								onClick={() => setActiveTab("register")}
-								className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
-									activeTab === "register"
-										? "bg-white text-gray-900 shadow-sm"
-										: "text-gray-500 hover:text-gray-700"
-								}`}>
-								Register
-							</button>
-						</div>
+						<CardTitle className="text-center">Mobile Login</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-4">
-						{activeTab === "login" ? (
-							<form onSubmit={handleLogin} className="space-y-4">
-								<div className="space-y-2">
-									<Label htmlFor="email">Email</Label>
-									<Input
-										id="email"
-										type="email"
-										placeholder="Enter your email"
-										value={loginForm.email}
-										onChange={(e) =>
-											setLoginForm({
-												...loginForm,
-												email: e.target.value,
-											})
-										}
-										required
-									/>
-								</div>
-								<div className="space-y-2">
-									<Label htmlFor="password">Password</Label>
-									<Input
-										id="password"
-										type="password"
-										placeholder="Enter your password"
-										value={loginForm.password}
-										onChange={(e) =>
-											setLoginForm({
-												...loginForm,
-												password: e.target.value,
-											})
-										}
-										required
-									/>
-								</div>
-								<Button
-									type="submit"
-									className="w-full"
-									disabled={loginMutation.isPending}>
-									{loginMutation.isPending ? "Signing in..." : "Sign In"}
-								</Button>
-							</form>
-						) : (
-							<form onSubmit={handleRegister} className="space-y-4">
-								<div className="space-y-2">
-									<Label htmlFor="name">Full Name</Label>
-									<Input
-										id="name"
-										type="text"
-										placeholder="Enter your full name"
-										value={registerForm.name}
-										onChange={(e) =>
-											setRegisterForm({
-												...registerForm,
-												name: e.target.value,
-											})
-										}
-										required
-									/>
-								</div>
-								<div className="space-y-2">
-									<Label htmlFor="register-email">Email</Label>
-									<Input
-										id="register-email"
-										type="email"
-										placeholder="Enter your email"
-										value={registerForm.email}
-										onChange={(e) =>
-											setRegisterForm({
-												...registerForm,
-												email: e.target.value,
-											})
-										}
-										required
-									/>
-								</div>
+						{!step.isOtpSent ? (
+							<form onSubmit={handleSendOtp} className="space-y-4">
 								<div className="space-y-2">
 									<Label htmlFor="phone">Phone Number</Label>
 									<Input
 										id="phone"
 										type="tel"
 										placeholder="Enter your phone number"
-										value={registerForm.phone}
+										value={step.phone}
 										onChange={(e) =>
-											setRegisterForm({
-												...registerForm,
-												phone: e.target.value,
-											})
+											setStep({ ...step, phone: e.target.value })
 										}
 										required
 									/>
 								</div>
+								<Button type="submit" className="w-full" disabled={loading}>
+									{loading ? "Sending OTP..." : "Send OTP"}
+								</Button>
+							</form>
+						) : (
+							<form onSubmit={handleVerifyOtp} className="space-y-4">
 								<div className="space-y-2">
-									<Label htmlFor="register-password">Password</Label>
+									<Label htmlFor="otp">Enter OTP</Label>
 									<Input
-										id="register-password"
-										type="password"
-										placeholder="Create a password"
-										value={registerForm.password}
-										onChange={(e) =>
-											setRegisterForm({
-												...registerForm,
-												password: e.target.value,
-											})
-										}
+										id="otp"
+										type="text"
+										placeholder="Enter OTP received"
+										value={step.otp}
+										onChange={(e) => setStep({ ...step, otp: e.target.value })}
 										required
 									/>
 								</div>
+								<Button type="submit" className="w-full" disabled={loading}>
+									{loading ? "Verifying..." : "Verify & Login"}
+								</Button>
 								<Button
-									type="submit"
+									type="button"
+									variant="ghost"
 									className="w-full"
-									disabled={registerMutation.isPending}>
-									{registerMutation.isPending
-										? "Creating account..."
-										: "Create Account"}
+									onClick={() =>
+										setStep({ phone: "", otp: "", isOtpSent: false })
+									}>
+									Change phone number
 								</Button>
 							</form>
 						)}

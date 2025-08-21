@@ -27,8 +27,34 @@ const places = ["schools", "hospitals", "malls", "transport"];
 const distanceUnits = ["meter", "km"];
 
 export default function LocationNearbyStep({ form }: StepProps) {
+	// Debug: collect all address field errors
+	const addressKeys = [
+		"street",
+		"area",
+		"city",
+		"state",
+		"zipCode",
+		"country",
+		"coordinates",
+		"landmark",
+	];
+	const addressErrors = addressKeys
+		.map((key) => form.getFieldState(`address.${key}` as any).error?.message)
+		.filter(Boolean);
+
 	return (
 		<div className="space-y-6">
+			{/* Debug: show all address field errors */}
+			{addressErrors.length > 0 && (
+				<div className="mb-2 p-2 bg-yellow-100 border border-yellow-300 rounded text-yellow-800 text-xs">
+					<div className="font-bold mb-1">Address Field Errors:</div>
+					<ul className="list-disc ml-5">
+						{addressErrors.map((err, idx) => (
+							<li key={idx}>{err}</li>
+						))}
+					</ul>
+				</div>
+			)}
 			{/* Address Fields */}
 			{[
 				{ key: "street", label: "Street" },
@@ -46,7 +72,7 @@ export default function LocationNearbyStep({ form }: StepProps) {
 				<FormField
 					key={key}
 					control={form.control}
-					name={key as keyof PropertyFormData}
+					name={`address.${key}` as any}
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>{label}</FormLabel>
@@ -106,11 +132,14 @@ export default function LocationNearbyStep({ form }: StepProps) {
 											control={form.control}
 											name={`nearbyPlaces.${place}.${idx}.name` as any}
 											render={({ field }) => (
-												<Input
-													placeholder="Name"
-													className="min-w-[16rem] lg:w-[25rem] w-full text-sm bg-background/80 border border-input rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition mx-0"
-													{...field}
-												/>
+												<>
+													<Input
+														placeholder="Name"
+														className="min-w-[16rem] lg:w-[25rem] w-full text-sm bg-background/80 border border-input rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition mx-0"
+														{...field}
+													/>
+													<FormMessage />
+												</>
 											)}
 										/>
 										<div className="flex items-center  bg-background border border-input rounded-lg overflow-hidden shadow-sm">
@@ -118,54 +147,60 @@ export default function LocationNearbyStep({ form }: StepProps) {
 												control={form.control}
 												name={`nearbyPlaces.${place}.${idx}.distance` as any}
 												render={({ field }) => (
-													<Input
-														type="number"
-														placeholder="Distance"
-														min={0}
-														step={0.1}
-														className="w-24 border-none rounded-none h-[44px] px-4 text-sm focus:ring-0 focus:border-none focus:bg-primary/5 transition"
-														{...field}
-													/>
+													<>
+														<Input
+															type="number"
+															placeholder="Distance"
+															min={0}
+															step={0.1}
+															className="w-24 border-none rounded-none h-[44px] px-4 text-sm focus:ring-0 focus:border-none focus:bg-primary/5 transition"
+															{...field}
+														/>
+														<FormMessage />
+													</>
 												)}
 											/>
 											<FormField
 												control={form.control}
 												name={`nearbyPlaces.${place}.${idx}.unit` as any}
 												render={({ field }) => (
-													<DropdownMenu>
-														<DropdownMenuTrigger asChild>
-															<Button
-																variant="ghost"
-																className="border-none rounded-none h-[44px] px-5 text-muted-foreground font-medium flex items-center justify-between gap-2 hover:bg-primary/10 focus:bg-primary/10 transition">
-																<span className="text-sm">
-																	{field.value || "Unit"}
-																</span>
-																<svg
-																	width="16"
-																	height="16"
-																	viewBox="0 0 16 16"
-																	fill="none"
-																	xmlns="http://www.w3.org/2000/svg">
-																	<path
-																		d="M4 6L8 10L12 6"
-																		stroke="currentColor"
-																		strokeWidth="1.5"
-																		strokeLinecap="round"
-																		strokeLinejoin="round"
-																	/>
-																</svg>
-															</Button>
-														</DropdownMenuTrigger>
-														<DropdownMenuContent align="end">
-															{distanceUnits.map((unit) => (
-																<DropdownMenuItem
-																	key={unit}
-																	onSelect={() => field.onChange(unit)}>
-																	{unit}
-																</DropdownMenuItem>
-															))}
-														</DropdownMenuContent>
-													</DropdownMenu>
+													<>
+														<DropdownMenu>
+															<DropdownMenuTrigger asChild>
+																<Button
+																	variant="ghost"
+																	className="border-none rounded-none h-[44px] px-5 text-muted-foreground font-medium flex items-center justify-between gap-2 hover:bg-primary/10 focus:bg-primary/10 transition">
+																	<span className="text-sm">
+																		{field.value || "Unit"}
+																	</span>
+																	<svg
+																		width="16"
+																		height="16"
+																		viewBox="0 0 16 16"
+																		fill="none"
+																		xmlns="http://www.w3.org/2000/svg">
+																		<path
+																			d="M4 6L8 10L12 6"
+																			stroke="currentColor"
+																			strokeWidth="1.5"
+																			strokeLinecap="round"
+																			strokeLinejoin="round"
+																		/>
+																	</svg>
+																</Button>
+															</DropdownMenuTrigger>
+															<DropdownMenuContent align="end">
+																{distanceUnits.map((unit) => (
+																	<DropdownMenuItem
+																		key={unit}
+																		onSelect={() => field.onChange(unit)}>
+																		{unit}
+																	</DropdownMenuItem>
+																))}
+															</DropdownMenuContent>
+														</DropdownMenu>
+														<FormMessage />
+													</>
 												)}
 											/>
 										</div>

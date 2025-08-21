@@ -223,6 +223,10 @@ export const sellerNavItems: NavigationItem[] = [
 	{ route: routes.sellerPlans, icon: "Crown" },
 	{ route: routes.sellerGuide, icon: "BookOpen" },
 	{ route: routes.sellerSupport, icon: "HelpCircle" },
+	{ route: routes.sellerAnalytics, icon: "BarChart3" },
+	{ route: routes.sellerLeads, icon: "MessageSquare" },
+	{ route: routes.addProperty, icon: "Plus", isHighlighted: true },
+	{ route: routes.sellerPremium, icon: "Diamond" },
 ];
 
 export const sellerBottomNavItems: NavigationItem[] = [

@@ -112,7 +112,7 @@ export class AuthService {
 	static async resetPassword(
 		token: string,
 		password: string
-	): Promise<ApiResponse<null>	> {
+	): Promise<ApiResponse<null>> {
 		const response = await apiClient.post("/auth/reset-password", {
 			token,
 			password,
@@ -167,10 +167,4 @@ export class AuthService {
 	/**
 	 * Update user profile
 	 */
-	static async updateProfile(
-		profileData: Partial<User>
-	): Promise<ApiResponse<User>> {
-		const response = await apiClient.put("/auth/profile", profileData);
-		return response.data;
-	}
 }

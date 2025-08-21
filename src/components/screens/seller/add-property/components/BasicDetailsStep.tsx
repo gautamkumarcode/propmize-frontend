@@ -67,76 +67,77 @@ export default function BasicDetailsStep({ form }: StepProps) {
 					</FormItem>
 				)}
 			/>
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<FormField
+					control={form.control}
+					name="propertyType"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Property Type</FormLabel>
+							<FormControl>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant="outline"
+											className="w-full flex justify-between">
+											<span>
+												{propertyTypes.find((pt) => pt.value === field.value)
+													?.label || "Select Type"}
+											</span>
+											<ChevronDown className="w-4 h-4 text-muted-foreground" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent className="w-full min-w-[180px]">
+										{propertyTypes.map((pt) => (
+											<DropdownMenuItem
+												key={pt.value}
+												onSelect={() => field.onChange(pt.value)}>
+												{pt.label}
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
-			<FormField
-				control={form.control}
-				name="propertyType"
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel>Property Type</FormLabel>
-						<FormControl>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline"
-										className="w-full flex justify-between">
-										<span>
-											{propertyTypes.find((pt) => pt.value === field.value)
-												?.label || "Select Type"}
-										</span>
-										<ChevronDown className="w-4 h-4 text-muted-foreground" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent className="w-full min-w-[180px]">
-									{propertyTypes.map((pt) => (
-										<DropdownMenuItem
-											key={pt.value}
-											onSelect={() => field.onChange(pt.value)}>
-											{pt.label}
-										</DropdownMenuItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</FormControl>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
-
-			<FormField
-				control={form.control}
-				name="listingType"
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel>Listing Type</FormLabel>
-						<FormControl>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline"
-										className="w-full flex justify-between">
-										<span>
-											{listingTypes.find((lt) => lt.value === field.value)
-												?.label || "Select Listing"}
-										</span>
-										<ChevronDown className="w-4 h-4 text-muted-foreground" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent className="w-full min-w-[180px]">
-									{listingTypes.map((lt) => (
-										<DropdownMenuItem
-											key={lt.value}
-											onSelect={() => field.onChange(lt.value)}>
-											{lt.label}
-										</DropdownMenuItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</FormControl>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
+				<FormField
+					control={form.control}
+					name="listingType"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Listing Type</FormLabel>
+							<FormControl>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant="outline"
+											className="w-full flex justify-between">
+											<span>
+												{listingTypes.find((lt) => lt.value === field.value)
+													?.label || "Select Listing"}
+											</span>
+											<ChevronDown className="w-4 h-4 text-muted-foreground" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent className="w-full min-w-[180px]">
+										{listingTypes.map((lt) => (
+											<DropdownMenuItem
+												key={lt.value}
+												onSelect={() => field.onChange(lt.value)}>
+												{lt.label}
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+			</div>
 		</div>
 	);
 }

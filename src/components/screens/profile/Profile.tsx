@@ -40,7 +40,20 @@ export default function Profile() {
 		name: "",
 		email: "",
 		phone: "",
-		location: "",
+		address: {
+			street: "",
+			city: "",
+			state: "",
+			zipCode: "",
+			country: "India",
+		},
+		avatar: undefined as string | File | undefined,
+		preferences: {
+			propertyTypes: [] as string[],
+			priceRange: { min: 0, max: 10000000 },
+			locations: [] as string[],
+			notifications: { email: true, sms: true, push: true },
+		},
 	});
 
 	// Update form data when profile loads
@@ -50,29 +63,90 @@ export default function Profile() {
 				name: profile.name || "",
 				email: profile.email || "",
 				phone: profile.phone || "",
-				location: profile.location || "",
+				address: {
+					street: profile.address?.street || "",
+					city: profile.address?.city || "",
+					state: profile.address?.state || "",
+					zipCode: profile.address?.zipCode || "",
+					country: profile.address?.country || "India",
+				},
+				avatar: profile.avatar || undefined,
+				preferences: (profile as any).preferences || {
+					propertyTypes: [],
+					priceRange: { min: 0, max: 10000000 },
+					locations: [],
+					notifications: { email: true, sms: true, push: true },
+				},
 			});
 		}
 	}, [profile]);
 
-	const handleSave = () => {
-		updateProfileMutation.mutate(formData, {
-			onSuccess: () => {
-				setIsEditing(false);
-				toast({
-					title: "Profile updated",
-					description: "Your profile has been updated successfully.",
-				});
-			},
-			onError: (error: any) => {
-				toast({
-					title: "Update failed",
-					description:
-						error.response?.data?.message || "Failed to update profile",
-					variant: "destructive",
-				});
+	const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files[0]) {
+			setFormData({ ...formData, avatar: e.target.files[0] });
+		}
+	};
+
+	const handlePreferenceChange = (key: string, value: any) => {
+		setFormData({
+			...formData,
+			preferences: {
+				...formData.preferences,
+				[key]: value,
 			},
 		});
+	};
+
+	const handleSave = () => {
+		const updateData: any = { ...formData };
+		// If avatar is a file, send as FormData
+		if (typeof formData.avatar === "object" && formData.avatar !== null) {
+			const fd = new FormData();
+			Object.entries(updateData).forEach(([key, value]) => {
+				if (key === "avatar" && value instanceof File) {
+					fd.append("avatar", value);
+				} else if (key === "address" || key === "preferences") {
+					fd.append(key, JSON.stringify(value));
+				} else if (value !== undefined) {
+					fd.append(key, String(value));
+				}
+			});
+			updateProfileMutation.mutate(fd, {
+				onSuccess: () => {
+					setIsEditing(false);
+					toast({
+						title: "Profile updated",
+						description: "Your profile has been updated successfully.",
+					});
+				},
+				onError: (error: any) => {
+					toast({
+						title: "Update failed",
+						description:
+							error.response?.data?.message || "Failed to update profile",
+						variant: "destructive",
+					});
+				},
+			});
+		} else {
+			updateProfileMutation.mutate(updateData, {
+				onSuccess: () => {
+					setIsEditing(false);
+					toast({
+						title: "Profile updated",
+						description: "Your profile has been updated successfully.",
+					});
+				},
+				onError: (error: any) => {
+					toast({
+						title: "Update failed",
+						description:
+							error.response?.data?.message || "Failed to update profile",
+						variant: "destructive",
+					});
+				},
+			});
+		}
 	};
 
 	if (!isAuthenticated) {
@@ -142,7 +216,7 @@ export default function Profile() {
 										</h1>
 										<p className="text-gray-600 flex items-center mt-1">
 											<MapPin className="w-4 h-4 mr-1" />
-											{profile?.location || "Location not provided"}
+											{profile?.address?.city || "Location not provided"}
 										</p>
 										<p className="text-sm text-gray-500 mt-1">
 											Member since{" "}
@@ -178,14 +252,18 @@ export default function Profile() {
 											<div className="text-2xl font-bold text-gray-900">
 												{(profile as any)?.properties?.length || 0}
 											</div>
-											<div className="text-sm text-gray-600">Properties Listed</div>
+											<div className="text-sm text-gray-600">
+												Properties Listed
+											</div>
 										</div>
 										<div className="text-center p-4 bg-green-50 rounded-lg">
 											<TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-2" />
 											<div className="text-2xl font-bold text-gray-900">
 												{(profile as any)?.totalViews || 0}
 											</div>
-											<div className="text-sm text-gray-600">Total Property Views</div>
+											<div className="text-sm text-gray-600">
+												Total Property Views
+											</div>
 										</div>
 										<div className="text-center p-4 bg-purple-50 rounded-lg">
 											<Crown className="w-8 h-8 text-purple-600 mx-auto mb-2" />
@@ -203,21 +281,27 @@ export default function Profile() {
 											<div className="text-2xl font-bold text-gray-900">
 												{(profile as any)?.savedProperties?.length || 0}
 											</div>
-											<div className="text-sm text-gray-600">Saved Properties</div>
+											<div className="text-sm text-gray-600">
+												Saved Properties
+											</div>
 										</div>
 										<div className="text-center p-4 bg-blue-50 rounded-lg">
 											<TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
 											<div className="text-2xl font-bold text-gray-900">
 												{(profile as any)?.viewedProperties?.length || 0}
 											</div>
-											<div className="text-sm text-gray-600">Properties Viewed</div>
+											<div className="text-sm text-gray-600">
+												Properties Viewed
+											</div>
 										</div>
 										<div className="text-center p-4 bg-green-50 rounded-lg">
 											<Phone className="w-8 h-8 text-green-600 mx-auto mb-2" />
 											<div className="text-2xl font-bold text-gray-900">
 												{(profile as any)?.contactedOwners?.length || 0}
 											</div>
-											<div className="text-sm text-gray-600">Owners Contacted</div>
+											<div className="text-sm text-gray-600">
+												Owners Contacted
+											</div>
 										</div>
 									</>
 								)}
@@ -287,23 +371,203 @@ export default function Profile() {
 								</div>
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-2">
-										Location
+										City
 									</label>
 									<div className="flex items-center space-x-2">
 										<MapPin className="w-5 h-5 text-gray-400" />
 										{isEditing ? (
 											<Input
-												value={formData.location}
+												value={formData.address.city}
 												onChange={(e) =>
-													setFormData({ ...formData, location: e.target.value })
+													setFormData({
+														...formData,
+														address: {
+															...formData.address,
+															city: e.target.value,
+														},
+													})
 												}
 											/>
 										) : (
 											<p className="text-gray-900">
-												{profile?.location || "Not provided"}
+												{profile?.address?.city || "Not provided"}
 											</p>
 										)}
 									</div>
+								</div>
+								<div className="md:col-span-2">
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Avatar
+									</label>
+									<div className="flex items-center space-x-4">
+										<Avatar className="w-16 h-16">
+											{formData.avatar &&
+											typeof formData.avatar === "string" ? (
+												<img
+													src={formData.avatar}
+													alt="Avatar"
+													className="w-full h-full object-cover rounded-full"
+												/>
+											) : profile?.avatar ? (
+												<img
+													src={profile.avatar}
+													alt="Avatar"
+													className="w-full h-full object-cover rounded-full"
+												/>
+											) : (
+												<User className="w-8 h-8 text-blue-600" />
+											)}
+										</Avatar>
+										{isEditing && (
+											<input
+												type="file"
+												accept="image/*"
+												onChange={handleAvatarChange}
+												className="block"
+											/>
+										)}
+									</div>
+								</div>
+							</div>
+							<hr className="my-6" />
+							<h2 className="text-xl font-semibold mb-4">Preferences</h2>
+							<div className="space-y-4">
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Property Types
+									</label>
+									{isEditing ? (
+										<Input
+											value={formData.preferences.propertyTypes.join(", ")}
+											onChange={(e) =>
+												handlePreferenceChange(
+													"propertyTypes",
+													e.target.value.split(",").map((s) => s.trim())
+												)
+											}
+											placeholder="apartment, house, villa, plot, commercial, office"
+										/>
+									) : (
+										<p className="text-gray-900">
+											{formData.preferences.propertyTypes.join(", ") ||
+												"Not set"}
+										</p>
+									)}
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Price Range
+									</label>
+									{isEditing ? (
+										<div className="flex space-x-2">
+											<Input
+												type="number"
+												value={formData.preferences.priceRange.min}
+												onChange={(e) =>
+													handlePreferenceChange("priceRange", {
+														...formData.preferences.priceRange,
+														min: Number(e.target.value),
+													})
+												}
+												placeholder="Min"
+											/>
+											<Input
+												type="number"
+												value={formData.preferences.priceRange.max}
+												onChange={(e) =>
+													handlePreferenceChange("priceRange", {
+														...formData.preferences.priceRange,
+														max: Number(e.target.value),
+													})
+												}
+												placeholder="Max"
+											/>
+										</div>
+									) : (
+										<p className="text-gray-900">
+											{formData.preferences.priceRange.min} -{" "}
+											{formData.preferences.priceRange.max}
+										</p>
+									)}
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Locations
+									</label>
+									{isEditing ? (
+										<Input
+											value={formData.preferences.locations.join(", ")}
+											onChange={(e) =>
+												handlePreferenceChange(
+													"locations",
+													e.target.value.split(",").map((s) => s.trim())
+												)
+											}
+											placeholder="city1, city2, ..."
+										/>
+									) : (
+										<p className="text-gray-900">
+											{formData.preferences.locations.join(", ") || "Not set"}
+										</p>
+									)}
+								</div>
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Notifications
+									</label>
+									{isEditing ? (
+										<div className="flex space-x-4">
+											<label className="flex items-center">
+												<input
+													type="checkbox"
+													checked={formData.preferences.notifications.email}
+													onChange={(e) =>
+														handlePreferenceChange("notifications", {
+															...formData.preferences.notifications,
+															email: e.target.checked,
+														})
+													}
+													className="mr-2"
+												/>{" "}
+												Email
+											</label>
+											<label className="flex items-center">
+												<input
+													type="checkbox"
+													checked={formData.preferences.notifications.sms}
+													onChange={(e) =>
+														handlePreferenceChange("notifications", {
+															...formData.preferences.notifications,
+															sms: e.target.checked,
+														})
+													}
+													className="mr-2"
+												/>{" "}
+												SMS
+											</label>
+											<label className="flex items-center">
+												<input
+													type="checkbox"
+													checked={formData.preferences.notifications.push}
+													onChange={(e) =>
+														handlePreferenceChange("notifications", {
+															...formData.preferences.notifications,
+															push: e.target.checked,
+														})
+													}
+													className="mr-2"
+												/>{" "}
+												Push
+											</label>
+										</div>
+									) : (
+										<p className="text-gray-900">
+											{Object.entries(formData.preferences.notifications)
+												.map(([k, v]) => (v ? k : null))
+												.filter(Boolean)
+												.join(", ") || "None"}
+										</p>
+									)}
 								</div>
 							</div>
 							{isEditing && (

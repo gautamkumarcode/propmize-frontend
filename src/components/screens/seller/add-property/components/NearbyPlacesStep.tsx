@@ -36,20 +36,45 @@ export default function NearbyPlacesStep({
 								<FormField
 									control={form.control}
 									name={`nearbyPlaces.${place}.${idx}.name` as any}
-									render={({ field }) => (
-										<Input placeholder="Name" {...field} />
-									)}
+									render={({ field }) => {
+										// Get error for this field from formState.errors using type assertion
+										const errors = form.formState.errors as any;
+										const nameError =
+											errors?.nearbyPlaces?.[place]?.[idx]?.name;
+										return (
+											<>
+												<Input placeholder="Name" {...field} />
+												{nameError && (
+													<div className="text-xs text-red-600 mt-1">
+														{nameError.message}
+													</div>
+												)}
+											</>
+										);
+									}}
 								/>
 								<FormField
 									control={form.control}
 									name={`nearbyPlaces.${place}.${idx}.distance` as any}
-									render={({ field }) => (
-										<Input
-											type="number"
-											placeholder="Distance (km)"
-											{...field}
-										/>
-									)}
+									render={({ field }) => {
+										const errors = form.formState.errors as any;
+										const distanceError =
+											errors?.nearbyPlaces?.[place]?.[idx]?.distance;
+										return (
+											<>
+												<Input
+													type="number"
+													placeholder="Distance (km)"
+													{...field}
+												/>
+												{distanceError && (
+													<div className="text-xs text-red-600 mt-1">
+														{distanceError.message}
+													</div>
+												)}
+											</>
+										);
+									}}
 								/>
 								<Button
 									type="button"

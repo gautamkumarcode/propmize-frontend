@@ -28,7 +28,7 @@ export class UserService {
 			}
 		});
 
-		const response = await apiClient.put("/users/profile", formData, {
+		const response = await apiClient.put("/users/profile/update", formData, {
 			headers: {
 				"Content-Type": "multipart/form-data",
 			},

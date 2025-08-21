@@ -63,45 +63,84 @@ const AMENITIES_OPTIONS = [
 
 type PropertyDetailsFeaturesStepProps = {
 	form: UseFormReturn<PropertyFormData>;
+	section?: "details" | "amenities"; // Simplified to 'details' and 'amenities'
 };
 
 export default function PropertyDetailsFeaturesStep({
 	form,
 }: PropertyDetailsFeaturesStepProps) {
 	const amenities = form.watch("amenities") || [];
+	const propertyType = form.watch("propertyType");
+
+	// Determine if the property is a residential type that needs bedroom/bathroom fields
+	const isResidential =
+		propertyType === "apartment" ||
+		propertyType === "house" ||
+		propertyType === "villa";
+	const isCommercial =
+		propertyType === "commercial" || propertyType === "office";
 
 	return (
 		<div className="space-y-8">
-			{/* Property Details - Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-				{[
-					"bedrooms",
-					"bathrooms",
-					"balconies",
-					"parking",
-					"floor",
-					"totalFloors",
-					"age",
-				].map((fieldName) => (
+			{/* Residential fields like bedrooms, bathrooms, etc. */}
+			{isResidential && (
+				<>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+						{[
+							"bedrooms",
+							"bathrooms",
+							"balconies",
+							"parking",
+							"floor",
+							"totalFloors",
+							"age",
+						].map((fieldName) => (
+							<FormField
+								key={fieldName}
+								control={form.control}
+								name={fieldName as any}
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-sm text-muted-foreground mb-1">
+											{fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
+										</FormLabel>
+										<FormControl>
+											<Input
+												type="number"
+												placeholder={`Enter ${
+													fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+												}`}
+												{...field}
+												value={field.value ?? ""}
+												className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						))}
+					</div>
+				</>
+			)}
+
+			{/* Common fields for all property types except plot */}
+			{propertyType !== "plot" && (
+				<>
+					{/* Area */}
 					<FormField
-						key={fieldName}
 						control={form.control}
-						name={fieldName as any}
+						name="area.value"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="text-sm text-muted-foreground mb-1">
-									{fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
+									Area (in Sq. Ft.)
 								</FormLabel>
 								<FormControl>
 									<Input
 										type="number"
-										placeholder={`Enter ${
-											fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
-										} (e.g. 2)`}
+										placeholder="Enter area (e.g. 1200)"
 										{...field}
-										value={
-											typeof field.value === "object" ? "" : field.value ?? ""
-										}
 										className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
 									/>
 								</FormControl>
@@ -109,210 +148,195 @@ export default function PropertyDetailsFeaturesStep({
 							</FormItem>
 						)}
 					/>
-				))}
-			</div>
 
-			{/* Area */}
-			<FormField
-				control={form.control}
-				name="area.value"
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel className="text-sm text-muted-foreground mb-1">
-							Area (in Sq. Ft.)
-						</FormLabel>
-						<FormControl>
-							<Input
-								type="number"
-								placeholder="Enter area (e.g. 1200)"
-								{...field}
-								className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-							/>
-						</FormControl>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
-
-			{/* Furnished Dropdown */}
-			<FormField
-				control={form.control}
-				name="furnished"
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel className="text-sm text-muted-foreground mb-1">
-							Furnished
-						</FormLabel>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									className="w-full flex justify-between items-center px-3 py-2 text-sm font-normal">
-									<span>
-										{field.value
-											? field.value.charAt(0).toUpperCase() +
-											  field.value.slice(1)
-											: "Select Furnishing"}
-									</span>
-									<svg
-										width="16"
-										height="16"
-										viewBox="0 0 16 16"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg">
-										<path
-											d="M4 6L8 10L12 6"
-											stroke="currentColor"
-											strokeWidth="1.5"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-									</svg>
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="start">
-								{[
-									{ value: "unfurnished", label: "Unfurnished" },
-									{ value: "semi-furnished", label: "Semi-Furnished" },
-									{ value: "furnished", label: "Furnished" },
-								].map((opt) => (
-									<DropdownMenuItem
-										key={opt.value}
-										onSelect={() => field.onChange(opt.value)}>
-										{opt.label}
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
-
-			{/* Facing Dropdown */}
-			<FormField
-				control={form.control}
-				name="features.facing"
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel className="text-sm text-muted-foreground mb-1">
-							Facing
-						</FormLabel>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="outline"
-									className="w-full flex justify-between items-center px-3 py-2 text-sm font-normal">
-									<span>
-										{field.value
-											? field.value.charAt(0).toUpperCase() +
-											  field.value.slice(1)
-											: "Select Facing"}
-									</span>
-									<svg
-										width="16"
-										height="16"
-										viewBox="0 0 16 16"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg">
-										<path
-											d="M4 6L8 10L12 6"
-											stroke="currentColor"
-											strokeWidth="1.5"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-									</svg>
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="start">
-								{featureFacings.map((opt) => (
-									<DropdownMenuItem
-										key={opt}
-										onSelect={() => field.onChange(opt)}>
-										{opt.charAt(0).toUpperCase() + opt.slice(1)}
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
-
-			{/* Flooring Type */}
-			<FormField
-				control={form.control}
-				name="features.flooringType"
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel className="text-sm text-muted-foreground mb-1">
-							Flooring Type
-						</FormLabel>
-						<FormControl>
-							<Input
-								placeholder="Enter Flooring Type (e.g. Marble, Tile, Wood)"
-								{...field}
-								className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-							/>
-						</FormControl>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
-
-			{/* Water Supply */}
-			<FormField
-				control={form.control}
-				name="features.waterSupply"
-				render={({ field }) => (
-					<FormItem>
-						<FormLabel className="text-sm text-muted-foreground mb-1">
-							Water Supply
-						</FormLabel>
-						<FormControl>
-							<Input
-								placeholder="Enter Water Supply (e.g. Municipal, Borewell)"
-								{...field}
-								className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-							/>
-						</FormControl>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
-
-			{/* Boolean Features - Grid of Pills */}
-			<div>
-				<div className="text-sm font-medium text-muted-foreground mb-2">
-					Other Features
-				</div>
-				<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-					{featureBooleans.map((feat) => (
+					{/* Furnished Dropdown (residential only) */}
+					{isResidential && (
 						<FormField
-							key={feat.name}
 							control={form.control}
-							name={`features.${feat.name}` as any}
+							name="furnished"
 							render={({ field }) => (
 								<FormItem>
-									<label className="flex items-center gap-2 cursor-pointer ">
-										<input
-											type="checkbox"
-											checked={field.value || false}
-											onChange={(e) => field.onChange(e.target.checked)}
-											className="accent-blue-500 w-4 h-4"
-										/>
-										<span className="text-sm ">{feat.label}</span>
-									</label>
+									<FormLabel className="text-sm text-muted-foreground mb-1">
+										Furnished
+									</FormLabel>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant="outline"
+												className="w-full flex justify-between items-center px-3 py-2 text-sm font-normal">
+												<span>
+													{field.value
+														? field.value.charAt(0).toUpperCase() +
+														  field.value.slice(1)
+														: "Select Furnishing"}
+												</span>
+												<svg
+													width="16"
+													height="16"
+													viewBox="0 0 16 16"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg">
+													<path
+														d="M4 6L8 10L12 6"
+														stroke="currentColor"
+														strokeWidth="1.5"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													/>
+												</svg>
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="start">
+											{[
+												{ value: "unfurnished", label: "Unfurnished" },
+												{ value: "semi-furnished", label: "Semi-Furnished" },
+												{ value: "furnished", label: "Furnished" },
+											].map((opt) => (
+												<DropdownMenuItem
+													key={opt.value}
+													onSelect={() => field.onChange(opt.value)}>
+													{opt.label}
+												</DropdownMenuItem>
+											))}
+										</DropdownMenuContent>
+									</DropdownMenu>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-					))}
-				</div>
-			</div>
+					)}
 
-			{/* Amenities Selection */}
+					{/* Facing Dropdown */}
+					<FormField
+						control={form.control}
+						name="features.facing"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel className="text-sm text-muted-foreground mb-1">
+									Facing
+								</FormLabel>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant="outline"
+											className="w-full flex justify-between items-center px-3 py-2 text-sm font-normal">
+											<span>
+												{field.value
+													? field.value.charAt(0).toUpperCase() +
+													  field.value.slice(1)
+													: "Select Facing"}
+											</span>
+											<svg
+												width="16"
+												height="16"
+												viewBox="0 0 16 16"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg">
+												<path
+													d="M4 6L8 10L12 6"
+													stroke="currentColor"
+													strokeWidth="1.5"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+												/>
+											</svg>
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="start">
+										{featureFacings.map((opt) => (
+											<DropdownMenuItem
+												key={opt}
+												onSelect={() => field.onChange(opt)}>
+												{opt.charAt(0).toUpperCase() + opt.slice(1)}
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					{/* Flooring Type & Water Supply (residential only) */}
+					{isResidential && (
+						<>
+							<FormField
+								control={form.control}
+								name="features.flooringType"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-sm text-muted-foreground mb-1">
+											Flooring Type
+										</FormLabel>
+										<FormControl>
+											<Input
+												placeholder="Enter Flooring Type (e.g. Marble, Tile, Wood)"
+												{...field}
+												className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name="features.waterSupply"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-sm text-muted-foreground mb-1">
+											Water Supply
+										</FormLabel>
+										<FormControl>
+											<Input
+												placeholder="Enter Water Supply (e.g. Municipal, Borewell)"
+												{...field}
+												className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</>
+					)}
+				</>
+			)}
+
+			{/* Boolean Features - Grid of Pills (residential & commercial) */}
+			{!isCommercial && !isResidential && (
+				<div>
+					<div className="text-sm font-medium text-muted-foreground mb-2">
+						Other Features
+					</div>
+					<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+						{featureBooleans.map((feat) => (
+							<FormField
+								key={feat.name}
+								control={form.control}
+								name={`features.${feat.name}` as any}
+								render={({ field }) => (
+									<FormItem>
+										<label className="flex items-center gap-2 cursor-pointer ">
+											<input
+												type="checkbox"
+												checked={field.value || false}
+												onChange={(e) => field.onChange(e.target.checked)}
+												className="accent-blue-500 w-4 h-4"
+											/>
+											<span className="text-sm ">{feat.label}</span>
+										</label>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						))}
+					</div>
+				</div>
+			)}
+
+			{/* Amenities Selection (residential & commercial) */}
 			<div className="">
 				<h3 className="text-sm font-medium text-muted-foreground mb-2">
 					Select Amenities
@@ -341,6 +365,12 @@ export default function PropertyDetailsFeaturesStep({
 						</label>
 					))}
 				</div>
+				{/* Error message for amenities */}
+				{form.formState.errors.amenities && (
+					<div className="text-xs text-red-600 mt-2">
+						{(form.formState.errors.amenities as any).message}
+					</div>
+				)}
 			</div>
 		</div>
 	);

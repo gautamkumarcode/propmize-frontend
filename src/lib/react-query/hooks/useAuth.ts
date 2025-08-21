@@ -1,3 +1,4 @@
+import { UserService } from "@/lib/services";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthService } from "../../services/authService";
 import {
@@ -23,10 +24,10 @@ interface HttpError {
 // Type guard to check if error is an HttpError
 function isHttpError(error: unknown): error is HttpError {
 	return (
-		typeof error === 'object' &&
+		typeof error === "object" &&
 		error !== null &&
-		'response' in error &&
-		typeof (error as HttpError).response?.status === 'number'
+		"response" in error &&
+		typeof (error as HttpError).response?.status === "number"
 	);
 }
 
@@ -77,9 +78,10 @@ export const useLogin = () => {
 			}, 500);
 		},
 		onError: (error: unknown) => {
-			const errorMessage = isHttpError(error) && error.response?.data?.message
-				? error.response.data.message
-				: "Login failed";
+			const errorMessage =
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Login failed";
 			console.error("Login failed:", errorMessage);
 			console.error("Full error:", error);
 		},
@@ -106,9 +108,10 @@ export const useRegister = () => {
 			queryClient.refetchQueries({ queryKey: QueryKeys.profile });
 		},
 		onError: (error: unknown) => {
-			const errorMessage = isHttpError(error) && error.response?.data?.message
-				? error.response.data.message
-				: "Registration failed";
+			const errorMessage =
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Registration failed";
 			console.error("Registration failed:", errorMessage);
 		},
 	});
@@ -157,10 +160,13 @@ export const useProfile = () => {
 		retry: (failureCount, error: unknown) => {
 			console.log("Profile query retry:", {
 				failureCount,
-				error: isHttpError(error) ? error.response?.status : 'Unknown error',
+				error: isHttpError(error) ? error.response?.status : "Unknown error",
 			});
 			// Don't retry if it's an auth error (401/403)
-			if (isHttpError(error) && (error.response?.status === 401 || error.response?.status === 403)) {
+			if (
+				isHttpError(error) &&
+				(error.response?.status === 401 || error.response?.status === 403)
+			) {
 				return false;
 			}
 			return failureCount < 2; // Retry up to 2 times for other errors
@@ -175,9 +181,10 @@ export const useForgotPassword = () => {
 			console.log("Password reset link sent to your email");
 		},
 		onError: (error: unknown) => {
-			const errorMessage = isHttpError(error) && error.response?.data?.message
-				? error.response.data.message
-				: "Failed to send reset link";
+			const errorMessage =
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Failed to send reset link";
 			console.error(errorMessage);
 		},
 	});
@@ -235,7 +242,7 @@ export const useUpdateProfile = () => {
 
 	return useMutation({
 		mutationFn: (profileData: Partial<any>) =>
-			AuthService.updateProfile(profileData),
+			UserService.updateProfile(profileData),
 		onSuccess: (data: ApiResponse<any>) => {
 			queryClient.setQueryData(QueryKeys.profile, data.data);
 			queryClient.invalidateQueries({ queryKey: QueryKeys.profile });
