@@ -360,3 +360,10 @@ export function useRealTimeProperties() {
 
 	return { newProperty, updatedProperty };
 }
+
+export function useRecentlyViewedProperties() {
+	return useQuery({
+		queryKey: QueryKeys.recentlyViewedProperties,
+		queryFn: PropertyService.getRecentlyViewedProperties,
+	});
+}

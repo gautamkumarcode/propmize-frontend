@@ -1,5 +1,6 @@
+import { AxiosRequestConfig } from "axios";
 import apiClient from "../api";
-import { ApiResponse, User, UserUpdateData } from "../types/api";
+import { ApiResponse, User } from "../types/api";
 
 export class UserService {
 	/**
@@ -14,26 +15,25 @@ export class UserService {
 	 * Update user profile
 	 */
 	static async updateProfile(
-		updateData: UserUpdateData
+		updateData: FormData | any
 	): Promise<ApiResponse<User>> {
-		const formData = new FormData();
+		let config: AxiosRequestConfig = {};
 
-		Object.entries(updateData).forEach(([key, value]) => {
-			if (key === "avatar" && value instanceof File) {
-				formData.append("avatar", value);
-			} else if (typeof value === "object") {
-				formData.append(key, JSON.stringify(value));
-			} else if (value !== undefined) {
-				formData.append(key, String(value));
-			}
-		});
+		console.log("Update data received in service:", updateData);
+		// Check if it's FormData and set appropriate headers
+		if (updateData instanceof FormData) {
+			config = {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			};
+		}
 
-		const response = await apiClient.put("/users/profile/update", formData, {
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-		});
-
+		const response = await apiClient.put(
+			"/users/profile/update",
+			updateData,
+			config
+		);
 		return response.data;
 	}
 

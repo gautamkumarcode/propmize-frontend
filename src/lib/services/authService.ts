@@ -52,7 +52,6 @@ export class AuthService {
 		try {
 			await apiClient.post("/auth/logout");
 		} catch (error) {
-			console.error("Logout API error:", error);
 		} finally {
 			// Always clear tokens
 			safeLocalStorage.removeItem("accessToken");
@@ -149,10 +148,6 @@ export class AuthService {
 			safeLocalStorage.removeItem("refreshToken");
 		}
 
-		console.log("AuthService.isAuthenticated check:", {
-			hasToken: hasValidToken,
-			token: hasValidToken ? token.substring(0, 20) + "..." : token,
-		});
 		return hasValidToken;
 	}
 

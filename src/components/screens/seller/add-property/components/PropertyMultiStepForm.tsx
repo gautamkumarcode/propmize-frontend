@@ -164,13 +164,7 @@ export default function PropertyForm({
 			case "media":
 				fieldsToValidate = ["images"];
 				break;
-			case "review":
-				fieldsToValidate = [
-					"contact.name",
-					"contact.phone",
-					"pricing.basePrice.value",
-				];
-				break;
+
 			default:
 				break;
 		}
@@ -201,12 +195,12 @@ export default function PropertyForm({
 						<LocationNearbyStep form={form} />
 						<PropertyDetailsFeaturesStep form={form} section="details" />
 						<PropertyDetailsFeaturesStep form={form} section="amenities" />
-						<MediaStep form={form} />
 					</>
 				);
 			case "pricing":
 				return (
 					<>
+						<MediaStep form={form} />
 						<PricingLegalStep form={form} />
 						<ContactNotesStep form={form} />
 						{/* Nearby places and notes can be added here if needed */}

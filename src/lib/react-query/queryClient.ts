@@ -87,6 +87,7 @@ export const QueryKeys = {
 	featuredProperties: ["properties", "featured"] as const,
 	premiumProperties: ["properties", "premium"] as const,
 	likedProperties: ["properties", "liked"] as const,
+	recentlyViewedProperties: ["properties", "recently-viewed"] as const,
 	propertiesByLocation: (city: string, state?: string) =>
 		state
 			? ["properties", "location", city, state]

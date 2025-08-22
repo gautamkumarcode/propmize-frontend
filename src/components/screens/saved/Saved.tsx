@@ -3,51 +3,18 @@
 import BuyerLayout from "@/components/custom/layout/BuyerLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+
+import { useLikedProperties } from "@/lib";
 import { Bath, Bed, Heart, MapPin, Phone, Share2, Square } from "lucide-react";
-import { useState } from "react";
 
 export default function Saved() {
-	const [savedProperties, setSavedProperties] = useState([
-		{
-			id: 1,
-			title: "3BHK Luxury Apartment",
-			location: "Koramangala, Bangalore",
-			price: "₹1.2 Cr",
-			beds: 3,
-			baths: 3,
-			area: "1450 sq ft",
-			image: "/api/placeholder/300/200",
-			savedDate: "2024-01-15",
-		},
-		{
-			id: 2,
-			title: "2BHK Modern Flat",
-			location: "Whitefield, Bangalore",
-			price: "₹85 Lakh",
-			beds: 2,
-			baths: 2,
-			area: "1200 sq ft",
-			image: "/api/placeholder/300/200",
-			savedDate: "2024-01-12",
-		},
-		{
-			id: 3,
-			title: "4BHK Villa with Garden",
-			location: "HSR Layout, Bangalore",
-			price: "₹2.5 Cr",
-			beds: 4,
-			baths: 4,
-			area: "2800 sq ft",
-			image: "/api/placeholder/300/200",
-			savedDate: "2024-01-10",
-		},
-	]);
+	const { data: savedProperties = [], isLoading } = useLikedProperties();
 
-	const handleUnsave = (propertyId: number) => {
-		setSavedProperties(savedProperties.filter((p) => p.id !== propertyId));
+	const handleUnsave = (propertyId: string) => {
+		// unsaveMutation.mutate(propertyId);
 	};
 
-	const handleContact = (propertyId: number) => {
+	const handleContact = (propertyId: string) => {
 		// Contact logic here
 		console.log("Contacting for property:", propertyId);
 	};
@@ -80,15 +47,15 @@ export default function Saved() {
 						{savedProperties.length > 0 ? (
 							<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 								{savedProperties.map((property) => (
-									<Card key={property.id} className="overflow-hidden">
+									<Card key={property._id} className="overflow-hidden">
 										<div className="relative">
 											<img
-												src={property.image}
+												src={property.images[0].url}
 												alt={property.title}
 												className="w-full h-48 object-cover"
 											/>
 											<button
-												onClick={() => handleUnsave(property.id)}
+												onClick={() => handleUnsave(property._id)}
 												className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-lg hover:bg-gray-50">
 												<Heart className="w-5 h-5 text-red-500 fill-current" />
 											</button>
@@ -102,22 +69,22 @@ export default function Saved() {
 											</h3>
 											<p className="text-gray-600 flex items-center mb-3">
 												<MapPin className="w-4 h-4 mr-1" />
-												{property.location}
+												{property.address.city}, {property.address.state}
 											</p>
 
 											<div className="flex items-center justify-between mb-4">
 												<div className="flex items-center space-x-4 text-sm text-gray-600">
 													<span className="flex items-center">
 														<Bed className="w-4 h-4 mr-1" />
-														{property.beds} Beds
+														{property.bedrooms} Beds
 													</span>
 													<span className="flex items-center">
 														<Bath className="w-4 h-4 mr-1" />
-														{property.baths} Baths
+														{property.bathrooms} Baths
 													</span>
 													<span className="flex items-center">
 														<Square className="w-4 h-4 mr-1" />
-														{property.area}
+														{property.area.size} {property.area.unit}
 													</span>
 												</div>
 											</div>
@@ -140,7 +107,7 @@ export default function Saved() {
 												</p>
 												<Button
 													size="sm"
-													onClick={() => handleContact(property.id)}>
+													onClick={() => handleContact(property._id)}>
 													<Phone className="w-4 h-4 mr-1" />
 													Contact
 												</Button>

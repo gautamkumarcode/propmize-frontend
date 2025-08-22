@@ -58,11 +58,7 @@ export default function PropertyCard({
 				{/* Property Image */}
 				<div className="relative h-48 w-full">
 					<Image
-						src={
-							typeof property.images?.[0] === "string"
-								? property.images[0]
-								: property.images?.[0]?.url || "/placeholder-property.jpg"
-						}
+						src={"/placeholder-property.jpg"}
 						alt={property.title}
 						fill
 						className="object-cover rounded-t-lg"

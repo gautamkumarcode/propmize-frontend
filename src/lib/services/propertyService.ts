@@ -202,7 +202,7 @@ export class PropertyService {
 	 * Get liked properties
 	 */
 	static async getLikedProperties(): Promise<ApiResponse<Property[]>> {
-		const response = await apiClient.get("/properties/liked");
+		const response = await apiClient.get("/properties/user/liked");
 		return response.data;
 	}
 
@@ -228,4 +228,10 @@ export class PropertyService {
 		const response = await apiClient.get(`/properties/${propertyId}/analytics`);
 		return response.data;
 	}
+
+	static async getRecentlyViewedProperties(): Promise<ApiResponse<Property[]>> {
+		const response = await apiClient.get("/properties/user/recently-viewed");
+		return response.data;
+	}
+
 }

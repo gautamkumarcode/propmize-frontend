@@ -25,16 +25,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 	const isAuthenticated = !!user && AuthService.isAuthenticated();
 
-	// Debug logging
-	useEffect(() => {
-		console.log("AuthProvider state:", {
-			user,
-			isLoading,
-			isError,
-			isAuthenticated,
-			hasToken: !!AuthService.getAccessToken(),
-		});
-	}, [user, isLoading, isError, isAuthenticated]);
+
 
 	// Cleanup tokens on error
 	useEffect(() => {

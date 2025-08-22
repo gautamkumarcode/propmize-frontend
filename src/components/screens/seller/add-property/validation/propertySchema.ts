@@ -4,12 +4,12 @@ import { z } from "zod";
 export const propertySchema = z.object({
 	title: z
 		.string()
-		.min(10, "Title must be between 10 and 200 characters")
-		.max(200, "Title must be between 10 and 200 characters"),
+		.min(5, "Title must be between 5 and 200 characters")
+		.max(200, "Title must be between 5 and 200 characters"),
 	description: z
 		.string()
-		.min(50, "Description must be between 50 and 2000 characters")
-		.max(2000, "Description must be between 50 and 2000 characters"),
+		.min(10, "Description must be between 10 and 2000 characters")
+		.max(2000, "Description must be between 10 and 2000 characters"),
 
 	propertyType: z.enum([
 		"apartment",
@@ -54,20 +54,20 @@ export const propertySchema = z.object({
 
 	pricing: z.object({
 		basePrice: z.object({
-			value: z.string().min(1, "Price must be a positive number"),
+			value: z.string(),
 
 			unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]).default("Lakh"),
 		}),
 
 		maintenanceCharges: z
 			.object({
-				value: z.string().min(1, "Price must be a positive number").optional(),
+				value: z.string().optional(),
 				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]),
 			})
 			.optional(),
 		securityDeposit: z
 			.object({
-				value: z.string().min(1, "Price must be a positive number").optional(),
+				value: z.string().optional(),
 				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]),
 			})
 			.optional(),

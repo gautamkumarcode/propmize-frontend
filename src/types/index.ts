@@ -1,23 +1,28 @@
 // User and Authentication Types
 export interface User {
-	id: string;
-	email: string;
+	_id: string;
 	name: string;
-	phone: string;
+	email: string;
+	phone?: string;
+	bio?: string;
 	avatar?: string;
-	role: "buyer" | "seller" | "admin";
-	isVerified: boolean;
-	createdAt: Date;
-	updatedAt: Date;
 	address?: {
 		street?: string;
 		city?: string;
 		state?: string;
-		country?: string;
 		zipCode?: string;
+		country?: string;
 	};
-
 	verified?: boolean;
+	createdAt?: string;
+	updatedAt?: string;
+	preferences?: {
+		propertyTypes?: string[];
+		priceRange?: { min: number; max: number };
+		locations?: string[];
+		notifications?: { email: boolean; sms: boolean; push: boolean };
+	};
+	role: "buyer" | "seller" | "admin";
 }
 
 // Property Types
@@ -58,6 +63,7 @@ export interface Property {
 	bedrooms?: number;
 	bathrooms?: number;
 	parking?: boolean;
+	savedDate: string;
 }
 
 export interface PropertyImage {

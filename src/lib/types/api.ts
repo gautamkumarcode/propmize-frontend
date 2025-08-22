@@ -143,6 +143,15 @@ export interface UserUpdateData {
 		emailUpdates: boolean;
 		smsAlerts: boolean;
 	};
+	// Additional fields can be added here
+	address?: {
+		street: string;
+		city: string;
+		state: string;
+		country: string;
+		zip: string;
+	};
+	// Additional fields can be added here
 }
 
 // Re-export existing types
