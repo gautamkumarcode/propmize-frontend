@@ -4,8 +4,9 @@ import { Loader2 } from "lucide-react";
 import {
 	useInfiniteProperties,
 	useRealTimeProperties,
+	useSearchProperties,
 } from "../../../lib/react-query/hooks/useProperties";
-import { Property } from "../../../types";
+import { PropertyResponse } from "../../../types";
 import { Button } from "../../ui/button";
 import PropertyCard from "./PropertyCard";
 import PropertyCardLoader from "./PropertyCardLoader";
@@ -17,6 +18,7 @@ interface PropertiesListProps {
 	className?: string;
 	showLoadMore?: boolean;
 	mode?: "buyer" | "seller";
+	searchQuery?: string;
 }
 
 export default function PropertiesList({
@@ -24,19 +26,25 @@ export default function PropertiesList({
 	className = "",
 	showLoadMore = true,
 	mode = "buyer",
+	searchQuery = "",
 }: PropertiesListProps) {
-	const {
-		data,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
-		isLoading,
-		isError,
-		error,
-	} = useInfiniteProperties(filters);
+	const isSearching = !!searchQuery && searchQuery.trim().length > 0;
+	const infinite = useInfiniteProperties(filters);
+	const search = useSearchProperties(searchQuery, filters);
 
 	// Real-time updates
 	useRealTimeProperties();
+
+	// Select data based on search mode
+	const data = isSearching
+		? { pages: [search.data || []], pageParams: [1] }
+		: infinite.data;
+	const fetchNextPage = isSearching ? undefined : infinite.fetchNextPage;
+	const hasNextPage = isSearching ? false : infinite.hasNextPage;
+	const isFetchingNextPage = isSearching ? false : infinite.isFetchingNextPage;
+	const isLoading = isSearching ? search.isLoading : infinite.isLoading;
+	const isError = isSearching ? search.isError : infinite.isError;
+	const error = isSearching ? search.error : infinite.error;
 
 	if (isLoading) {
 		return (
@@ -63,8 +71,11 @@ export default function PropertiesList({
 	}
 
 	const properties =
-		data?.pages.flatMap((page: Property[] | { data: Property[] }) =>
-			Array.isArray(page) ? page : (page as { data: Property[] })?.data ?? []
+		data?.pages.flatMap(
+			(page: PropertyResponse[] | { data: PropertyResponse[] }) =>
+				Array.isArray(page)
+					? page
+					: (page as { data: PropertyResponse[] })?.data ?? []
 		) || [];
 
 	if (properties.length === 0) {
@@ -84,7 +95,7 @@ export default function PropertiesList({
 		<div className={className}>
 			{/* Properties Grid */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{properties.map((property: Property) => (
+				{properties.map((property: PropertyResponse) => (
 					<PropertyCard
 						key={property._id}
 						property={property}
@@ -102,7 +113,7 @@ export default function PropertiesList({
 			{showLoadMore && hasNextPage && (
 				<div className="text-center mt-8">
 					<Button
-						onClick={() => fetchNextPage()}
+						onClick={() => fetchNextPage && fetchNextPage()}
 						disabled={isFetchingNextPage}
 						variant="outline"
 						className="px-8 py-2">

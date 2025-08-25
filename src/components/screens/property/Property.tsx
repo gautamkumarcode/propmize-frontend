@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
 import AppLayout from "@/components/custom/layout/AppLayout";
 import PropertiesList from "@/components/custom/property/PropertiesList";
 import PropertySearch from "@/components/custom/property/PropertySearch";
 import { PropertyFilters } from "@/lib/types/api";
+import { useState } from "react";
 
 const Property = ({ mode = "buyer" }: { mode?: "buyer" | "seller" }) => {
 	const [filters, setFilters] = useState<PropertyFilters>({});
+	const [searchQuery, setSearchQuery] = useState("");
 
-	const handleFilterChange = (newFilters: PropertyFilters) => {
+	const handleFilterChange = (newFilters: PropertyFilters, query?: string) => {
 		setFilters(newFilters);
+		if (typeof query === "string") setSearchQuery(query);
+		else setSearchQuery("");
 	};
 
 	return (
@@ -27,12 +30,19 @@ const Property = ({ mode = "buyer" }: { mode?: "buyer" | "seller" }) => {
 							tailored to your needs
 						</p>
 					</div>
-					
+
 					{/* Search and Filter */}
-					<PropertySearch onFilterChange={handleFilterChange} />
-					
+					<PropertySearch
+						onFilterChange={handleFilterChange}
+						searchQuery={searchQuery}
+						setSearchQuery={setSearchQuery}
+					/>
+
 					{/* Property Listings */}
-					<PropertiesList filters={filters} />
+					<PropertiesList
+						filters={filters as { [key: string]: unknown }}
+						searchQuery={searchQuery}
+					/>
 				</div>
 			</div>
 		</AppLayout>

@@ -14,16 +14,20 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { PropertyFilters } from "@/lib/types/api";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface PropertySearchProps {
-	onFilterChange: (filters: PropertyFilters) => void;
+	onFilterChange: (filters: PropertyFilters, query?: string) => void;
 	className?: string;
+	searchQuery: string;
+	setSearchQuery: (query: string) => void;
 }
 
 export default function PropertySearch({
 	onFilterChange,
 	className = "",
+	searchQuery,
+	setSearchQuery,
 }: PropertySearchProps) {
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const [filters, setFilters] = useState<PropertyFilters>({
@@ -35,10 +39,18 @@ export default function PropertySearch({
 		bathrooms: undefined,
 		city: undefined,
 	});
-	const [searchQuery, setSearchQuery] = useState("");
 	const [priceRange, setPriceRange] = useState([0, 10000000]); // Default price range in INR
 
-	// Handle search input change
+	// Debounced search using useEffect
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			onFilterChange(filters, searchQuery);
+		}, 500); // 500ms debounce
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [searchQuery, filters]);
+
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchQuery(e.target.value);
 	};
@@ -65,12 +77,7 @@ export default function PropertySearch({
 
 	// Apply filters
 	const applyFilters = () => {
-		// If search query exists, add it to filters (backend can search in title/description)
-		const appliedFilters = { ...filters };
-		if (searchQuery) {
-			appliedFilters.query = searchQuery as any;
-		}
-		onFilterChange(appliedFilters);
+		onFilterChange(filters, searchQuery);
 	};
 
 	// Reset filters

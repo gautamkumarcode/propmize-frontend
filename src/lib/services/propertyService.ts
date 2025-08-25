@@ -1,4 +1,5 @@
 import { PropertyFormData } from "@/components/screens/seller/add-property/validation/propertySchema";
+import { PropertyResponse } from "@/types";
 import apiClient from "../api";
 import {
 	ApiResponse,
@@ -49,7 +50,7 @@ export class PropertyService {
 	/**
 	 * Get a single property by ID
 	 */
-	static async getProperty(id: string): Promise<ApiResponse<Property>> {
+	static async getProperty(id: string): Promise<ApiResponse<PropertyResponse>> {
 		const response = await apiClient.get(`/properties/${id}`);
 		return {
 			...response.data,

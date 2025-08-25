@@ -30,46 +30,79 @@ export interface User {
 }
 
 // Property Types
-export interface Property {
+export interface PropertyResponse {
 	_id: string;
 	title: string;
 	description: string;
+	images: string[];
+	status: string;
+	featured?: boolean;
+	isPremium?: boolean;
+	propertyType: string;
+	listingType: string;
 	price: number;
-	type: "residential" | "commercial" | "land" | "industrial";
-	subType: string; // apartment, villa, plot, office, etc.
-	status: "sale" | "rent" | "sold" | "rented";
-	area: {
-		size: number;
-		unit: "sqft" | "sqyard" | "acre";
+	pricing?: {
+		priceNegotiable?: boolean;
+		maintenanceCharges?: number;
+		securityDeposit?: number;
+		brokeragePercentage?: number;
 	};
-	address: {
-		area: string;
-		street: string;
-		city: string;
-		state: string;
-		pincode: string;
-		latitude?: number;
-		longitude?: number;
-	};
-	features: string[];
-	amenities: string[];
-	images: PropertyImage[];
-	sellerId: string;
-	seller: User;
-	isPremium: boolean;
-	views: number;
-	inquiries: number;
-	createdAt: Date;
-	updatedAt: Date;
-	isNew?: boolean; // Indicates if the property is newly listed
-	featured?: boolean; // Indicates if the property is featured
-	isLiked?: boolean;
 	bedrooms?: number;
 	bathrooms?: number;
-	parking?: boolean;
-	savedDate: string;
+	area: {
+		value: number;
+		unit: string;
+	};
+	parking?: number;
+	balconies?: number;
+	floor?: number;
+	totalFloors?: number;
+	age: number;
+	furnished: string;
+	amenities?: string[];
+	features?: {
+		facing?: string;
+		flooringType?: string;
+		waterSupply?: string;
+		powerBackup?: boolean;
+	};
+	address: {
+		street: string;
+		area: string;
+		city: string;
+		state: string;
+		zipCode: string;
+		country: string;
+		landmark?: string;
+	};
+	nearbyPlaces?: {
+		schools?: { name: string; distance: number; unit?: string }[];
+		hospitals?: { name: string; distance: number; unit?: string }[];
+		malls?: { name: string; distance: number; unit?: string }[];
+		transport?: { name: string; distance: number; unit?: string }[];
+	};
+	createdAt: string;
+	expiresAt?: string;
+	views?: number;
+	contact: {
+		name: string;
+		type: string;
+		phone: string;
+		whatsapp?: string;
+	};
+	legalInfo?: {
+		ownershipType: string;
+		rera?: {
+			number: string;
+			approved: boolean;
+		};
+	};
+	availability?: {
+		immediatelyAvailable: boolean;
+		possessionDate?: string;
+		leaseDuration?: number;
+	};
 }
-
 export interface PropertyImage {
 	id: string;
 	url: string;
@@ -82,7 +115,7 @@ export interface PropertyImage {
 export interface Inquiry {
 	id: string;
 	propertyId: string;
-	property: Property;
+	property: PropertyResponse;
 	buyerId: string;
 	buyer: User;
 	sellerId: string;
@@ -174,9 +207,9 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 
 // Filter and Search Types
 export interface PropertyFilters {
-	type?: Property["type"];
+	type?: PropertyResponse["propertyType"];
 	subType?: string;
-	status?: Property["status"];
+	status?: PropertyResponse["status"];
 	priceRange?: {
 		min: number;
 		max: number;
@@ -232,7 +265,7 @@ export interface LayoutProps {
 }
 
 export interface PropertyCardProps {
-	property: Property;
+	property: PropertyResponse;
 	showSaveButton?: boolean;
 	showContactButton?: boolean;
 	className?: string;
@@ -261,7 +294,7 @@ export interface AuthState {
 }
 
 export interface PropertyState {
-	properties: Property[];
+	properties: PropertyResponse[];
 	filters: PropertyFilters;
 	isLoading: boolean;
 	error: string | null;
