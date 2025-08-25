@@ -6,7 +6,7 @@ const ProfilePage = dynamic(() => import("./Profile"), {
 	ssr: true,
 });
 
-const ProfileHOC = (props: Props) => {
+const ProfileHOC = (/* props: Props */) => {
 	return <ProfilePage />;
 };
 

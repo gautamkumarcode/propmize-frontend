@@ -8,19 +8,22 @@ import {
 import { Property } from "../../../types";
 import { Button } from "../../ui/button";
 import PropertyCard from "./PropertyCard";
+import PropertyCardLoader from "./PropertyCardLoader";
 
 interface PropertiesListProps {
 	filters?: {
-		[key: string]: any;
+		[key: string]: unknown;
 	};
 	className?: string;
 	showLoadMore?: boolean;
+	mode?: "buyer" | "seller";
 }
 
 export default function PropertiesList({
 	filters = {},
 	className = "",
 	showLoadMore = true,
+	mode = "buyer",
 }: PropertiesListProps) {
 	const {
 		data,
@@ -61,9 +64,7 @@ export default function PropertiesList({
 
 	const properties =
 		data?.pages.flatMap((page: Property[] | { data: Property[] }) =>
-			Array.isArray(page)
-				? page
-				: (page as { data: Property[] })?.data ?? []
+			Array.isArray(page) ? page : (page as { data: Property[] })?.data ?? []
 		) || [];
 
 	if (properties.length === 0) {
@@ -90,6 +91,11 @@ export default function PropertiesList({
 						showSaveButton={true}
 					/>
 				))}
+				{/* Show loading placeholders when fetching next page */}
+				{isFetchingNextPage &&
+					Array.from({ length: 3 }).map((_, index) => (
+						<PropertyCardLoader key={`loader-${index}`} />
+					))}
 			</div>
 
 			{/* Load More Button */}

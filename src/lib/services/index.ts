@@ -9,7 +9,7 @@ export { SupportService } from "./supportService";
 export { UserService } from "./userService";
 
 // Re-export types from services
-export type { AnalyticsData } from "./analyticsService";
+export type { SellerDashboardData } from "./analyticsService";
 export type {
 	Notification,
 	NotificationPreferences,

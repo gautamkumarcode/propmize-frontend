@@ -19,6 +19,7 @@ import {
 	Zap,
 } from "lucide-react";
 import { useState } from "react";
+import AppLayout from "@/components/custom/layout/AppLayout";
 
 export default function SellerPremium() {
 	const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
@@ -174,7 +175,7 @@ export default function SellerPremium() {
 	};
 
 	return (
-		<SellerLayout>
+		<AppLayout mode="seller">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-8">
@@ -386,6 +387,6 @@ export default function SellerPremium() {
 					</div>
 				</div>
 			</div>
-		</SellerLayout>
+		</AppLayout>
 	);
 }

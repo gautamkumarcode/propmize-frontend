@@ -1,6 +1,18 @@
 "use client";
 
-import { Calendar, Eye, Heart, MapPin, Square } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import {
+	Bath,
+	Bed,
+	Calendar,
+	Eye,
+	Heart,
+	Home,
+	MapPin,
+	Square,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -24,7 +36,6 @@ export default function PropertyCard({
 
 	const handleSaveToggle = (e: React.MouseEvent) => {
 		e.preventDefault(); // Prevent navigation when clicking save button
-
 		toggleLikeMutation.mutate(property._id);
 	};
 
@@ -50,110 +61,142 @@ export default function PropertyCard({
 		return `${area} sq ft`;
 	};
 
-	return (
-		<Link
-			href={`/property/${property._id}`}
-			className={`block bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow ${className}`}>
-			<div className="relative">
-				{/* Property Image */}
-				<div className="relative h-48 w-full">
-					<Image
-						src={"/placeholder-property.jpg"}
-						alt={property.title}
-						fill
-						className="object-cover rounded-t-lg"
-					/>
-					{property.features && (
-						<div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">
-							FEATURED
-						</div>
-					)}
-					{property?.isNew && (
-						<div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold">
-							NEW
-						</div>
-					)}
-					{showSaveButton && (
-						<button
-							onClick={handleSaveToggle}
-							disabled={toggleLikeMutation.isPending}
-							className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-colors ${
-								isSaved || property.isLiked
-									? "bg-red-500 text-white"
-									: "bg-white text-gray-600 hover:bg-red-50 hover:text-red-500"
-							}`}>
-							<Heart
-								className={`h-5 w-5 ${
-									isSaved || property.isLiked ? "fill-current" : ""
-								}`}
-							/>
-						</button>
-					)}
-				</div>
+	const formatDate = (dateString: string) => {
+		const date = new Date(dateString);
+		const day = date.getDate();
+		const month = date.toLocaleDateString("en-IN", { month: "short" });
+		return `${day} ${month}`;
+	};
 
-				{/* Property Details */}
-				<div className="p-4">
-					{/* Price and Type */}
-					<div className="flex items-start justify-between mb-2">
-						<div>
-							<h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
-								{property.title}
-							</h3>
-							<p className="text-xl font-bold text-blue-600">
+	return (
+		<Card
+			className={cn(
+				"overflow-hidden group hover:shadow-lg transition-all duration-300",
+				className
+			)}>
+			<Link href={`/property/${property._id}`} className="block">
+				<div className="relative">
+					{/* Property Image */}
+					<div className="relative h-52 w-full overflow-hidden">
+						<Image
+							src={"/placeholder-property.jpg"}
+							alt={property.title}
+							fill
+							className="object-cover group-hover:scale-105 transition-transform duration-500"
+						/>
+
+						{/* Status badges */}
+						<div className="absolute top-3 left-3 flex flex-col gap-2">
+							{property.featured && (
+								<Badge variant="featured" className="shadow-lg">
+									FEATURED
+								</Badge>
+							)}
+							{property?.isNew && (
+								<Badge variant="new" className="shadow-lg">
+									NEW
+								</Badge>
+							)}
+						</div>
+
+						{/* Price badge */}
+						<div className="absolute bottom-3 left-3">
+							<Badge variant="price" className="text-sm px-3 py-1.5 shadow-lg">
 								{formatPrice(property.price)}
 								{property.status === "rent" && (
-									<span className="text-sm text-gray-500 font-normal">
-										/month
-									</span>
+									<span className="font-normal">/month</span>
 								)}
-							</p>
+							</Badge>
 						</div>
-						<span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium capitalize">
-							{property.status}
-						</span>
+
+						{/* Save button */}
+						{showSaveButton && (
+							<button
+								onClick={handleSaveToggle}
+								disabled={toggleLikeMutation.isPending}
+								className={cn(
+									"absolute top-3 right-3 p-2 rounded-full shadow-lg transition-all duration-300",
+									isSaved || property.isLiked
+										? "bg-red-500 text-white hover:bg-red-600"
+										: "bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-red-50 hover:text-red-500"
+								)}>
+								<Heart
+									className={cn(
+										"h-5 w-5",
+										isSaved || property.isLiked ? "fill-current" : ""
+									)}
+								/>
+							</button>
+						)}
 					</div>
 
-					{/* Location */}
-					<div className="flex items-center text-gray-600 mb-3">
-						<MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-						<span className="text-sm truncate">
-							{property.address.street}, {property.address.city}
-						</span>
-					</div>
-
-					{/* Property Specs */}
-					<div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-						<div className="flex items-center">
-							<Square className="h-4 w-4 mr-1" />
-							<span>{formatArea(property.area.size)}</span>
+					{/* Property Details */}
+					<CardContent className="p-4">
+						{/* Title and Type */}
+						<div className="flex items-start justify-between mb-3">
+							<h3 className="text-lg font-semibold text-gray-900 line-clamp-1 flex-1">
+								{property.title}
+							</h3>
+							<Badge variant="secondary" className="ml-2 capitalize">
+								{property.status}
+							</Badge>
 						</div>
-						{property && <span>{property.bedrooms} Bed</span>}
-						{property.bathrooms && <span>{property.bathrooms} Bath</span>}
-						{property.parking && <span>Parking</span>}
-					</div>
 
-					{/* Footer */}
-					<div className="flex items-center justify-between pt-3 border-t border-gray-100">
-						<div className="flex items-center text-xs text-gray-500">
-							<Calendar className="h-3 w-3 mr-1" />
-							<span>
-								{(() => {
-									const date = new Date(property.createdAt);
-									const day = date.getDate();
-									const month = date.toLocaleDateString("en-IN", {
-										month: "short",
-									});
-									return `${day} ${month}`;
-								})()}
+						{/* Location */}
+						<div className="flex items-center text-gray-600 mb-4">
+							<MapPin className="h-4 w-4 mr-1.5 flex-shrink-0 text-blue-500" />
+							<span className="text-sm truncate">
+								{property.address.street}, {property.address.city}
 							</span>
 						</div>
+
+						{/* Property Specs */}
+						<div className="grid grid-cols-4 gap-2 mb-2">
+							<div className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg">
+								<Square className="h-4 w-4 mb-1 text-blue-500" />
+								<span className="text-xs font-medium">
+									{formatArea(property.area.size)}
+								</span>
+							</div>
+
+							<div className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg">
+								<Bed className="h-4 w-4 mb-1 text-blue-500" />
+								<span className="text-xs font-medium">
+									{property.bedrooms} Bed
+								</span>
+							</div>
+
+							{property.bathrooms && (
+								<div className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg">
+									<Bath className="h-4 w-4 mb-1 text-blue-500" />
+									<span className="text-xs font-medium">
+										{property.bathrooms} Bath
+									</span>
+								</div>
+							)}
+
+							{property.parking && (
+								<div className="flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg">
+									<Home className="h-4 w-4 mb-1 text-blue-500" />
+									<span className="text-xs font-medium">Parking</span>
+								</div>
+							)}
+						</div>
+					</CardContent>
+
+					{/* Footer */}
+					<CardFooter className="px-4 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50">
 						<div className="flex items-center text-xs text-gray-500">
-							<Eye className="h-3 w-3 mr-1" />
+							<Calendar className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+							<span>{formatDate(property.createdAt as unknown as string)}</span>
+						</div>
+						<div className="flex items-center text-xs text-gray-500">
+							<Eye className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
 							<span>{property.views || 0} views</span>
 						</div>
-					</div>
+					</CardFooter>
 				</div>
-			</div>
-		</Link>
+			</Link>
+		</Card>
 	);
 }

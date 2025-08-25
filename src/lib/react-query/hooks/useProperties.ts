@@ -54,7 +54,7 @@ export const useInfiniteProperties = (filters: PropertyFilters = {}) => {
 		queryKey: ["properties", "infinite", filters],
 		queryFn: ({ pageParam = 1 }) =>
 			PropertyService.getProperties({ ...filters, page: pageParam }),
-		getNextPageParam: (lastPage, pages) => {
+		getNextPageParam: (lastPage, _pages) => {
 			const { meta } = lastPage as ApiResponse<Property[]>;
 			if (meta && meta.page && meta.totalPages && meta.page < meta.totalPages) {
 				return meta.page + 1;

@@ -1,15 +1,15 @@
 "use client";
 
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import NavigationOverview from "@/components/custom/navigation/NavigationOverview";
 
 export default function NavigationOverviewPage() {
 	return (
-		<BuyerLayout>
+		<AppLayout mode="buyer">
 			<NavigationOverview
 				title="All Available Pages"
 				description="Navigate to any section of the application"
 			/>
-		</BuyerLayout>
+		</AppLayout>
 	);
 }

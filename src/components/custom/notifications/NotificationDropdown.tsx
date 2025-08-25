@@ -115,7 +115,7 @@ export default function NotificationDropdown({
 	onNotificationClick,
 }: NotificationDropdownProps) {
 	const dropdownRef = useRef<HTMLDivElement>(null);
-	const { userMode } = useAuthStore();
+	// const { userMode } = useAuthStore();
 
 	// Close dropdown when clicking outside
 	useEffect(() => {

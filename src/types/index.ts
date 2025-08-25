@@ -23,6 +23,10 @@ export interface User {
 		notifications?: { email: boolean; sms: boolean; push: boolean };
 	};
 	role: "buyer" | "seller" | "admin";
+	savedProperties?: string[]; // Array of property IDs
+	viewedProperties?: string[]; // Array of property IDs
+	contactedOwners?: string[]; // Array of owner IDs or property IDs
+	notifications?: Notification[]; // Use the Notification interface
 }
 
 // Property Types

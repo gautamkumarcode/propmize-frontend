@@ -1,6 +1,6 @@
 "use client";
 
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRecentlyViewedProperties } from "@/lib/react-query/hooks/useProperties";
@@ -8,8 +8,8 @@ import { Property } from "@/types";
 import { Bath, Bed, Eye, MapPin, Phone, Square, Trash2 } from "lucide-react";
 
 export default function Recent() {
-	const { data, isLoading } = useRecentlyViewedProperties();
-	const recentProperties: Property[] = data?.data || [];
+	const { data: recentPropertiesData, isLoading } = useRecentlyViewedProperties();
+	const recentProperties: Property[] = recentPropertiesData?.data || [];
 
 	// Example clearAllHistory handler (implement API if needed)
 	const clearAllHistory = () => {
@@ -17,7 +17,7 @@ export default function Recent() {
 	};
 
 	return (
-		<BuyerLayout>
+		<AppLayout mode="buyer">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-6">
@@ -87,6 +87,7 @@ export default function Recent() {
 													</span>
 												</div>
 											</div>
+
 											<div className="flex items-center justify-between">
 												<p className="text-xs text-gray-500">
 													{/* If API provides viewedDate, format it here */}
@@ -117,6 +118,6 @@ export default function Recent() {
 					</div>
 				</div>
 			</div>
-		</BuyerLayout>
+		</AppLayout>
 	);
 }

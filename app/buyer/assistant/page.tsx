@@ -2,7 +2,7 @@
 
 import AIChatWindow from "@/components/custom/chat/AIChatWindow";
 import ChatHistoryModal from "@/components/custom/chat/ChatHistoryModal";
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -22,7 +22,7 @@ import {
 	Settings,
 	X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export default function AssistantPage() {
 	const { user } = useAuth();
@@ -35,40 +35,41 @@ export default function AssistantPage() {
 	const [showChatHistory, setShowChatHistory] = useState(false);
 
 	// Initialize chat when component mounts
+	const initializeChat = useCallback(async () => {
+		const storedChatId = localStorage.getItem("ai_current_chat");
+		if (storedChatId) {
+			setChatId(storedChatId);
+			setIsInitializing(false);
+			return;
+		}
+		// If chatId exists (from localStorage), do not create a new chat
+		if (chatId) {
+			setIsInitializing(false);
+			return;
+		}
+		try {
+			const response = await aiChatService.startAIChat(chatMode, {
+				showModeSpecificContent: false,
+				...(user && {
+					userPreferences: {
+						// Add any user preferences if available
+					},
+				}),
+			});
+			if (response.success && response.data) {
+				setChatId(response.data._id);
+				localStorage.setItem("ai_current_chat", response.data._id);
+			}
+		} catch (error) {
+			console.error("Error initializing chat:", error);
+		} finally {
+			setIsInitializing(false);
+		}
+	}, [chatMode, user, chatId]);
+
 	useEffect(() => {
-		const initializeChat = async () => {
-			const storedChatId = localStorage.getItem("ai_current_chat");
-			if (storedChatId) {
-				setChatId(storedChatId);
-				setIsInitializing(false);
-				return;
-			}
-			// If chatId exists (from localStorage), do not create a new chat
-			if (chatId) {
-				setIsInitializing(false);
-				return;
-			}
-			try {
-				const response = await aiChatService.startAIChat(chatMode, {
-					showModeSpecificContent: false,
-					...(user && {
-						userPreferences: {
-							// Add any user preferences if available
-						},
-					}),
-				});
-				if (response.success && response.data) {
-					setChatId(response.data._id);
-					localStorage.setItem("ai_current_chat", response.data._id);
-				}
-			} catch (error) {
-				console.error("Error initializing chat:", error);
-			} finally {
-				setIsInitializing(false);
-			}
-		};
 		initializeChat();
-	}, [chatMode, user]);
+	}, [initializeChat]);
 
 	const chatModes = [
 		{
@@ -150,7 +151,7 @@ export default function AssistantPage() {
 
 	if (isInitializing) {
 		return (
-			<BuyerLayout>
+			<AppLayout mode="buyer">
 				<div className="fixed inset-x-0 top-16 bottom-20 md:bottom-6 bg-white flex items-center justify-center mx-auto max-w-7xl">
 					<div className="text-center">
 						<div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -159,12 +160,12 @@ export default function AssistantPage() {
 						<p className="text-gray-600">Initializing AI Assistant...</p>
 					</div>
 				</div>
-			</BuyerLayout>
+			</AppLayout>
 		);
 	}
 
 	return (
-		<BuyerLayout>
+		<AppLayout mode="buyer">
 			{/* Full height chat container accounting for navbar/bottom nav */}
 			<div className="fixed inset-x-0 top-16 bottom-20 md:bottom-6 bg-white flex flex-col mx-auto max-w-7xl">
 				{/* Header */}
@@ -319,6 +320,6 @@ export default function AssistantPage() {
 				onClose={() => setShowChatHistory(false)}
 				onSelectChat={handleSelectChat}
 			/>
-		</BuyerLayout>
+		</AppLayout>
 	);
 }

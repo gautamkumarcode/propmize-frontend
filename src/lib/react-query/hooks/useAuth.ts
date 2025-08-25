@@ -159,8 +159,12 @@ export const useResetPassword = () => {
 		onSuccess: () => {
 			console.log("Password reset successfully");
 		},
-		onError: (error: any) => {
-			console.error(error.response?.data?.message || "Password reset failed");
+		onError: (error: unknown) => {
+			const errorMessage =
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Password reset failed";
+			console.error(errorMessage);
 		},
 	});
 };
@@ -176,10 +180,12 @@ export const useVerifyEmail = () => {
 			// Refresh user profile to get updated verification status
 			queryClient.invalidateQueries({ queryKey: QueryKeys.profile });
 		},
-		onError: (error: any) => {
-			console.error(
-				error.response?.data?.message || "Email verification failed"
-			);
+		onError: (error: unknown) => {
+			const errorMessage =
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Email verification failed";
+			console.error(errorMessage);
 		},
 	});
 };
@@ -190,10 +196,12 @@ export const useResendVerification = () => {
 		onSuccess: () => {
 			console.log("Verification email sent");
 		},
-		onError: (error: any) => {
-			console.error(
-				error.response?.data?.message || "Failed to send verification email"
-			);
+		onError: (error: unknown) => {
+			const errorMessage =
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Failed to send verification email";
+			console.error(errorMessage);
 		},
 	});
 };
@@ -203,13 +211,13 @@ export const useUpdateProfile = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (profileData: FormData | any) => {
+		mutationFn: (profileData: FormData) => {
 			console.log("Profile data received:", profileData);
 
 			// Debug: Log FormData contents if it's FormData
 			if (profileData instanceof FormData) {
 				console.log("FormData contents:");
-				for (let [key, value] of profileData.entries()) {
+				for (const [key, value] of profileData.entries()) {
 					console.log(key, value);
 				}
 			}
@@ -220,8 +228,12 @@ export const useUpdateProfile = () => {
 			queryClient.setQueryData(QueryKeys.profile, data.data);
 			queryClient.invalidateQueries({ queryKey: QueryKeys.profile });
 		},
-		onError: (error: any) => {
-			console.error("Failed to update profile:", error.response?.data?.message);
+		onError: (error: unknown) => {
+			const errorMessage =
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Failed to update profile";
+			console.error("Failed to update profile:", errorMessage);
 		},
 	});
 };

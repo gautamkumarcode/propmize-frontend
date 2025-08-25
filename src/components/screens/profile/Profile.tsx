@@ -1,7 +1,6 @@
 "use client";
 
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
-import SellerLayout from "@/components/custom/layout/SellerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { useProfile, useUpdateProfile } from "@/lib/react-query/hooks/useAuth";
 import { useAuthStore } from "@/store/app-store";
+import { User } from "@/types";
 import {
 	Bell,
 	Camera,
@@ -33,7 +33,7 @@ import {
 	Phone,
 	Save,
 	Shield,
-	User,
+	User as UserIcon, // Alias User to UserIcon to avoid naming conflict with interface User
 	Verified,
 	X,
 } from "lucide-react";
@@ -45,8 +45,8 @@ export default function Profile() {
 	const { data: profileData, isLoading, error } = useProfile();
 	const updateProfileMutation = useUpdateProfile();
 
-	const profile = profileData || user;
-	const Layout = userMode === "seller" ? SellerLayout : BuyerLayout;
+	const profile: User | undefined | null = profileData || user;
+	// const Layout = userMode === "seller" ? SellerLayout : BuyerLayout;
 
 	const [formData, setFormData] = useState({
 		name: "",
@@ -84,7 +84,12 @@ export default function Profile() {
 					country: profile.address?.country || "India",
 				},
 				avatar: profile.avatar || undefined,
-				preferences: (profile as any).preferences || {
+				preferences: profile.preferences ? {
+					propertyTypes: profile.preferences.propertyTypes || [],
+					priceRange: profile.preferences.priceRange || { min: 0, max: 10000000 },
+					locations: profile.preferences.locations || [],
+					notifications: profile.preferences.notifications || { email: true, sms: true, push: true },
+				} : {
 					propertyTypes: [],
 					priceRange: { min: 0, max: 10000000 },
 					locations: [],
@@ -102,9 +107,13 @@ export default function Profile() {
 
 	const handleSave = () => {
 		const fd = new FormData();
-		const changedData: Record<string, any> = {};
+		const changedData: Record<string, unknown> = {};
 
-		const compareAndAdd = (key: string, newValue: any, oldValue: any) => {
+		const compareAndAdd = <K extends keyof User>(
+			key: K,
+			newValue: User[K] | undefined,
+			oldValue: User[K] | undefined
+		) => {
 			if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
 				changedData[key] = newValue;
 			}
@@ -131,8 +140,8 @@ export default function Profile() {
 		if (formData.preferences) {
 			Object.keys(formData.preferences).forEach((key) => {
 				if (
-					formData.preferences[key as keyof typeof formData.preferences] !==
-					profile?.preferences?.[key as keyof typeof profile.preferences]
+					JSON.stringify(formData.preferences[key as keyof typeof formData.preferences]) !==
+					JSON.stringify(profile?.preferences?.[key as keyof typeof profile.preferences])
 				) {
 					changedData[`preferences.${key}`] =
 						formData.preferences[key as keyof typeof formData.preferences];
@@ -148,7 +157,6 @@ export default function Profile() {
 		}
 
 		// Append changed fields to FormData
-		// Append changed fields to FormData
 		Object.entries(changedData).forEach(([key, value]) => {
 			if (value !== undefined && value !== null) {
 				if (typeof value === "object") {
@@ -161,7 +169,7 @@ export default function Profile() {
 		if (fd.entries().next().done) {
 			toast({
 				title: "No changes detected",
-				description: "You didn't modify anything.",
+				description: "You didn&apos;t modify anything.",
 			});
 			return;
 		}
@@ -174,11 +182,13 @@ export default function Profile() {
 					description: "Your changes have been saved.",
 				});
 			},
-			onError: (error: any) => {
+			onError: (error: unknown) => {
 				toast({
 					title: "Update failed",
 					description:
-						error.response?.data?.message || "Failed to update profile",
+						error instanceof Error
+							? error.message
+							: "Failed to update profile",
 					variant: "destructive",
 				});
 			},
@@ -187,7 +197,7 @@ export default function Profile() {
 
 	if (!isAuthenticated) {
 		return (
-			<Layout>
+			<AppLayout mode={userMode === "seller" ? "seller" : "buyer"}>
 				<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
 					<div className="text-center p-8 bg-white rounded-xl shadow-lg">
 						<Shield className="w-12 h-12 text-blue-500 mx-auto mb-4" />
@@ -200,26 +210,26 @@ export default function Profile() {
 						<Button>Sign In</Button>
 					</div>
 				</div>
-			</Layout>
+			</AppLayout>
 		);
 	}
 
 	if (isLoading) {
 		return (
-			<Layout>
+			<AppLayout mode={userMode === "seller" ? "seller" : "buyer"}>
 				<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
 					<div className="text-center">
 						<Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-600" />
 						<p className="text-gray-600 text-lg">Loading your profile...</p>
 					</div>
 				</div>
-			</Layout>
+			</AppLayout>
 		);
 	}
 
 	if (error) {
 		return (
-			<Layout>
+			<AppLayout mode={userMode === "seller" ? "seller" : "buyer"}>
 				<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
 					<div className="text-center p-8 bg-white rounded-xl shadow-lg">
 						<div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -234,12 +244,12 @@ export default function Profile() {
 						</Button>
 					</div>
 				</div>
-			</Layout>
+			</AppLayout>
 		);
 	}
 
 	return (
-		<Layout>
+		<AppLayout mode={userMode === "seller" ? "seller" : "buyer"}>
 			<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
 				<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 					{/* Header Section */}
@@ -313,7 +323,7 @@ export default function Profile() {
 															/>
 														) : null}
 														<AvatarFallback className="bg-blue-100 text-blue-800 text-2xl">
-															<User className="w-8 h-8" />
+															<UserIcon className="w-8 h-8" />
 														</AvatarFallback>
 													</Avatar>
 													{isEditing && (
@@ -368,7 +378,7 @@ export default function Profile() {
 													</div>
 												</div>
 												<div className="flex items-center p-3 bg-gray-50 rounded-lg">
-													<User className="w-5 h-5 text-gray-500 mr-3" />
+													<UserIcon className="w-5 h-5 text-gray-500 mr-3" />
 													<div>
 														<p className="text-sm text-gray-600">
 															Member since
@@ -794,7 +804,7 @@ export default function Profile() {
 											</div>
 											<div>
 												<p className="text-2xl font-bold text-gray-900">
-													{(profile as any)?.savedProperties?.length || 0}
+													{profile?.savedProperties?.length || 0}
 												</p>
 												<p className="text-sm text-gray-600">
 													Saved Properties
@@ -812,7 +822,7 @@ export default function Profile() {
 											</div>
 											<div>
 												<p className="text-2xl font-bold text-gray-900">
-													{(profile as any)?.viewedProperties?.length || 0}
+													{profile?.viewedProperties?.length || 0}
 												</p>
 												<p className="text-sm text-gray-600">
 													Properties Viewed
@@ -830,7 +840,7 @@ export default function Profile() {
 											</div>
 											<div>
 												<p className="text-2xl font-bold text-gray-900">
-													{(profile as any)?.contactedOwners?.length || 0}
+													{profile?.contactedOwners?.length || 0}
 												</p>
 												<p className="text-sm text-gray-600">
 													Owners Contacted
@@ -848,7 +858,7 @@ export default function Profile() {
 											</div>
 											<div>
 												<p className="text-2xl font-bold text-gray-900">
-													{(profile as any)?.notifications?.length || 0}
+													{profile?.notifications?.length || 0}
 												</p>
 												<p className="text-sm text-gray-600">Notifications</p>
 											</div>
@@ -891,6 +901,6 @@ export default function Profile() {
 					</Tabs>
 				</div>
 			</div>
-		</Layout>
+		</AppLayout>
 	);
 }

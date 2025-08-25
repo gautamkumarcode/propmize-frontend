@@ -67,7 +67,7 @@ export default function AIChatWindow({
 		} else if (!chatId && !isLoading) {
 			setIsNewChat(true);
 		}
-	}, [initialChatId, chatId, isLoading]);
+	}, [initialChatId, chatId, isLoading, setAIChatId]);
 
 	// Auto scroll to bottom
 	useEffect(() => {

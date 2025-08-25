@@ -6,6 +6,10 @@ import {
 	PropertyCreateData,
 	PropertyFilters,
 } from "../types/api";
+import {
+	transformPropertyData,
+	transformPropertyDataArray,
+} from "../utils/propertyTransformer";
 
 export class PropertyService {
 	/**
@@ -36,7 +40,10 @@ export class PropertyService {
 		});
 
 		const response = await apiClient.get(`/properties?${params.toString()}`);
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
 
 	/**
@@ -44,7 +51,10 @@ export class PropertyService {
 	 */
 	static async getProperty(id: string): Promise<ApiResponse<Property>> {
 		const response = await apiClient.get(`/properties/${id}`);
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyData(response.data.data),
+		};
 	}
 
 	/**
@@ -134,7 +144,10 @@ export class PropertyService {
 		const response = await apiClient.get(
 			`/properties/my-properties?${params.toString()}`
 		);
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
 
 	/**
@@ -142,7 +155,10 @@ export class PropertyService {
 	 */
 	static async getFeaturedProperties(): Promise<ApiResponse<Property[]>> {
 		const response = await apiClient.get("/properties/featured");
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
 
 	/**
@@ -150,7 +166,10 @@ export class PropertyService {
 	 */
 	static async getPremiumProperties(): Promise<ApiResponse<Property[]>> {
 		const response = await apiClient.get("/properties/premium");
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
 
 	/**
@@ -166,7 +185,10 @@ export class PropertyService {
 		const response = await apiClient.get(
 			`/properties/location?${params.toString()}`
 		);
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
 
 	/**
@@ -187,7 +209,10 @@ export class PropertyService {
 		const response = await apiClient.get(
 			`/properties/search?${params.toString()}`
 		);
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
 
 	/**
@@ -203,7 +228,10 @@ export class PropertyService {
 	 */
 	static async getLikedProperties(): Promise<ApiResponse<Property[]>> {
 		const response = await apiClient.get("/properties/user/liked");
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
 
 	/**
@@ -231,7 +259,9 @@ export class PropertyService {
 
 	static async getRecentlyViewedProperties(): Promise<ApiResponse<Property[]>> {
 		const response = await apiClient.get("/properties/user/recently-viewed");
-		return response.data;
+		return {
+			...response.data,
+			data: transformPropertyDataArray(response.data.data || []),
+		};
 	}
-
 }

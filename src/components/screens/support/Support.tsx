@@ -1,6 +1,6 @@
 "use client";
 
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -113,7 +113,7 @@ export default function Support() {
 	};
 
 	return (
-		<BuyerLayout>
+		<AppLayout mode="buyer">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-6">
@@ -299,6 +299,6 @@ export default function Support() {
 					</div>
 				</div>
 			</div>
-		</BuyerLayout>
+		</AppLayout>
 	);
 }

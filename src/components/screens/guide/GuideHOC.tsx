@@ -1,12 +1,10 @@
 import dynamic from "next/dynamic";
 
-type Props = {};
-
 const GuidePage = dynamic(() => import("./Guide"), {
 	ssr: true,
 });
 
-const GuideHOC = (props: Props) => {
+const GuideHOC = () => {
 	return <GuidePage />;
 };
 

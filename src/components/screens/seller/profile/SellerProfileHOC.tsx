@@ -1,12 +1,10 @@
 import dynamic from "next/dynamic";
 
-type Props = {};
-
 const ProfilePage = dynamic(() => import("../../profile/Profile"), {
 	ssr: true,
 });
 
-const SellerProfileHOC = (props: Props) => {
+const SellerProfileHOC = () => {
 	return <ProfilePage />;
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -8,19 +8,19 @@ import { useLikedProperties } from "@/lib";
 import { Bath, Bed, Heart, MapPin, Phone, Share2, Square } from "lucide-react";
 
 export default function Saved() {
-	const { data: savedProperties = [], isLoading } = useLikedProperties();
+	const { data: savedProperties = [], isLoading: _isLoading } = useLikedProperties();
 
-	const handleUnsave = (propertyId: string) => {
-		// unsaveMutation.mutate(propertyId);
-	};
+	// const handleUnsave = (propertyId: string) => {
+	// 	// unsaveMutation.mutate(propertyId);
+	// };
 
-	const handleContact = (propertyId: string) => {
-		// Contact logic here
-		console.log("Contacting for property:", propertyId);
-	};
+	// const handleContact = (propertyId: string) => {
+	// 	// Contact logic here
+	// 	console.log("Contacting for property:", propertyId);
+	// };
 
 	return (
-		<BuyerLayout>
+		<AppLayout mode="buyer">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-6">
@@ -55,7 +55,7 @@ export default function Saved() {
 												className="w-full h-48 object-cover"
 											/>
 											<button
-												onClick={() => handleUnsave(property._id)}
+												// onClick={() => handleUnsave(property._id)}
 												className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-lg hover:bg-gray-50">
 												<Heart className="w-5 h-5 text-red-500 fill-current" />
 											</button>
@@ -107,7 +107,8 @@ export default function Saved() {
 												</p>
 												<Button
 													size="sm"
-													onClick={() => handleContact(property._id)}>
+													// onClick={() => handleContact(property._id)}
+													variant="outline">
 													<Phone className="w-4 h-4 mr-1" />
 													Contact
 												</Button>
@@ -131,6 +132,6 @@ export default function Saved() {
 					</div>
 				</div>
 			</div>
-		</BuyerLayout>
+		</AppLayout>
 	);
 }

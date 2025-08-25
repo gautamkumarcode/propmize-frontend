@@ -6,12 +6,16 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useAuth } from "@/lib/providers/AuthProvider";
 import { AIChat, aiChatService } from "@/services/aiChatService";
 import { Bot, Calendar, MessageSquare, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ChatHistoryModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onSelectChat: (chatId: string) => void;
+}
+
+interface Message {
+  content: string;
 }
 
 export default function ChatHistoryModal({
@@ -27,6 +31,26 @@ export default function ChatHistoryModal({
 	const [hasMore, setHasMore] = useState(true);
 	const scrollRef = useRef<HTMLDivElement>(null);
 
+	const fetchChatHistory = useCallback(async (pageToFetch = 1, reset = false) => {
+		if (!user) return;
+		setIsLoading(true);
+		setError(null);
+		try {
+			const response = await aiChatService.getUserAIChats(pageToFetch, 20);
+			if (response.success) {
+				const newChats = response.data.chats;
+				setChats((prev) => (reset ? newChats : [...prev, ...newChats]));
+				setPage(pageToFetch);
+				setHasMore(pageToFetch < response.data.pagination.pages);
+			}
+		} catch (error) {
+			console.error("Error fetching chat history:", error);
+			setError("Failed to load chat history");
+		} finally {
+			setIsLoading(false);
+		}
+	}, [user]); // `user` is a dependency here
+
 	useEffect(() => {
 		if (isOpen && user) {
 			setChats([]);
@@ -34,7 +58,7 @@ export default function ChatHistoryModal({
 			setHasMore(true);
 			fetchChatHistory(1, true);
 		}
-	}, [isOpen, user]);
+	}, [isOpen, user, fetchChatHistory]);
 
 	// Infinite scroll handler
 	useEffect(() => {
@@ -58,7 +82,7 @@ export default function ChatHistoryModal({
 				el.removeEventListener("scroll", handleScroll);
 			}
 		};
-	}, [isOpen, hasMore, isLoading, page]);
+	}, [isOpen, hasMore, isLoading, page, fetchChatHistory]);
 
 	// If not logged in, show message and do not fetch
 	if (!user) {
@@ -78,26 +102,6 @@ export default function ChatHistoryModal({
 			</Card>
 		);
 	}
-
-	const fetchChatHistory = async (pageToFetch = 1, reset = false) => {
-		if (!user) return;
-		setIsLoading(true);
-		setError(null);
-		try {
-			const response = await aiChatService.getUserAIChats(pageToFetch, 20);
-			if (response.success) {
-				const newChats = response.data.chats;
-				setChats((prev) => (reset ? newChats : [...prev, ...newChats]));
-				setPage(pageToFetch);
-				setHasMore(pageToFetch < response.data.pagination.pages);
-			}
-		} catch (error) {
-			console.error("Error fetching chat history:", error);
-			setError("Failed to load chat history");
-		} finally {
-			setIsLoading(false);
-		}
-	};
 
 	const handleChatSelect = (chatId: string) => {
 		onSelectChat(chatId);
@@ -136,7 +140,7 @@ export default function ChatHistoryModal({
 		}
 	};
 
-	const getMessagePreview = (messages: any[]) => {
+	const getMessagePreview = (messages: Message[]) => {
 		if (!messages || messages.length === 0) return "No messages";
 		const lastMessage = messages[messages.length - 1];
 		return lastMessage?.content?.substring(0, 100) + "..." || "Chat started";

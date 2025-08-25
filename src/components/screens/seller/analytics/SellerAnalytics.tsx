@@ -1,6 +1,6 @@
 "use client";
 
-import SellerLayout from "@/components/custom/layout/SellerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -165,7 +165,7 @@ export default function SellerAnalytics() {
 	};
 
 	return (
-		<SellerLayout>
+		<AppLayout mode="seller">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-8">
@@ -281,7 +281,7 @@ export default function SellerAnalytics() {
 													<div
 														className="bg-blue-500 rounded-full h-2"
 														style={{
-															width: `${Math.min(day?.views! / 5, 100)}%`,
+															width: `${Math.min(day.views / 5, 100)}%`,
 														}}
 													/>
 												</div>
@@ -482,6 +482,6 @@ export default function SellerAnalytics() {
 					</div>
 				</div>
 			</div>
-		</SellerLayout>
+		</AppLayout>
 	);
 }

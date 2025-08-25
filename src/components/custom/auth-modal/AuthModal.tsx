@@ -73,7 +73,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 	};
 
 	// Login mutation
-	const loginMutation = useMutation({
+	const _loginMutation = useMutation({
 		mutationFn: async (data: LoginData) => {
 			const response = await apiClient.post("/auth/login", data);
 			return response.data;
@@ -104,7 +104,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 	});
 
 	// Register mutation
-	const registerMutation = useMutation({
+	const _registerMutation = useMutation({
 		mutationFn: async (data: RegisterData) => {
 			const response = await apiClient.post("/auth/register", data);
 			return response.data;
@@ -153,10 +153,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
 				title: "OTP sent",
 				description: "Check your SMS for the OTP.",
 			});
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const errorMessage =
+				error instanceof AxiosError
+					? (error.response?.data as { error?: string })?.error ||
+					  (typeof error.response?.data === "string"
+							? error.response.data
+							: "Failed to send OTP")
+					: "Failed to send OTP";
 			toast({
 				title: "Error",
-				description: error?.response?.data?.error || "Failed to send OTP",
+				description: errorMessage,
 				variant: "destructive",
 			});
 		}
@@ -193,10 +200,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
 				setTimeout(() => router.push(redirectTo), 100);
 			}
 			onClose();
-		} catch (error: any) {
+		} catch (error: unknown) {
+			const errorMessage =
+				error instanceof AxiosError
+					? (error.response?.data as { error?: string })?.error ||
+					  (typeof error.response?.data === "string"
+							? error.response.data
+							: "Invalid OTP")
+					: "Invalid OTP";
 			toast({
 				title: "Error",
-				description: error?.response?.data?.error || "Invalid OTP",
+				description: errorMessage,
 				variant: "destructive",
 			});
 		}

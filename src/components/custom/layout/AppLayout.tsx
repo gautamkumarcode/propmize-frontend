@@ -2,51 +2,55 @@
 
 import AuthModal from "@/components/custom/auth-modal/AuthModal";
 import Navbar from "@/components/custom/navbar/Navbar";
+import { useNavigation } from "@/hooks/useNavigation";
 import { iconMap } from "@/lib/routing/iconMap";
-import { buyerBottomNavItems, buyerNavItems } from "@/lib/routing/routes";
+import { buyerBottomNavItems, buyerNavItems, sellerBottomNavItems, sellerNavItems } from "@/lib/routing/routes";
+import { useAuthStore } from "@/store/app-store";
 import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
-interface BuyerLayoutProps {
+interface AppLayoutProps {
 	children: React.ReactNode;
+	mode: "buyer" | "seller";
 }
 
-const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
+const AppLayout: React.FC<AppLayoutProps> = ({ children, mode }) => {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [authRedirectTo, setAuthRedirectTo] = useState<string | undefined>();
-	const [activeTab, setActiveTab] = useState<
-		"properties" | "chat" | "analytics"
-	>("properties");
 	const pathname = usePathname();
+	const navigation = useNavigation();
+
+	// Determine which navigation items to use based on mode
+	const currentNavItems = mode === "seller" ? sellerNavItems : buyerNavItems;
+	const currentBottomNavItems =
+		mode === "seller" ? sellerBottomNavItems : buyerBottomNavItems;
 
 	return (
 		<div className="min-h-screen bg-gray-50 pb-20">
 			{/* Enhanced Navbar */}
 			<Navbar
-				activeTab={activeTab}
-				onTabChange={setActiveTab}
+				mode={mode}
 				onShowAuthModal={(redirectTo) => {
 					setAuthRedirectTo(redirectTo);
 					setShowAuthModal(true);
 				}}
-				mode="buyer"
 			/>
-
-			{/* Mobile Menu Button - Only visible on mobile */}
 
 			{/* Sidebar Overlay */}
 			{sidebarOpen && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden">
 					<div className="w-80 h-full bg-white shadow-lg">
-						<div className="p-4 border-b border-gray-200">
+						<div className="p-4 border-b">
 							<div className="flex items-center justify-between">
-								<h2 className="text-lg font-semibold text-gray-900">Browse</h2>
+								<h2 className="text-lg font-semibold">
+									{mode === "seller" ? "Seller Menu" : "Buyer Menu"}
+								</h2>
 								<button
 									onClick={() => setSidebarOpen(false)}
-									className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+									className="p-2 rounded-md hover:bg-gray-100">
 									<X className="h-5 w-5 text-gray-500" />
 								</button>
 							</div>
@@ -54,7 +58,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 
 						<nav className="flex flex-col h-full">
 							<div className="flex-1 py-4">
-								{buyerNavItems
+								{currentNavItems
 									.filter((item) => !item.isBottom)
 									.map((item) => {
 										const isActive = pathname === item.route.path;
@@ -65,11 +69,11 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 												key={item.route.path}
 												href={item.route.path}
 												onClick={() => setSidebarOpen(false)}
-												className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 transition-colors ${
+												className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 ${
 													isActive
-														? "bg-blue-50 text-blue-600 font-medium border-r-2 border-blue-600"
+														? "bg-green-50 text-green-600 font-medium border-r-2 border-green-600"
 														: item.isHighlighted
-														? "bg-blue-50 text-blue-600 font-medium border-r-2 border-blue-600"
+														? "bg-green-50 text-green-600 font-medium border-r-2 border-green-600"
 														: ""
 												}`}>
 												{IconComponent && (
@@ -82,7 +86,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 							</div>
 
 							<div className="border-t py-4">
-								{buyerNavItems
+								{currentNavItems
 									.filter((item) => item.isBottom)
 									.map((item) => {
 										const IconComponent =
@@ -92,7 +96,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 												key={item.route.path}
 												href={item.route.path}
 												onClick={() => setSidebarOpen(false)}
-												className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100 transition-colors">
+												className="flex items-center px-6 py-3 text-gray-700 hover:bg-gray-100">
 												{IconComponent && (
 													<IconComponent className="h-5 w-5 mr-3" />
 												)}
@@ -107,17 +111,14 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 			)}
 
 			{/* Main Content */}
-			<main>
-				<div className="container mx-auto px-4 py-6 max-w-7xl">
-					{/* <Breadcrumb /> */}
-					{children}
-				</div>
+			<main className="container mx-auto px-4 py-6">
+				{children}
 			</main>
 
 			{/* Bottom Navigation - Mobile Only */}
 			<div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden z-50">
 				<div className="flex items-center justify-around py-1">
-					{buyerBottomNavItems.map((item) => {
+					{currentBottomNavItems.map((item) => {
 						const isActive = pathname === item.route.path;
 						const IconComponent = iconMap[item.icon as keyof typeof iconMap];
 						return (
@@ -133,14 +134,13 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 								}`}>
 								{IconComponent && (
 									<IconComponent
-										size={20}
 										className={`h-5 w-5 mb-1 ${
 											item.isHighlighted ? "text-white" : ""
 										}`}
 									/>
 								)}
 								<span
-									className={`text-[10px] font-medium leading-tight text-center  ${
+									className={`text-[10px] font-medium leading-tight text-center ${
 										item.isHighlighted ? "text-white" : ""
 									}`}>
 									{item.route.name}
@@ -164,4 +164,4 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 	);
 };
 
-export default BuyerLayout;
+export default AppLayout;

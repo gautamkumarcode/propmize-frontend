@@ -22,8 +22,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({
-	activeTab = "properties",
-	onTabChange,
+	// activeTab = "properties",
+	// onTabChange,
 	onShowAuthModal,
 	mode = "buyer",
 }: NavbarProps) {
@@ -134,6 +134,11 @@ export default function Navbar({
 
 					{/* Right Side Actions */}
 					<div className="flex items-center space-x-4">
+						<Link
+							href={mode === "seller" ? "/property" : "/property"}
+							className="text-gray-600 hover:text-gray-800">
+							Properties
+						</Link>
 						{/* Notifications */}
 						<div className="relative" ref={notificationRef}>
 							<button

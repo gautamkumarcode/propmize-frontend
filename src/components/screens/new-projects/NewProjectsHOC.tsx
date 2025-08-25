@@ -1,12 +1,10 @@
 import dynamic from "next/dynamic";
 
-type Props = {};
-
 const NewProjectsPage = dynamic(() => import("./NewProjects"), {
 	ssr: true,
 });
 
-const NewProjectsHOC = (props: Props) => {
+const NewProjectsHOC = () => {
 	return <NewProjectsPage />;
 };
 

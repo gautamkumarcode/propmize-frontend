@@ -1,6 +1,6 @@
 "use client";
 
-import SellerLayout from "@/components/custom/layout/SellerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -121,7 +121,7 @@ export default function SellerSupport() {
 	);
 
 	return (
-		<SellerLayout>
+		<AppLayout mode="seller">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-8">
@@ -405,6 +405,6 @@ export default function SellerSupport() {
 					</div>
 				</div>
 			</div>
-		</SellerLayout>
+		</AppLayout>
 	);
 }

@@ -168,7 +168,7 @@ import { OpenAIService } from "../integrations/openai";
 import { RazorpayService } from "../integrations/razorpay";
 import { ZohoBooksService, ZohoCRMService } from "../integrations/zoho";
 
-let services: {
+const services: {
 	razorpay?: RazorpayService;
 	msg91?: MSG91Service;
 	openai?: OpenAIService;

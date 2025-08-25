@@ -1,6 +1,6 @@
 "use client";
 
-import SellerLayout from "@/components/custom/layout/SellerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -185,7 +185,7 @@ export default function SellerLeads() {
 	};
 
 	return (
-		<SellerLayout>
+		<AppLayout mode="seller">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-8">
@@ -494,6 +494,6 @@ export default function SellerLeads() {
 					</div>
 				</div>
 			</div>
-		</SellerLayout>
+		</AppLayout>
 	);
 }

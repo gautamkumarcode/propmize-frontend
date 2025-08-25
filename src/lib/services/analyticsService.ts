@@ -1,42 +1,19 @@
 import apiClient from "../api";
-import { ApiResponse } from "../types/api";
+import { ApiResponse, Lead } from "../types/api";
 
 // Analytics types
-export interface AnalyticsData {
-	properties: {
-		total: number;
-		active: number;
-		sold: number;
+export interface SellerDashboardData {
+	stats: {
+		totalProperties: number;
+		totalViews: number;
+		totalLeads: number;
+	};
+	recentLeads: Lead[];
+	topProperties: Array<{
+		id: string;
+		title: string;
 		views: number;
-		inquiries: number;
-	};
-	leads: {
-		total: number;
-		new: number;
-		qualified: number;
-		converted: number;
-		conversionRate: number;
-	};
-	revenue: {
-		total: number;
-		thisMonth: number;
-		lastMonth: number;
-		growth: number;
-	};
-	traffic: {
-		views: number;
-		uniqueVisitors: number;
-		topProperties: Array<{
-			id: string;
-			title: string;
-			views: number;
-		}>;
-	};
-	timeline: Array<{
-		date: string;
-		views: number;
-		inquiries: number;
-		conversions: number;
+		leads: number;
 	}>;
 }
 
@@ -44,22 +21,10 @@ export class AnalyticsService {
 	/**
 	 * Get dashboard analytics for seller
 	 */
-	static async getDashboardAnalytics(
-		filters: {
-			period?: "week" | "month" | "quarter" | "year";
-			propertyIds?: string[];
-		} = {}
-	): Promise<ApiResponse<AnalyticsData>> {
-		const params = new URLSearchParams();
-
-		if (filters.period) params.append("period", filters.period);
-		if (filters.propertyIds?.length) {
-			filters.propertyIds.forEach((id) => params.append("propertyIds", id));
-		}
-
-		const response = await apiClient.get(
-			`/analytics/dashboard?${params.toString()}`
-		);
+	static async getDashboardAnalytics(): Promise<
+		ApiResponse<SellerDashboardData>
+	> {
+		const response = await apiClient.get(`/analytics/seller-dashboard`);
 		return response.data;
 	}
 

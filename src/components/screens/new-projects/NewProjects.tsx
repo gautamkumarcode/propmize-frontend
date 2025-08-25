@@ -1,6 +1,6 @@
 "use client";
 
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -104,7 +104,7 @@ export default function NewProjects() {
 	};
 
 	return (
-		<BuyerLayout>
+		<AppLayout mode="buyer">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-6">
@@ -326,6 +326,6 @@ export default function NewProjects() {
 					</div>
 				</div>
 			</div>
-		</BuyerLayout>
+		</AppLayout>
 	);
 }

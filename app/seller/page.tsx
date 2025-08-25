@@ -1,7 +1,9 @@
 "use client";
 
-import SellerLayout from "@/components/custom/layout/SellerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import useNavigation from "@/hooks/useNavigation";
+import { useSellerDashboard } from "@/lib/react-query/hooks/useAnalytics";
+import { format } from "date-fns";
 import {
 	Building,
 	Eye,
@@ -13,93 +15,80 @@ import {
 
 export default function SellerDashboard() {
 	const { goToAddProperty } = useNavigation();
+	const { data: dashboardData, isLoading, isError } = useSellerDashboard();
+
+	if (isLoading) {
+		return (
+			<AppLayout mode="seller">
+				<div className="space-y-6">
+					<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+						<h1 className="text-2xl font-bold mb-2">Loading...</h1>
+						<p className="text-blue-100">Fetching your dashboard data</p>
+					</div>
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+						{[1, 2, 3, 4].map((i) => (
+							<div
+								key={i}
+								className="bg-white rounded-lg p-6 shadow-sm border h-32 animate-pulse"></div>
+						))}
+					</div>
+				</div>
+			</AppLayout>
+		);
+	}
+
+	if (isError) {
+		return (
+			<AppLayout mode="seller">
+				<div className="space-y-6">
+					<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+						<h1 className="text-2xl font-bold mb-2">Error</h1>
+						<p className="text-blue-100">Failed to load dashboard data</p>
+					</div>
+				</div>
+			</AppLayout>
+		);
+	}
+
 	const stats = [
 		{
 			title: "Total Listings",
-			value: "12",
-			change: "+2 this month",
+			value: dashboardData?.stats.totalProperties?.toString() || "0",
+			change: "+0 this month",
 			icon: Building,
 			color: "bg-blue-500",
 		},
 		{
 			title: "Total Views",
-			value: "1,247",
-			change: "+15.3%",
+			value: dashboardData?.stats.totalViews?.toString() || "0",
+			change: "+0%",
 			icon: Eye,
 			color: "bg-green-500",
 		},
 		{
 			title: "Inquiries",
-			value: "89",
-			change: "+12 new",
+			value: dashboardData?.stats.totalLeads?.toString() || "0",
+			change: "+0 new",
 			icon: MessageSquare,
 			color: "bg-yellow-500",
 		},
 		{
 			title: "Revenue",
-			value: "₹2.8L",
-			change: "+8.2%",
+			value: "₹0L",
+			change: "+0%",
 			icon: IndianRupee,
 			color: "bg-purple-500",
 		},
 	];
 
-	const recentInquiries = [
-		{
-			id: 1,
-			property: "3BHK Apartment in Koramangala",
-			buyer: "Rajesh Kumar",
-			time: "2 hours ago",
-			status: "new",
-		},
-		{
-			id: 2,
-			property: "2BHK Villa in Whitefield",
-			buyer: "Priya Sharma",
-			time: "4 hours ago",
-			status: "replied",
-		},
-		{
-			id: 3,
-			property: "Commercial Space in MG Road",
-			buyer: "Tech Solutions Pvt Ltd",
-			time: "1 day ago",
-			status: "new",
-		},
-	];
-
-	const topProperties = [
-		{
-			id: 1,
-			title: "3BHK Apartment in Koramangala",
-			views: 234,
-			inquiries: 15,
-			image: "/placeholder-property.jpg",
-		},
-		{
-			id: 2,
-			title: "2BHK Villa in Whitefield",
-			views: 189,
-			inquiries: 12,
-			image: "/placeholder-property.jpg",
-		},
-		{
-			id: 3,
-			title: "Commercial Space in MG Road",
-			views: 156,
-			inquiries: 8,
-			image: "/placeholder-property.jpg",
-		},
-	];
-
 	return (
-		<SellerLayout>
+		<AppLayout mode="seller">
 			<div className="space-y-6">
 				{/* Header */}
 				<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
-					<h1 className="text-2xl font-bold mb-2">Welcome back, John!</h1>
+					<h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
 					<p className="text-blue-100">
-						Here&apos;s what&apos;s happening with your properties today
+						Here's what's happening with your properties today
 					</p>
 				</div>
 
@@ -139,34 +128,47 @@ export default function SellerDashboard() {
 							</button>
 						</div>
 						<div className="space-y-4">
-							{recentInquiries.map((inquiry) => (
-								<div
-									key={inquiry.id}
-									className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-									<div className="flex-shrink-0">
-										<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-											<Users className="h-5 w-5 text-blue-600" />
+							{dashboardData?.recentLeads &&
+							dashboardData.recentLeads.length > 0 ? (
+								dashboardData.recentLeads.map((lead) => (
+									<div
+										key={lead.id}
+										className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+										<div className="flex-shrink-0">
+											<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+												<Users className="h-5 w-5 text-blue-600" />
+											</div>
+										</div>
+										<div className="flex-1 min-w-0">
+											<p className="text-sm font-medium text-gray-900 truncate">
+												{lead.property?.title || "Property"}
+											</p>
+											<p className="text-sm text-gray-600">
+												{lead.buyer?.name || "Buyer"}
+											</p>
+											<p className="text-xs text-gray-500 mt-1">
+												{lead.createdAt
+													? format(new Date(lead.createdAt), "PPP")
+													: "Unknown date"}
+											</p>
+										</div>
+										<div className="flex-shrink-0">
+											<span
+												className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+													lead.status === "new"
+														? "bg-red-100 text-red-800"
+														: "bg-green-100 text-green-800"
+												}`}>
+												{lead.status}
+											</span>
 										</div>
 									</div>
-									<div className="flex-1 min-w-0">
-										<p className="text-sm font-medium text-gray-900 truncate">
-											{inquiry.property}
-										</p>
-										<p className="text-sm text-gray-600">{inquiry.buyer}</p>
-										<p className="text-xs text-gray-500 mt-1">{inquiry.time}</p>
-									</div>
-									<div className="flex-shrink-0">
-										<span
-											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-												inquiry.status === "new"
-													? "bg-red-100 text-red-800"
-													: "bg-green-100 text-green-800"
-											}`}>
-											{inquiry.status}
-										</span>
-									</div>
-								</div>
-							))}
+								))
+							) : (
+								<p className="text-gray-500 text-center py-4">
+									No recent inquiries
+								</p>
+							)}
 						</div>
 					</div>
 
@@ -181,35 +183,42 @@ export default function SellerDashboard() {
 							</button>
 						</div>
 						<div className="space-y-4">
-							{topProperties.map((property) => (
-								<div
-									key={property.id}
-									className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-									<div className="flex-shrink-0">
-										<div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-											<Building className="h-6 w-6 text-gray-600" />
-										</div>
-									</div>
-									<div className="flex-1 min-w-0">
-										<p className="text-sm font-medium text-gray-900 truncate">
-											{property.title}
-										</p>
-										<div className="flex items-center space-x-4 mt-1">
-											<div className="flex items-center text-xs text-gray-500">
-												<Eye className="h-3 w-3 mr-1" />
-												{property.views} views
-											</div>
-											<div className="flex items-center text-xs text-gray-500">
-												<MessageSquare className="h-3 w-3 mr-1" />
-												{property.inquiries} inquiries
+							{dashboardData?.topProperties &&
+							dashboardData.topProperties.length > 0 ? (
+								dashboardData.topProperties.map((property) => (
+									<div
+										key={property.id}
+										className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+										<div className="flex-shrink-0">
+											<div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+												<Building className="h-6 w-6 text-gray-600" />
 											</div>
 										</div>
+										<div className="flex-1 min-w-0">
+											<p className="text-sm font-medium text-gray-900 truncate">
+												{property.title}
+											</p>
+											<div className="flex items-center space-x-4 mt-1">
+												<div className="flex items-center text-xs text-gray-500">
+													<Eye className="h-3 w-3 mr-1" />
+													{property.views} views
+												</div>
+												<div className="flex items-center text-xs text-gray-500">
+													<MessageSquare className="h-3 w-3 mr-1" />
+													{property.leads} inquiries
+												</div>
+											</div>
+										</div>
+										<div className="flex-shrink-0">
+											<TrendingUp className="h-5 w-5 text-green-500" />
+										</div>
 									</div>
-									<div className="flex-shrink-0">
-										<TrendingUp className="h-5 w-5 text-green-500" />
-									</div>
-								</div>
-							))}
+								))
+							) : (
+								<p className="text-gray-500 text-center py-4">
+									No properties found
+								</p>
+							)}
 						</div>
 					</div>
 				</div>
@@ -246,6 +255,6 @@ export default function SellerDashboard() {
 					</div>
 				</div>
 			</div>
-		</SellerLayout>
+		</AppLayout>
 	);
 }

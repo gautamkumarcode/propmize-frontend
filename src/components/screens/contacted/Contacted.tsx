@@ -1,6 +1,6 @@
 "use client";
 
-import BuyerLayout from "@/components/custom/layout/BuyerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,7 +17,7 @@ import {
 import { useState } from "react";
 
 export default function Contacted() {
-	const [contacts, setContacts] = useState([
+	const [contacts, /* setContacts */] = useState([
 		{
 			id: 1,
 			property: {
@@ -120,7 +120,7 @@ export default function Contacted() {
 	};
 
 	return (
-		<BuyerLayout>
+		<AppLayout mode="buyer">
 			<div className="min-h-screen bg-gray-50 py-6">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-6">
@@ -272,6 +272,6 @@ export default function Contacted() {
 					</div>
 				</div>
 			</div>
-		</BuyerLayout>
+		</AppLayout>
 	);
 }

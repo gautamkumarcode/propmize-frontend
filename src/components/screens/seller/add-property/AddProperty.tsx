@@ -1,6 +1,6 @@
 "use client";
 
-import SellerLayout from "@/components/custom/layout/SellerLayout";
+import AppLayout from "@/components/custom/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Camera, Contact, Home, MapPin } from "lucide-react";
 import { useState } from "react";
@@ -31,7 +31,7 @@ export default function AddProperty() {
 	};
 
 	return (
-		<SellerLayout>
+		<AppLayout mode="seller">
 			<div className="min-h-screen py-10">
 				<div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="space-y-10">
@@ -108,6 +108,6 @@ export default function AddProperty() {
 					</div>
 				</div>
 			</div>
-		</SellerLayout>
+		</AppLayout>
 	);
 }
