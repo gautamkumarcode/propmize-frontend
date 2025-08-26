@@ -1,6 +1,5 @@
 "use client";
 
-import AppLayout from "@/components/custom/layout/AppLayout";
 import useNavigation from "@/hooks/useNavigation";
 import { useSellerDashboard } from "@/lib/react-query/hooks/useAnalytics";
 import { format } from "date-fns";
@@ -19,34 +18,30 @@ export default function SellerDashboard() {
 
 	if (isLoading) {
 		return (
-			<AppLayout mode="seller">
-				<div className="space-y-6">
-					<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
-						<h1 className="text-2xl font-bold mb-2">Loading...</h1>
-						<p className="text-blue-100">Fetching your dashboard data</p>
-					</div>
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-						{[1, 2, 3, 4].map((i) => (
-							<div
-								key={i}
-								className="bg-white rounded-lg p-6 shadow-sm border h-32 animate-pulse"></div>
-						))}
-					</div>
+			<div className="space-y-6">
+				<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+					<h1 className="text-2xl font-bold mb-2">Loading...</h1>
+					<p className="text-blue-100">Fetching your dashboard data</p>
 				</div>
-			</AppLayout>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+					{[1, 2, 3, 4].map((i) => (
+						<div
+							key={i}
+							className="bg-white rounded-lg p-6 shadow-sm border h-32 animate-pulse" />
+					))}
+				</div>
+			</div>
 		);
 	}
 
 	if (isError) {
 		return (
-			<AppLayout mode="seller">
-				<div className="space-y-6">
-					<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
-						<h1 className="text-2xl font-bold mb-2">Error</h1>
-						<p className="text-blue-100">Failed to load dashboard data</p>
-					</div>
+			<div className="space-y-6">
+				<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+					<h1 className="text-2xl font-bold mb-2">Error</h1>
+					<p className="text-blue-100">Failed to load dashboard data</p>
 				</div>
-			</AppLayout>
+			</div>
 		);
 	}
 
@@ -82,179 +77,177 @@ export default function SellerDashboard() {
 	];
 
 	return (
-		<AppLayout mode="seller">
-			<div className="space-y-6">
-				{/* Header */}
-				<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
-					<h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
-					<p className="text-blue-100">
-						Here's what's happening with your properties today
-					</p>
-				</div>
+		<div className="space-y-6">
+			{/* Header */}
+			<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+				<h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
+				<p className="text-blue-100">
+					Here's what's happening with your properties today
+				</p>
+			</div>
 
-				{/* Stats Grid */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-					{stats.map((stat, index) => (
-						<div
-							key={index}
-							className="bg-white rounded-lg p-6 shadow-sm border">
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="text-sm text-gray-600 font-medium">
-										{stat.title}
-									</p>
-									<p className="text-2xl font-bold text-gray-900 mt-1">
-										{stat.value}
-									</p>
-									<p className="text-sm text-green-600 mt-1">{stat.change}</p>
-								</div>
-								<div className={`${stat.color} rounded-full p-3`}>
-									<stat.icon className="h-6 w-6 text-white" />
-								</div>
+			{/* Stats Grid */}
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+				{stats.map((stat, index) => (
+					<div
+						key={index}
+						className="bg-white rounded-lg p-6 shadow-sm border">
+						<div className="flex items-center justify-between">
+							<div>
+								<p className="text-sm text-gray-600 font-medium">
+									{stat.title}
+								</p>
+								<p className="text-2xl font-bold text-gray-900 mt-1">
+									{stat.value}
+								</p>
+								<p className="text-sm text-green-600 mt-1">{stat.change}</p>
+							</div>
+							<div className={`${stat.color} rounded-full p-3`}>
+								<stat.icon className="h-6 w-6 text-white" />
 							</div>
 						</div>
-					))}
-				</div>
-
-				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-					{/* Recent Inquiries */}
-					<div className="bg-white rounded-lg p-6 shadow-sm border">
-						<div className="flex items-center justify-between mb-4">
-							<h2 className="text-lg font-semibold text-gray-900">
-								Recent Inquiries
-							</h2>
-							<button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-								View All
-							</button>
-						</div>
-						<div className="space-y-4">
-							{dashboardData?.recentLeads &&
-							dashboardData.recentLeads.length > 0 ? (
-								dashboardData.recentLeads.map((lead) => (
-									<div
-										key={lead.id}
-										className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
-										<div className="flex-shrink-0">
-											<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-												<Users className="h-5 w-5 text-blue-600" />
-											</div>
-										</div>
-										<div className="flex-1 min-w-0">
-											<p className="text-sm font-medium text-gray-900 truncate">
-												{lead.property?.title || "Property"}
-											</p>
-											<p className="text-sm text-gray-600">
-												{lead.buyer?.name || "Buyer"}
-											</p>
-											<p className="text-xs text-gray-500 mt-1">
-												{lead.createdAt
-													? format(new Date(lead.createdAt), "PPP")
-													: "Unknown date"}
-											</p>
-										</div>
-										<div className="flex-shrink-0">
-											<span
-												className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-													lead.status === "new"
-														? "bg-red-100 text-red-800"
-														: "bg-green-100 text-green-800"
-												}`}>
-												{lead.status}
-											</span>
-										</div>
-									</div>
-								))
-							) : (
-								<p className="text-gray-500 text-center py-4">
-									No recent inquiries
-								</p>
-							)}
-						</div>
 					</div>
+				))}
+			</div>
 
-					{/* Top Performing Properties */}
-					<div className="bg-white rounded-lg p-6 shadow-sm border">
-						<div className="flex items-center justify-between mb-4">
-							<h2 className="text-lg font-semibold text-gray-900">
-								Top Performing Properties
-							</h2>
-							<button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-								View All
-							</button>
-						</div>
-						<div className="space-y-4">
-							{dashboardData?.topProperties &&
-							dashboardData.topProperties.length > 0 ? (
-								dashboardData.topProperties.map((property) => (
-									<div
-										key={property.id}
-										className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-										<div className="flex-shrink-0">
-											<div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-												<Building className="h-6 w-6 text-gray-600" />
-											</div>
-										</div>
-										<div className="flex-1 min-w-0">
-											<p className="text-sm font-medium text-gray-900 truncate">
-												{property.title}
-											</p>
-											<div className="flex items-center space-x-4 mt-1">
-												<div className="flex items-center text-xs text-gray-500">
-													<Eye className="h-3 w-3 mr-1" />
-													{property.views} views
-												</div>
-												<div className="flex items-center text-xs text-gray-500">
-													<MessageSquare className="h-3 w-3 mr-1" />
-													{property.leads} inquiries
-												</div>
-											</div>
-										</div>
-										<div className="flex-shrink-0">
-											<TrendingUp className="h-5 w-5 text-green-500" />
-										</div>
-									</div>
-								))
-							) : (
-								<p className="text-gray-500 text-center py-4">
-									No properties found
-								</p>
-							)}
-						</div>
-					</div>
-				</div>
-
-				{/* Quick Actions */}
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				{/* Recent Inquiries */}
 				<div className="bg-white rounded-lg p-6 shadow-sm border">
-					<h2 className="text-lg font-semibold text-gray-900 mb-4">
-						Quick Actions
-					</h2>
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-						<button
-							onClick={() => goToAddProperty()}
-							className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg text-left transition-colors">
-							<Building className="h-8 w-8 text-blue-600 mb-2" />
-							<p className="font-medium text-gray-900">Add New Property</p>
-							<p className="text-sm text-gray-600">
-								List a new property for sale or rent
-							</p>
+					<div className="flex items-center justify-between mb-4">
+						<h2 className="text-lg font-semibold text-gray-900">
+							Recent Inquiries
+						</h2>
+						<button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+							View All
 						</button>
-						<button className="p-4 bg-green-50 hover:bg-green-100 rounded-lg text-left transition-colors">
-							<TrendingUp className="h-8 w-8 text-green-600 mb-2" />
-							<p className="font-medium text-gray-900">Upgrade to Premium</p>
-							<p className="text-sm text-gray-600">
-								Get more visibility for your listings
+					</div>
+					<div className="space-y-4">
+						{dashboardData?.recentLeads &&
+						dashboardData.recentLeads.length > 0 ? (
+							dashboardData.recentLeads.map((lead) => (
+								<div
+									key={lead.id}
+									className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+									<div className="flex-shrink-0">
+										<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+											<Users className="h-5 w-5 text-blue-600" />
+										</div>
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-sm font-medium text-gray-900 truncate">
+											{lead.property?.title || "Property"}
+										</p>
+										<p className="text-sm text-gray-600">
+											{lead.buyer?.name || "Buyer"}
+										</p>
+										<p className="text-xs text-gray-500 mt-1">
+											{lead.createdAt
+												? format(new Date(lead.createdAt), "PPP")
+												: "Unknown date"}
+										</p>
+									</div>
+									<div className="flex-shrink-0">
+										<span
+											className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+												lead.status === "new"
+													? "bg-red-100 text-red-800"
+													: "bg-green-100 text-green-800"
+											}`}>
+											{lead.status}
+										</span>
+									</div>
+								</div>
+							))
+						) : (
+							<p className="text-gray-500 text-center py-4">
+								No recent inquiries
 							</p>
+						)}
+					</div>
+				</div>
+
+				{/* Top Performing Properties */}
+				<div className="bg-white rounded-lg p-6 shadow-sm border">
+					<div className="flex items-center justify-between mb-4">
+						<h2 className="text-lg font-semibold text-gray-900">
+							Top Performing Properties
+						</h2>
+						<button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+							View All
 						</button>
-						<button className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg text-left transition-colors">
-							<MessageSquare className="h-8 w-8 text-purple-600 mb-2" />
-							<p className="font-medium text-gray-900">Manage Inquiries</p>
-							<p className="text-sm text-gray-600">
-								Respond to buyer inquiries
+					</div>
+					<div className="space-y-4">
+						{dashboardData?.topProperties &&
+						dashboardData.topProperties.length > 0 ? (
+							dashboardData.topProperties.map((property) => (
+								<div
+									key={property.id}
+									className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+									<div className="flex-shrink-0">
+										<div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+											<Building className="h-6 w-6 text-gray-600" />
+										</div>
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-sm font-medium text-gray-900 truncate">
+											{property.title}
+										</p>
+										<div className="flex items-center space-x-4 mt-1">
+											<div className="flex items-center text-xs text-gray-500">
+												<Eye className="h-3 w-3 mr-1" />
+												{property.views} views
+											</div>
+											<div className="flex items-center text-xs text-gray-500">
+												<MessageSquare className="h-3 w-3 mr-1" />
+												{property.leads} inquiries
+											</div>
+										</div>
+									</div>
+									<div className="flex-shrink-0">
+										<TrendingUp className="h-5 w-5 text-green-500" />
+									</div>
+								</div>
+							))
+						) : (
+							<p className="text-gray-500 text-center py-4">
+								No properties found
 							</p>
-						</button>
+						)}
 					</div>
 				</div>
 			</div>
-		</AppLayout>
+
+			{/* Quick Actions */}
+			<div className="bg-white rounded-lg p-6 shadow-sm border">
+				<h2 className="text-lg font-semibold text-gray-900 mb-4">
+					Quick Actions
+				</h2>
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<button
+						onClick={() => goToAddProperty()}
+						className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg text-left transition-colors">
+						<Building className="h-8 w-8 text-blue-600 mb-2" />
+						<p className="font-medium text-gray-900">Add New Property</p>
+						<p className="text-sm text-gray-600">
+							List a new property for sale or rent
+						</p>
+					</button>
+					<button className="p-4 bg-green-50 hover:bg-green-100 rounded-lg text-left transition-colors">
+						<TrendingUp className="h-8 w-8 text-green-600 mb-2" />
+						<p className="font-medium text-gray-900">Upgrade to Premium</p>
+						<p className="text-sm text-gray-600">
+							Get more visibility for your listings
+						</p>
+					</button>
+					<button className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg text-left transition-colors">
+						<MessageSquare className="h-8 w-8 text-purple-600 mb-2" />
+						<p className="font-medium text-gray-900">Manage Inquiries</p>
+						<p className="text-sm text-gray-600">
+							Respond to buyer inquiries
+						</p>
+					</button>
+				</div>
+			</div>
+		</div>
 	);
 }

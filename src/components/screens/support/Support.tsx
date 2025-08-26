@@ -1,6 +1,5 @@
 "use client";
 
-import AppLayout from "@/components/custom/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -113,192 +112,190 @@ export default function Support() {
 	};
 
 	return (
-		<AppLayout mode="buyer">
-			<div className="min-h-screen bg-gray-50 py-6">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="space-y-6">
-						{/* Header */}
-						<div className="bg-white rounded-lg shadow-sm p-6">
-							<div className="text-center">
-								<h1 className="text-2xl font-bold text-gray-900 flex items-center justify-center">
-									<HelpCircle className="w-6 h-6 mr-3 text-orange-500" />
-									Help & Support
-								</h1>
-								<p className="text-gray-600 mt-1">
-									We're here to help you with your property journey
-								</p>
+		<div className="min-h-screen bg-gray-50 py-6">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div className="space-y-6">
+					{/* Header */}
+					<div className="bg-white rounded-lg shadow-sm p-6">
+						<div className="text-center">
+							<h1 className="text-2xl font-bold text-gray-900 flex items-center justify-center">
+								<HelpCircle className="w-6 h-6 mr-3 text-orange-500" />
+								Help & Support
+							</h1>
+							<p className="text-gray-600 mt-1">
+								We're here to help you with your property journey
+							</p>
+						</div>
+					</div>
+
+					{/* Search Help */}
+					<div className="bg-white rounded-lg shadow-sm p-6">
+						<div className="max-w-md mx-auto">
+							<div className="relative">
+								<Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+								<Input
+									placeholder="Search help articles..."
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									className="pl-10"
+								/>
 							</div>
 						</div>
+					</div>
 
-						{/* Search Help */}
-						<div className="bg-white rounded-lg shadow-sm p-6">
-							<div className="max-w-md mx-auto">
-								<div className="relative">
-									<Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-									<Input
-										placeholder="Search help articles..."
-										value={searchQuery}
-										onChange={(e) => setSearchQuery(e.target.value)}
-										className="pl-10"
-									/>
+					{/* Support Options */}
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+						{supportOptions.map((option, index) => (
+							<Card
+								key={index}
+								className="p-6 text-center hover:shadow-lg transition-shadow">
+								<div
+									className={`w-16 h-16 ${option.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+									<option.icon className="w-8 h-8" />
 								</div>
-							</div>
-						</div>
-
-						{/* Support Options */}
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-							{supportOptions.map((option, index) => (
-								<Card
-									key={index}
-									className="p-6 text-center hover:shadow-lg transition-shadow">
-									<div
-										className={`w-16 h-16 ${option.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-										<option.icon className="w-8 h-8" />
-									</div>
-									<h3 className="text-lg font-semibold mb-2">{option.title}</h3>
-									<p className="text-gray-600 mb-3">{option.description}</p>
-									<div className="flex items-center justify-center text-sm text-gray-500 mb-4">
-										<Clock className="w-4 h-4 mr-1" />
-										{option.availability}
-									</div>
-									<Button className="w-full">{option.action}</Button>
-								</Card>
-							))}
-						</div>
-
-						{/* Recent Support Tickets */}
-						{recentTickets.length > 0 && (
-							<Card className="p-6">
-								<h2 className="text-xl font-semibold mb-4">
-									Recent Support Tickets
-								</h2>
-								<div className="space-y-3">
-									{recentTickets.map((ticket) => (
-										<div
-											key={ticket.id}
-											className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-											<div className="flex-1">
-												<div className="flex items-center space-x-3">
-													<span className="font-medium text-blue-600">
-														{ticket.id}
-													</span>
-													<span
-														className={`px-2 py-1 text-xs rounded-full ${
-															ticket.status === "Resolved"
-																? "bg-green-100 text-green-800"
-																: "bg-yellow-100 text-yellow-800"
-														}`}>
-														{ticket.status}
-													</span>
-													<span
-														className={`px-2 py-1 text-xs rounded-full ${
-															ticket.priority === "High"
-																? "bg-red-100 text-red-800"
-																: "bg-blue-100 text-blue-800"
-														}`}>
-														{ticket.priority}
-													</span>
-												</div>
-												<p className="text-gray-900 mt-1">{ticket.subject}</p>
-												<p className="text-sm text-gray-500">{ticket.date}</p>
-											</div>
-											<Button size="sm" variant="outline">
-												View Details
-											</Button>
-										</div>
-									))}
+								<h3 className="text-lg font-semibold mb-2">{option.title}</h3>
+								<p className="text-gray-600 mb-3">{option.description}</p>
+								<div className="flex items-center justify-center text-sm text-gray-500 mb-4">
+									<Clock className="w-4 h-4 mr-1" />
+									{option.availability}
 								</div>
+								<Button className="w-full">{option.action}</Button>
 							</Card>
-						)}
+						))}
+					</div>
 
-						{/* FAQ Section */}
+					{/* Recent Support Tickets */}
+					{recentTickets.length > 0 && (
 						<Card className="p-6">
-							<h2 className="text-xl font-semibold mb-6">
-								Frequently Asked Questions
+							<h2 className="text-xl font-semibold mb-4">
+								Recent Support Tickets
 							</h2>
-							<div className="space-y-4">
-								{faqs.map((faq, index) => (
-									<div key={index} className="border-b border-gray-200 pb-4">
-										<button
-											onClick={() => toggleFaq(index)}
-											className="flex items-center justify-between w-full text-left">
-											<h3 className="font-medium text-gray-900 pr-4">
-												{faq.question}
-											</h3>
-											<ChevronDown
-												className={`w-5 h-5 text-gray-500 transform transition-transform ${
-													expandedFaq === index ? "rotate-180" : ""
-												}`}
-											/>
-										</button>
-										{expandedFaq === index && (
-											<div className="mt-3 text-gray-600">{faq.answer}</div>
-										)}
+							<div className="space-y-3">
+								{recentTickets.map((ticket) => (
+									<div
+										key={ticket.id}
+										className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+										<div className="flex-1">
+											<div className="flex items-center space-x-3">
+												<span className="font-medium text-blue-600">
+													{ticket.id}
+												</span>
+												<span
+													className={`px-2 py-1 text-xs rounded-full ${
+														ticket.status === "Resolved"
+															? "bg-green-100 text-green-800"
+															: "bg-yellow-100 text-yellow-800"
+													}`}>
+													{ticket.status}
+												</span>
+												<span
+													className={`px-2 py-1 text-xs rounded-full ${
+														ticket.priority === "High"
+															? "bg-red-100 text-red-800"
+															: "bg-blue-100 text-blue-800"
+													}`}>
+													{ticket.priority}
+												</span>
+											</div>
+											<p className="text-gray-900 mt-1">{ticket.subject}</p>
+											<p className="text-sm text-gray-500">{ticket.date}</p>
+										</div>
+										<Button size="sm" variant="outline">
+											View Details
+										</Button>
 									</div>
 								))}
 							</div>
 						</Card>
+					)}
 
-						{/* Contact Information */}
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							<Card className="p-6">
-								<h3 className="text-lg font-semibold mb-4">
-									Contact Information
-								</h3>
-								<div className="space-y-3">
-									<div className="flex items-center">
-										<Phone className="w-5 h-5 text-blue-600 mr-3" />
-										<div>
-											<p className="font-medium">Phone Support</p>
-											<p className="text-gray-600">+91 1800-XXX-XXXX</p>
-										</div>
-									</div>
-									<div className="flex items-center">
-										<Mail className="w-5 h-5 text-green-600 mr-3" />
-										<div>
-											<p className="font-medium">Email Support</p>
-											<p className="text-gray-600">support@propmize.com</p>
-										</div>
-									</div>
-									<div className="flex items-center">
-										<MessageCircle className="w-5 h-5 text-purple-600 mr-3" />
-										<div>
-											<p className="font-medium">Live Chat</p>
-											<p className="text-gray-600">Available 24/7</p>
-										</div>
-									</div>
+					{/* FAQ Section */}
+					<Card className="p-6">
+						<h2 className="text-xl font-semibold mb-6">
+							Frequently Asked Questions
+						</h2>
+						<div className="space-y-4">
+							{faqs.map((faq, index) => (
+								<div key={index} className="border-b border-gray-200 pb-4">
+									<button
+										onClick={() => toggleFaq(index)}
+										className="flex items-center justify-between w-full text-left">
+										<h3 className="font-medium text-gray-900 pr-4">
+											{faq.question}
+										</h3>
+										<ChevronDown
+											className={`w-5 h-5 text-gray-500 transform transition-transform ${
+												expandedFaq === index ? "rotate-180" : ""
+											}`}
+										/>
+									</button>
+									{expandedFaq === index && (
+										<div className="mt-3 text-gray-600">{faq.answer}</div>
+									)}
 								</div>
-							</Card>
-
-							<Card className="p-6">
-								<h3 className="text-lg font-semibold mb-4">
-									Customer Satisfaction
-								</h3>
-								<div className="space-y-4">
-									<div className="flex items-center justify-between">
-										<span className="text-gray-600">Average Response Time</span>
-										<span className="font-semibold">&lt; 2 hours</span>
-									</div>
-									<div className="flex items-center justify-between">
-										<span className="text-gray-600">Customer Rating</span>
-										<div className="flex items-center">
-											<Star className="w-4 h-4 text-yellow-500 mr-1" />
-											<span className="font-semibold">4.8/5</span>
-										</div>
-									</div>
-									<div className="flex items-center justify-between">
-										<span className="text-gray-600">Resolution Rate</span>
-										<div className="flex items-center">
-											<CheckCircle className="w-4 h-4 text-green-500 mr-1" />
-											<span className="font-semibold">98%</span>
-										</div>
-									</div>
-								</div>
-							</Card>
+							))}
 						</div>
+					</Card>
+
+					{/* Contact Information */}
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<Card className="p-6">
+							<h3 className="text-lg font-semibold mb-4">
+								Contact Information
+							</h3>
+							<div className="space-y-3">
+								<div className="flex items-center">
+									<Phone className="w-5 h-5 text-blue-600 mr-3" />
+									<div>
+										<p className="font-medium">Phone Support</p>
+										<p className="text-gray-600">+91 1800-XXX-XXXX</p>
+									</div>
+								</div>
+								<div className="flex items-center">
+									<Mail className="w-5 h-5 text-green-600 mr-3" />
+									<div>
+										<p className="font-medium">Email Support</p>
+										<p className="text-gray-600">support@propmize.com</p>
+									</div>
+								</div>
+								<div className="flex items-center">
+									<MessageCircle className="w-5 h-5 text-purple-600 mr-3" />
+									<div>
+										<p className="font-medium">Live Chat</p>
+										<p className="text-gray-600">Available 24/7</p>
+									</div>
+								</div>
+							</div>
+						</Card>
+
+						<Card className="p-6">
+							<h3 className="text-lg font-semibold mb-4">
+								Customer Satisfaction
+							</h3>
+							<div className="space-y-4">
+								<div className="flex items-center justify-between">
+									<span className="text-gray-600">Average Response Time</span>
+									<span className="font-semibold">&lt; 2 hours</span>
+								</div>
+								<div className="flex items-center justify-between">
+									<span className="text-gray-600">Customer Rating</span>
+									<div className="flex items-center">
+										<Star className="w-4 h-4 text-yellow-500 mr-1" />
+										<span className="font-semibold">4.8/5</span>
+									</div>
+								</div>
+								<div className="flex items-center justify-between">
+									<span className="text-gray-600">Resolution Rate</span>
+									<div className="flex items-center">
+										<CheckCircle className="w-4 h-4 text-green-500 mr-1" />
+										<span className="font-semibold">98%</span>
+									</div>
+								</div>
+							</div>
+						</Card>
 					</div>
 				</div>
 			</div>
-		</AppLayout>
+		</div>
 	);
 }

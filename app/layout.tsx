@@ -1,9 +1,12 @@
+
+
 import { Toaster } from "@/components/ui/Toaster";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { Providers } from "../src/lib/providers/Providers";
 import "./globals.css";
+import AppLayout from "@/components/custom/layout/AppLayout";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -44,7 +47,9 @@ export default function RootLayout({
 					zIndex={1600}
 				/>
 				<Toaster />
-				<Providers>{children}</Providers>
+				<Providers>
+					<AppLayout>{children}</AppLayout>
+				</Providers>
 			</body>
 		</html>
 	);

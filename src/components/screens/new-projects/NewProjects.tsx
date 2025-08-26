@@ -1,6 +1,5 @@
 "use client";
 
-import AppLayout from "@/components/custom/layout/AppLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -104,228 +103,226 @@ export default function NewProjects() {
 	};
 
 	return (
-		<AppLayout mode="buyer">
-			<div className="min-h-screen bg-gray-50 py-6">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div className="min-h-screen bg-gray-50 py-6">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div className="space-y-6">
+					{/* Header */}
+					<div className="bg-white rounded-lg shadow-sm p-6">
+						<div className="flex items-center justify-between">
+							<div>
+								<h1 className="text-2xl font-bold text-gray-900 flex items-center">
+									<Building className="w-6 h-6 mr-3 text-purple-500" />
+									New Projects in Bangalore
+								</h1>
+								<p className="text-gray-600 mt-1">
+									{projects.length} new residential projects available
+								</p>
+							</div>
+							<Button variant="outline">
+								<Filter className="w-4 h-4 mr-2" />
+								Filter Projects
+							</Button>
+						</div>
+					</div>
+
+					{/* Filter Tabs */}
+					<div className="bg-white rounded-lg shadow-sm p-4">
+						<div className="flex space-x-4">
+							<Button
+								variant={filter === "all" ? "default" : "outline"}
+								size="sm"
+								onClick={() => setFilter("all")}>
+								All Projects
+							</Button>
+							<Button
+								variant={filter === "pre-launch" ? "default" : "outline"}
+								size="sm"
+								onClick={() => setFilter("pre-launch")}>
+								Pre-Launch
+							</Button>
+							<Button
+								variant={filter === "launched" ? "default" : "outline"}
+								size="sm"
+								onClick={() => setFilter("launched")}>
+								Launched
+							</Button>
+							<Button
+								variant={filter === "ready-to-move" ? "default" : "outline"}
+								size="sm"
+								onClick={() => setFilter("ready-to-move")}>
+								Ready to Move
+							</Button>
+						</div>
+					</div>
+
+					{/* Projects List */}
 					<div className="space-y-6">
-						{/* Header */}
-						<div className="bg-white rounded-lg shadow-sm p-6">
-							<div className="flex items-center justify-between">
-								<div>
-									<h1 className="text-2xl font-bold text-gray-900 flex items-center">
-										<Building className="w-6 h-6 mr-3 text-purple-500" />
-										New Projects in Bangalore
-									</h1>
-									<p className="text-gray-600 mt-1">
-										{projects.length} new residential projects available
-									</p>
-								</div>
-								<Button variant="outline">
-									<Filter className="w-4 h-4 mr-2" />
-									Filter Projects
-								</Button>
-							</div>
-						</div>
+						{projects.map((project) => (
+							<Card key={project.id} className="overflow-hidden">
+								<div className="flex flex-col lg:flex-row">
+									<div className="lg:w-96">
+										<img
+											src={project.image}
+											alt={project.name}
+											className="w-full h-64 lg:h-full object-cover"
+										/>
+									</div>
 
-						{/* Filter Tabs */}
-						<div className="bg-white rounded-lg shadow-sm p-4">
-							<div className="flex space-x-4">
-								<Button
-									variant={filter === "all" ? "default" : "outline"}
-									size="sm"
-									onClick={() => setFilter("all")}>
-									All Projects
-								</Button>
-								<Button
-									variant={filter === "pre-launch" ? "default" : "outline"}
-									size="sm"
-									onClick={() => setFilter("pre-launch")}>
-									Pre-Launch
-								</Button>
-								<Button
-									variant={filter === "launched" ? "default" : "outline"}
-									size="sm"
-									onClick={() => setFilter("launched")}>
-									Launched
-								</Button>
-								<Button
-									variant={filter === "ready-to-move" ? "default" : "outline"}
-									size="sm"
-									onClick={() => setFilter("ready-to-move")}>
-									Ready to Move
-								</Button>
-							</div>
-						</div>
-
-						{/* Projects List */}
-						<div className="space-y-6">
-							{projects.map((project) => (
-								<Card key={project.id} className="overflow-hidden">
-									<div className="flex flex-col lg:flex-row">
-										<div className="lg:w-96">
-											<img
-												src={project.image}
-												alt={project.name}
-												className="w-full h-64 lg:h-full object-cover"
-											/>
+									<div className="flex-1 p-6">
+										<div className="flex items-start justify-between mb-4">
+											<div className="flex-1">
+												<div className="flex items-center justify-between mb-2">
+													<h3 className="text-2xl font-bold text-gray-900">
+														{project.name}
+													</h3>
+													<Badge className={getStatusColor(project.status)}>
+														{project.status}
+													</Badge>
+												</div>
+												<p className="text-lg font-medium text-gray-700 mb-1">
+													by {project.builder}
+												</p>
+												<p className="text-gray-600 flex items-center mb-2">
+													<MapPin className="w-4 h-4 mr-1" />
+													{project.location}
+												</p>
+												<div className="flex items-center space-x-4 mb-3">
+													<div className="flex items-center">
+														<Star className="w-4 h-4 text-yellow-500 mr-1" />
+														<span className="text-sm font-medium">
+															{project.rating}
+														</span>
+													</div>
+													<div className="flex items-center text-sm text-gray-600">
+														<Users className="w-4 h-4 mr-1" />
+														{project.interested} interested
+													</div>
+												</div>
+											</div>
 										</div>
 
-										<div className="flex-1 p-6">
-											<div className="flex items-start justify-between mb-4">
-												<div className="flex-1">
-													<div className="flex items-center justify-between mb-2">
-														<h3 className="text-2xl font-bold text-gray-900">
-															{project.name}
-														</h3>
-														<Badge className={getStatusColor(project.status)}>
-															{project.status}
-														</Badge>
-													</div>
-													<p className="text-lg font-medium text-gray-700 mb-1">
-														by {project.builder}
-													</p>
-													<p className="text-gray-600 flex items-center mb-2">
-														<MapPin className="w-4 h-4 mr-1" />
-														{project.location}
-													</p>
-													<div className="flex items-center space-x-4 mb-3">
-														<div className="flex items-center">
-															<Star className="w-4 h-4 text-yellow-500 mr-1" />
-															<span className="text-sm font-medium">
-																{project.rating}
-															</span>
-														</div>
-														<div className="flex items-center text-sm text-gray-600">
-															<Users className="w-4 h-4 mr-1" />
-															{project.interested} interested
-														</div>
-													</div>
-												</div>
+										<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+											<div>
+												<p className="text-sm text-gray-500">Price Range</p>
+												<p className="font-semibold text-blue-600">
+													{project.priceRange}
+												</p>
 											</div>
-
-											<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-												<div>
-													<p className="text-sm text-gray-500">Price Range</p>
-													<p className="font-semibold text-blue-600">
-														{project.priceRange}
-													</p>
-												</div>
-												<div>
-													<p className="text-sm text-gray-500">Configuration</p>
-													<p className="font-semibold">
-														{project.configuration}
-													</p>
-												</div>
-												<div>
-													<p className="text-sm text-gray-500">Total Units</p>
-													<p className="font-semibold">{project.totalUnits}</p>
-												</div>
-												<div>
-													<p className="text-sm text-gray-500">Available</p>
-													<p className="font-semibold text-green-600">
-														{project.availableUnits}
-													</p>
-												</div>
+											<div>
+												<p className="text-sm text-gray-500">Configuration</p>
+												<p className="font-semibold">
+													{project.configuration}
+												</p>
 											</div>
+											<div>
+												<p className="text-sm text-gray-500">Total Units</p>
+												<p className="font-semibold">{project.totalUnits}</p>
+											</div>
+											<div>
+												<p className="text-sm text-gray-500">Available</p>
+												<p className="font-semibold text-green-600">
+													{project.availableUnits}
+												</p>
+											</div>
+										</div>
 
-											<div className="mb-4">
-												<h4 className="font-medium text-gray-900 mb-2">
-													Special Offers
-												</h4>
-												<div className="flex flex-wrap gap-2">
-													{project.offers.map((offer, index) => (
+										<div className="mb-4">
+											<h4 className="font-medium text-gray-900 mb-2">
+												Special Offers
+											</h4>
+											<div className="flex flex-wrap gap-2">
+												{project.offers.map((offer, index) => (
+													<Badge
+														key={index}
+														variant="secondary"
+														className="text-xs">
+														<Percent className="w-3 h-3 mr-1" />
+														{offer}
+													</Badge>
+												))}
+											</div>
+										</div>
+
+										<div className="mb-4">
+											<h4 className="font-medium text-gray-900 mb-2">
+												Key Amenities
+											</h4>
+											<div className="flex flex-wrap gap-2">
+												{project.amenities
+													.slice(0, 4)
+													.map((amenity, index) => (
 														<Badge
 															key={index}
-															variant="secondary"
+															variant="outline"
 															className="text-xs">
-															<Percent className="w-3 h-3 mr-1" />
-															{offer}
+															{amenity}
 														</Badge>
 													))}
+												{project.amenities.length > 4 && (
+													<Badge variant="outline" className="text-xs">
+														+{project.amenities.length - 4} more
+													</Badge>
+												)}
+											</div>
+										</div>
+
+										<div className="flex items-center justify-between pt-4 border-t">
+											<div className="flex items-center space-x-4 text-sm text-gray-600">
+												<div className="flex items-center">
+													<Calendar className="w-4 h-4 mr-1" />
+													Launch:{" "}
+													{(() => {
+														const date = new Date(project.launchDate);
+														const day = date
+															.getDate()
+															.toString()
+															.padStart(2, "0");
+														const month = (date.getMonth() + 1)
+															.toString()
+															.padStart(2, "0");
+														const year = date.getFullYear();
+														return `${day}/${month}/${year}`;
+													})()}
+												</div>
+												<div className="flex items-center">
+													<Building className="w-4 h-4 mr-1" />
+													Possession:{" "}
+													{(() => {
+														const date = new Date(project.possessionDate);
+														const day = date
+															.getDate()
+															.toString()
+															.padStart(2, "0");
+														const month = (date.getMonth() + 1)
+															.toString()
+															.padStart(2, "0");
+														const year = date.getFullYear();
+														return `${day}/${month}/${year}`;
+													})()}
 												</div>
 											</div>
-
-											<div className="mb-4">
-												<h4 className="font-medium text-gray-900 mb-2">
-													Key Amenities
-												</h4>
-												<div className="flex flex-wrap gap-2">
-													{project.amenities
-														.slice(0, 4)
-														.map((amenity, index) => (
-															<Badge
-																key={index}
-																variant="outline"
-																className="text-xs">
-																{amenity}
-															</Badge>
-														))}
-													{project.amenities.length > 4 && (
-														<Badge variant="outline" className="text-xs">
-															+{project.amenities.length - 4} more
-														</Badge>
-													)}
-												</div>
-											</div>
-
-											<div className="flex items-center justify-between pt-4 border-t">
-												<div className="flex items-center space-x-4 text-sm text-gray-600">
-													<div className="flex items-center">
-														<Calendar className="w-4 h-4 mr-1" />
-														Launch:{" "}
-														{(() => {
-															const date = new Date(project.launchDate);
-															const day = date
-																.getDate()
-																.toString()
-																.padStart(2, "0");
-															const month = (date.getMonth() + 1)
-																.toString()
-																.padStart(2, "0");
-															const year = date.getFullYear();
-															return `${day}/${month}/${year}`;
-														})()}
-													</div>
-													<div className="flex items-center">
-														<Building className="w-4 h-4 mr-1" />
-														Possession:{" "}
-														{(() => {
-															const date = new Date(project.possessionDate);
-															const day = date
-																.getDate()
-																.toString()
-																.padStart(2, "0");
-															const month = (date.getMonth() + 1)
-																.toString()
-																.padStart(2, "0");
-															const year = date.getFullYear();
-															return `${day}/${month}/${year}`;
-														})()}
-													</div>
-												</div>
-												<div className="flex items-center space-x-3">
-													<Button
-														size="sm"
-														variant="outline"
-														onClick={() => handleInterest(project.id)}>
-														Show Interest
-													</Button>
-													<Button
-														size="sm"
-														onClick={() => handleContact(project.id)}>
-														<Phone className="w-4 h-4 mr-1" />
-														Contact
-													</Button>
-												</div>
+											<div className="flex items-center space-x-3">
+												<Button
+													size="sm"
+													variant="outline"
+													onClick={() => handleInterest(project.id)}>
+													Show Interest
+												</Button>
+												<Button
+													size="sm"
+													onClick={() => handleContact(project.id)}>
+													<Phone className="w-4 h-4 mr-1" />
+													Contact
+												</Button>
 											</div>
 										</div>
 									</div>
-								</Card>
-							))}
-						</div>
+								</div>
+							</Card>
+						))}
 					</div>
 				</div>
 			</div>
-		</AppLayout>
+		</div>
 	);
 }

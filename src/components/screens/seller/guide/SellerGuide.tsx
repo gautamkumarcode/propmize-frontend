@@ -1,6 +1,5 @@
 "use client";
 
-import AppLayout from "@/components/custom/layout/AppLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -179,197 +178,195 @@ export default function SellerGuide() {
 	};
 
 	return (
-		<AppLayout mode="seller">
-			<div className="min-h-screen bg-gray-50 py-6">
-				<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="space-y-8">
-						{/* Header */}
-						<div className="text-center">
-							<div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full mb-6">
-								<BookOpen className="w-8 h-8 text-white" />
+		<div className="min-h-screen bg-gray-50 py-6">
+			<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div className="space-y-8">
+					{/* Header */}
+					<div className="text-center">
+						<div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-full mb-6">
+							<BookOpen className="w-8 h-8 text-white" />
+						</div>
+						<h1 className="text-4xl font-bold text-gray-900 mb-4">
+							Seller's Guide
+						</h1>
+						<p className="text-xl text-gray-600 max-w-3xl mx-auto">
+							A comprehensive guide to help you sell your property quickly and
+							for the best price
+						</p>
+					</div>
+
+					{/* Progress Overview */}
+					<Card className="p-6">
+						<div className="flex items-center justify-between mb-6">
+							<h2 className="text-2xl font-bold text-gray-900">
+								Your Selling Journey
+							</h2>
+							<Badge className="bg-blue-100 text-blue-800">
+								Step 2 of 8 in progress
+							</Badge>
+						</div>
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+							{sellingSteps.map((step, index) => {
+								const IconComponent = step.icon;
+								return (
+									<Card
+										key={step.id}
+										className={`p-4 cursor-pointer transition-all ${
+											activeStep === index ? "ring-2 ring-blue-500" : ""
+										}`}
+										onClick={() => setActiveStep(index)}>
+										<div className="flex items-center space-x-3 mb-3">
+											<div
+												className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(
+													step.status
+												)}`}>
+												<IconComponent className="w-5 h-5" />
+											</div>
+											<div
+												className={`flex items-center ${getStatusColor(
+													step.status
+												)} px-2 py-1 rounded-full text-xs font-medium`}>
+												{getStatusIcon(step.status)}
+												<span className="ml-1 capitalize">
+													{step.status.replace("-", " ")}
+												</span>
+											</div>
+										</div>
+										<h3 className="font-semibold text-gray-900 mb-1">
+											{step.title}
+										</h3>
+										<p className="text-sm text-gray-600 mb-2">
+											{step.description}
+										</p>
+										<div className="flex items-center text-xs text-gray-500">
+											<Clock className="w-3 h-3 mr-1" />
+											{step.time}
+										</div>
+									</Card>
+								);
+							})}
+						</div>
+					</Card>
+
+					{/* Step Details */}
+					<Card className="p-6">
+						<div className="flex items-center space-x-4 mb-6">
+							{React.createElement(sellingSteps[activeStep].icon, {
+								className: "w-8 h-8 text-blue-600",
+							})}
+							<div>
+								<h2 className="text-2xl font-bold text-gray-900">
+									{sellingSteps[activeStep].title}
+								</h2>
+								<p className="text-gray-600">
+									{sellingSteps[activeStep].description}
+								</p>
 							</div>
-							<h1 className="text-4xl font-bold text-gray-900 mb-4">
-								Seller's Guide
-							</h1>
-							<p className="text-xl text-gray-600 max-w-3xl mx-auto">
-								A comprehensive guide to help you sell your property quickly and
-								for the best price
-							</p>
 						</div>
 
-						{/* Progress Overview */}
-						<Card className="p-6">
-							<div className="flex items-center justify-between mb-6">
-								<h2 className="text-2xl font-bold text-gray-900">
-									Your Selling Journey
-								</h2>
-								<Badge className="bg-blue-100 text-blue-800">
-									Step 2 of 8 in progress
-								</Badge>
-							</div>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-								{sellingSteps.map((step, index) => {
-									const IconComponent = step.icon;
-									return (
-										<Card
-											key={step.id}
-											className={`p-4 cursor-pointer transition-all ${
-												activeStep === index ? "ring-2 ring-blue-500" : ""
-											}`}
-											onClick={() => setActiveStep(index)}>
-											<div className="flex items-center space-x-3 mb-3">
-												<div
-													className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(
-														step.status
-													)}`}>
-													<IconComponent className="w-5 h-5" />
-												</div>
-												<div
-													className={`flex items-center ${getStatusColor(
-														step.status
-													)} px-2 py-1 rounded-full text-xs font-medium`}>
-													{getStatusIcon(step.status)}
-													<span className="ml-1 capitalize">
-														{step.status.replace("-", " ")}
-													</span>
-												</div>
-											</div>
-											<h3 className="font-semibold text-gray-900 mb-1">
-												{step.title}
-											</h3>
-											<p className="text-sm text-gray-600 mb-2">
-												{step.description}
-											</p>
-											<div className="flex items-center text-xs text-gray-500">
-												<Clock className="w-3 h-3 mr-1" />
-												{step.time}
-											</div>
-										</Card>
-									);
-								})}
-							</div>
-						</Card>
-
-						{/* Step Details */}
-						<Card className="p-6">
-							<div className="flex items-center space-x-4 mb-6">
-								{React.createElement(sellingSteps[activeStep].icon, {
-									className: "w-8 h-8 text-blue-600",
-								})}
-								<div>
-									<h2 className="text-2xl font-bold text-gray-900">
-										{sellingSteps[activeStep].title}
-									</h2>
-									<p className="text-gray-600">
-										{sellingSteps[activeStep].description}
+						<div className="space-y-6">
+							<div>
+								<h3 className="text-lg font-semibold text-gray-900 mb-4">
+									What you need to do:
+								</h3>
+								<div className="bg-gray-50 rounded-lg p-4">
+									<p className="text-gray-700">
+										{activeStep === 0 &&
+											"Prepare your property for potential buyers by cleaning, decluttering, and making necessary repairs."}
+										{activeStep === 1 &&
+											"Gather all necessary legal documents including title deed, NOC, and certificates."}
+										{activeStep === 2 &&
+											"Research market prices and set a competitive price for your property."}
+										{activeStep === 3 &&
+											"Arrange for professional photography or take high-quality photos yourself."}
+										{activeStep === 4 &&
+											"Create an attractive listing with compelling descriptions and photos."}
+										{activeStep === 5 &&
+											"Promote your property through various marketing channels."}
+										{activeStep === 6 &&
+											"Manage inquiries, schedule viewings, and negotiate with potential buyers."}
+										{activeStep === 7 &&
+											"Complete legal formalities and transfer ownership to the buyer."}
 									</p>
 								</div>
 							</div>
 
-							<div className="space-y-6">
-								<div>
-									<h3 className="text-lg font-semibold text-gray-900 mb-4">
-										What you need to do:
-									</h3>
-									<div className="bg-gray-50 rounded-lg p-4">
-										<p className="text-gray-700">
-											{activeStep === 0 &&
-												"Prepare your property for potential buyers by cleaning, decluttering, and making necessary repairs."}
-											{activeStep === 1 &&
-												"Gather all necessary legal documents including title deed, NOC, and certificates."}
-											{activeStep === 2 &&
-												"Research market prices and set a competitive price for your property."}
-											{activeStep === 3 &&
-												"Arrange for professional photography or take high-quality photos yourself."}
-											{activeStep === 4 &&
-												"Create an attractive listing with compelling descriptions and photos."}
-											{activeStep === 5 &&
-												"Promote your property through various marketing channels."}
-											{activeStep === 6 &&
-												"Manage inquiries, schedule viewings, and negotiate with potential buyers."}
-											{activeStep === 7 &&
-												"Complete legal formalities and transfer ownership to the buyer."}
-										</p>
-									</div>
-								</div>
-
-								<div className="flex space-x-4">
-									{activeStep > 0 && (
-										<Button
-											variant="outline"
-											onClick={() => setActiveStep(activeStep - 1)}>
-											Previous Step
-										</Button>
-									)}
-									{activeStep < sellingSteps.length - 1 && (
-										<Button onClick={() => setActiveStep(activeStep + 1)}>
-											Next Step
-										</Button>
-									)}
-								</div>
+							<div className="flex space-x-4">
+								{activeStep > 0 && (
+									<Button
+										variant="outline"
+										onClick={() => setActiveStep(activeStep - 1)}>
+										Previous Step
+									</Button>
+								)}
+								{activeStep < sellingSteps.length - 1 && (
+									<Button onClick={() => setActiveStep(activeStep + 1)}>
+										Next Step
+									</Button>
+								)}
 							</div>
-						</Card>
-
-						{/* Tips Section */}
-						<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-							{tips.map((tip, index) => (
-								<Card key={index} className="p-6">
-									<h3 className="text-xl font-bold text-gray-900 mb-4">
-										{tip.category} Tips
-									</h3>
-									<div className="space-y-3">
-										{tip.items.map((item, itemIndex) => (
-											<div key={itemIndex} className="flex items-start">
-												<Star className="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
-												<span className="text-gray-700">{item}</span>
-											</div>
-										))}
-									</div>
-								</Card>
-							))}
 						</div>
+					</Card>
 
-						{/* FAQ Section */}
-						<Card className="p-6">
-							<h2 className="text-2xl font-bold text-gray-900 mb-6">
-								Frequently Asked Questions
-							</h2>
-							<div className="space-y-6">
-								{faqs.map((faq, index) => (
-									<div key={index} className="border-b border-gray-200 pb-6">
-										<div className="flex items-start">
-											<MessageSquare className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
-											<div>
-												<h3 className="text-lg font-semibold text-gray-900 mb-2">
-													{faq.question}
-												</h3>
-												<p className="text-gray-700">{faq.answer}</p>
-											</div>
+					{/* Tips Section */}
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+						{tips.map((tip, index) => (
+							<Card key={index} className="p-6">
+								<h3 className="text-xl font-bold text-gray-900 mb-4">
+									{tip.category} Tips
+								</h3>
+								<div className="space-y-3">
+									{tip.items.map((item, itemIndex) => (
+										<div key={itemIndex} className="flex items-start">
+											<Star className="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
+											<span className="text-gray-700">{item}</span>
+										</div>
+									))}
+								</div>
+							</Card>
+						))}
+					</div>
+
+					{/* FAQ Section */}
+					<Card className="p-6">
+						<h2 className="text-2xl font-bold text-gray-900 mb-6">
+							Frequently Asked Questions
+						</h2>
+						<div className="space-y-6">
+							{faqs.map((faq, index) => (
+								<div key={index} className="border-b border-gray-200 pb-6">
+									<div className="flex items-start">
+										<MessageSquare className="w-6 h-6 text-blue-600 mr-3 mt-1 flex-shrink-0" />
+										<div>
+											<h3 className="text-lg font-semibold text-gray-900 mb-2">
+												{faq.question}
+											</h3>
+											<p className="text-gray-700">{faq.answer}</p>
 										</div>
 									</div>
-								))}
-							</div>
-						</Card>
+								</div>
+							))}
+						</div>
+					</Card>
 
-						{/* CTA */}
-						<Card className="p-8 bg-gradient-to-r from-blue-50 to-green-50 text-center">
-							<h2 className="text-2xl font-bold text-gray-900 mb-4">
-								Ready to Start Selling?
-							</h2>
-							<p className="text-gray-600 mb-6">
-								Follow our step-by-step guide and get expert support throughout
-								your selling journey
-							</p>
-							<div className="space-x-4">
-								<Button size="lg">List Your Property</Button>
-								<Button variant="outline" size="lg">
-									Get Expert Help
-								</Button>
-							</div>
-						</Card>
-					</div>
+					{/* CTA */}
+					<Card className="p-8 bg-gradient-to-r from-blue-50 to-green-50 text-center">
+						<h2 className="text-2xl font-bold text-gray-900 mb-4">
+							Ready to Start Selling?
+						</h2>
+						<p className="text-gray-600 mb-6">
+							Follow our step-by-step guide and get expert support throughout
+							your selling journey
+						</p>
+						<div className="space-x-4">
+							<Button size="lg">List Your Property</Button>
+							<Button variant="outline" size="lg">
+								Get Expert Help
+							</Button>
+						</div>
+					</Card>
 				</div>
 			</div>
-		</AppLayout>
+		</div>
 	);
 }

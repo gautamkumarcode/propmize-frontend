@@ -8,12 +8,10 @@ import React from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type { PropertyFormData } from "../validation/propertySchema";
 import { propertySchema } from "../validation/propertySchema";
-import BasicDetailsStep from "./BasicDetailsStep";
-import ContactNotesStep from "./ContactNotesStep";
-import LocationNearbyStep from "./LocationNearbyStep";
-import MediaStep from "./MediaStep";
-import PricingLegalStep from "./PricingLegalStep";
-import PropertyDetailsFeaturesStep from "./PropertyDetailsFeaturesStep";
+import PropertyBasicDetails from "./PropertyBasicDetails";
+import PropertyContactAndNotes from "./PropertyContactAndNotes";
+import PropertyLocationAndFeatures from "./PropertyLocationAndFeatures";
+import PropertyMediaAndPricing from "./PropertyMediaAndPricing";
 import ReviewStep from "./ReviewStep";
 
 export const getPropertyDefaultValues = (): PropertyFormData => ({
@@ -88,8 +86,9 @@ interface PropertyFormProps {
 // Refactored 4-step config
 const stepConfig = [
 	{ key: "basic", label: "Basic Details" },
-	{ key: "details", label: "Property Details & Features" },
-	{ key: "pricing", label: "Pricing, Contact & Nearby" },
+	{ key: "locationFeatures", label: "Location & Features" },
+	{ key: "mediaPricing", label: "Media & Pricing" },
+	{ key: "contactNotes", label: "Contact & Notes" },
 	{ key: "preview", label: "Preview" },
 ];
 
@@ -107,7 +106,7 @@ export default function PropertyForm({
 	const propertyType = form.watch("propertyType");
 
 	// Get the correct step configuration based on listing type
-	const currentStepConfig = stepConfig[listingType as keyof typeof stepConfig];
+	const currentStepConfig = stepConfig[currentStep -1];
 
 	// Use static 4-step config to match parent
 	const steps = stepConfig;
@@ -148,23 +147,44 @@ export default function PropertyForm({
 					"description",
 					"propertyType",
 					"listingType",
-				];
-				break;
-			case "details":
-				fieldsToValidate = [
-					"address.street",
-					"address.city",
-					"address.zipCode",
+					"currency",
 					"area.value",
-					"furnished",
+					"area.unit",
 					"bedrooms",
 					"bathrooms",
+					"balconies",
+					"parking",
+					"furnished",
+					"floor",
+					"totalFloors",
+					"age",
 				];
 				break;
-			case "media":
-				fieldsToValidate = ["images"];
+			case "locationFeatures":
+				fieldsToValidate = [
+					"address.street",
+					"address.area",
+					"address.city",
+					"address.state",
+					"address.zipCode",
+					"address.country",
+					"features.facing",
+					"features.flooringType",
+					"features.waterSupply",
+				];
 				break;
-
+			case "mediaPricing":
+				fieldsToValidate = [
+					"images",
+					"pricing.basePrice.value",
+					"pricing.basePrice.unit",
+					"pricing.priceNegotiable",
+					"legalInfo.ownershipType",
+				];
+				break;
+			case "contactNotes":
+				fieldsToValidate = ["contact.name", "contact.phone", "contact.whatsapp", "contact.type", "nearbyPlaces"];
+				break;
 			default:
 				break;
 		}
@@ -188,24 +208,13 @@ export default function PropertyForm({
 		const stepKey = steps[currentStep - 1]?.key;
 		switch (stepKey) {
 			case "basic":
-				return <BasicDetailsStep form={form} />;
-			case "details":
-				return (
-					<>
-						<LocationNearbyStep form={form} />
-						<PropertyDetailsFeaturesStep form={form} section="details" />
-						<PropertyDetailsFeaturesStep form={form} section="amenities" />
-					</>
-				);
-			case "pricing":
-				return (
-					<>
-						<MediaStep form={form} />
-						<PricingLegalStep form={form} />
-						<ContactNotesStep form={form} />
-						{/* Nearby places and notes can be added here if needed */}
-					</>
-				);
+				return <PropertyBasicDetails form={form} />;
+			case "locationFeatures":
+				return <PropertyLocationAndFeatures form={form} />;
+			case "mediaPricing":
+				return <PropertyMediaAndPricing form={form} />;
+			case "contactNotes":
+				return <PropertyContactAndNotes form={form} />;
 			case "preview":
 				// Show a read-only preview of all entered data
 				return <ReviewStep form={form} />;
@@ -245,18 +254,9 @@ export default function PropertyForm({
 					</div>
 				)}
 				{/* Success message */}
-				{isSuccess && (
-					<div className="text-green-600 font-semibold mt-2">
-						Property submitted successfully!
-					</div>
-				)}
+				
 				{/* Submitted data log */}
-				{submittedData && (
-					<div className="mt-4 p-4 bg-gray-100 rounded text-xs text-gray-800">
-						<div className="font-bold mb-2">Submitted Form Data:</div>
-						<pre>{JSON.stringify(submittedData, null, 2)}</pre>
-					</div>
-				)}
+			
 				<div className="flex justify-between mt-8">
 					<Button
 						disabled={currentStep === 1 || isLoading}

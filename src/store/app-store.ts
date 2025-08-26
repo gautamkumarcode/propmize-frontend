@@ -1,3 +1,5 @@
+"use client";
+
 import { AppState, ChatSession, Notification, User } from "@/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -32,7 +34,7 @@ export const useAppStore = create<AppStore>()(
 		(set, get) => ({
 			// Initial state
 			user: null,
-			userMode: "buyer",
+			userMode: typeof window !== "undefined" ? (localStorage.getItem("userMode") as "buyer" | "seller" || "buyer") : "buyer",
 			isAuthenticated: false,
 			notifications: [],
 			chatSessions: [],
@@ -42,7 +44,12 @@ export const useAppStore = create<AppStore>()(
 
 			// Auth actions
 			setUser: (user) => set({ user }),
-			setUserMode: (mode) => set({ userMode: mode }),
+			setUserMode: (mode) => {
+				set({ userMode: mode });
+				if (typeof window !== "undefined") {
+					localStorage.setItem("userMode", mode);
+				}
+			},
 			setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
 
 			// Notification actions

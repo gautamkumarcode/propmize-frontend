@@ -37,7 +37,7 @@ export const propertySchema = z.object({
 	totalFloors: z.string().optional(),
 	age: z.string().min(0).optional().or(z.literal("")),
 
-	images: z.array(z.any()).min(1, "At least one image file is required"),
+	images: z.array(z.any()).optional(),
 	videos: z.array(z.any()).optional(),
 
 	amenities: z.array(z.string()).optional(),
@@ -119,7 +119,7 @@ export const propertySchema = z.object({
 		name: z.string().min(2, "Contact name required"),
 		phone: z.string().min(10, "Phone number required"),
 		whatsapp: z.string().min(10, "WhatsApp number required").optional(),
-		type: z.enum(["owner", "agent", "builder"]).optional(),
+		type: z.enum(["owner", "agent", "builder"]).default("owner"),
 	}),
 
 	features: z
@@ -154,7 +154,7 @@ export const propertySchema = z.object({
 	notes: z.string().optional(),
 	legalInfo: z
 		.object({
-			ownershipType: z.string().min(1, "Invalid ownership type"),
+			ownershipType: z.string().optional(),
 		})
 		.optional(),
 });
