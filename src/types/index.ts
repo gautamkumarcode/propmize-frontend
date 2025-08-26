@@ -42,6 +42,10 @@ export interface PropertyResponse {
 	listingType: string;
 	price: number;
 	pricing?: {
+		basePrice?: {
+			value: number;
+			currency: string;
+		};
 		priceNegotiable?: boolean;
 		maintenanceCharges?: number;
 		securityDeposit?: number;
@@ -102,6 +106,18 @@ export interface PropertyResponse {
 		possessionDate?: string;
 		leaseDuration?: number;
 	};
+	postedBy: {
+		id: string;
+		name: string;
+		contact: string;
+	};
+	likedBy: [
+		{
+			user: string;
+			likedAt: string;
+			_id: string;
+		}
+	];
 }
 export interface PropertyImage {
 	id: string;

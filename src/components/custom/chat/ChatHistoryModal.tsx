@@ -2,7 +2,6 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useAuth } from "@/lib/providers/AuthProvider";
 import { AIChat, aiChatService } from "@/services/aiChatService";
 import { Bot, Calendar, MessageSquare, X } from "lucide-react";
@@ -15,7 +14,7 @@ interface ChatHistoryModalProps {
 }
 
 interface Message {
-  content: string;
+	content: string;
 }
 
 export default function ChatHistoryModal({
@@ -31,25 +30,28 @@ export default function ChatHistoryModal({
 	const [hasMore, setHasMore] = useState(true);
 	const scrollRef = useRef<HTMLDivElement>(null);
 
-	const fetchChatHistory = useCallback(async (pageToFetch = 1, reset = false) => {
-		if (!user) return;
-		setIsLoading(true);
-		setError(null);
-		try {
-			const response = await aiChatService.getUserAIChats(pageToFetch, 20);
-			if (response.success) {
-				const newChats = response.data.chats;
-				setChats((prev) => (reset ? newChats : [...prev, ...newChats]));
-				setPage(pageToFetch);
-				setHasMore(pageToFetch < response.data.pagination.pages);
+	const fetchChatHistory = useCallback(
+		async (pageToFetch = 1, reset = false) => {
+			if (!user) return;
+			setIsLoading(true);
+			setError(null);
+			try {
+				const response = await aiChatService.getUserAIChats(pageToFetch, 20);
+				if (response.success) {
+					const newChats = response.data.chats;
+					setChats((prev) => (reset ? newChats : [...prev, ...newChats]));
+					setPage(pageToFetch);
+					setHasMore(pageToFetch < response.data.pagination.pages);
+				}
+			} catch (error) {
+				console.error("Error fetching chat history:", error);
+				setError("Failed to load chat history");
+			} finally {
+				setIsLoading(false);
 			}
-		} catch (error) {
-			console.error("Error fetching chat history:", error);
-			setError("Failed to load chat history");
-		} finally {
-			setIsLoading(false);
-		}
-	}, [user]); // `user` is a dependency here
+		},
+		[user]
+	); // `user` is a dependency here
 
 	useEffect(() => {
 		if (isOpen && user) {
@@ -85,23 +87,6 @@ export default function ChatHistoryModal({
 	}, [isOpen, hasMore, isLoading, page, fetchChatHistory]);
 
 	// If not logged in, show message and do not fetch
-	if (!user) {
-		return (
-			<Card className="max-w-lg mx-auto mt-8">
-				<CardHeader className="flex flex-row items-center justify-between">
-					<span className="font-semibold text-lg">Chat History</span>
-					<Button variant="ghost" size="icon" onClick={onClose}>
-						<X className="w-5 h-5" />
-					</Button>
-				</CardHeader>
-				<CardContent>
-					<div className="text-center py-8 text-muted-foreground">
-						No chat history available. Please log in.
-					</div>
-				</CardContent>
-			</Card>
-		);
-	}
 
 	const handleChatSelect = (chatId: string) => {
 		onSelectChat(chatId);
@@ -173,6 +158,7 @@ export default function ChatHistoryModal({
 		);
 	}
 
+	console.log(isOpen);
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
 			<div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col border border-gray-200">

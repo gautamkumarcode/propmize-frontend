@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/Toaster";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
@@ -42,6 +43,7 @@ export default function RootLayout({
 
 					zIndex={1600}
 				/>
+				<Toaster />
 				<Providers>{children}</Providers>
 			</body>
 		</html>

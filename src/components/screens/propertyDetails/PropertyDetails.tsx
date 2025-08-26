@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useProperty } from "@/lib";
+import { PropertyResponse, useAuth, useProperty, useToggleLike } from "@/lib";
 import {
 	Bath,
 	Bed,
@@ -29,96 +29,43 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 interface PropertyDetailsProps {
 	propertyId: string;
 }
 
-// Add or update the Property type to include listingType
-interface Property {
-	_id: string;
-	title: string;
-	description: string;
-	images: string[];
-	status: string;
-	featured?: boolean;
-	isPremium?: boolean;
-	propertyType: string;
-	listingType: string;
-	price: number;
-	pricing?: {
-		priceNegotiable?: boolean;
-		maintenanceCharges?: number;
-		securityDeposit?: number;
-		brokeragePercentage?: number;
-	};
-	bedrooms?: number;
-	bathrooms?: number;
-	area: {
-		value: number;
-		unit: string;
-	};
-	parking?: number;
-	balconies?: number;
-	floor?: number;
-	totalFloors?: number;
-	age: number;
-	furnished: string;
-	amenities?: string[];
-	features?: {
-		facing?: string;
-		flooringType?: string;
-		waterSupply?: string;
-		powerBackup?: boolean;
-	};
-	address: {
-		street: string;
-		area: string;
-		city: string;
-		state: string;
-		zipCode: string;
-		country: string;
-		landmark?: string;
-	};
-	nearbyPlaces?: {
-		schools?: { name: string; distance: number; unit?: string }[];
-		hospitals?: { name: string; distance: number; unit?: string }[];
-		malls?: { name: string; distance: number; unit?: string }[];
-		transport?: { name: string; distance: number; unit?: string }[];
-	};
-	createdAt: string;
-	expiresAt?: string;
-	views?: number;
-	contact: {
-		name: string;
-		type: string;
-		phone: string;
-		whatsapp?: string;
-	};
-	legalInfo?: {
-		ownershipType: string;
-		rera?: {
-			number: string;
-			approved: boolean;
-		};
-	};
-	availability?: {
-		immediatelyAvailable: boolean;
-		possessionDate?: string;
-		leaseDuration?: number;
-	};
-}
-
 const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 	const params = useParams();
+	const { user } = useAuth();
 	const { data: propertyData, isLoading } = useProperty(
 		(params.id ?? "") as string
 	);
-	const property = propertyData! || {};
 
+	const toggleLikeMutation = useToggleLike();
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
-	const [isFavorite, setIsFavorite] = useState(false);
+	const [imageError, setImageError] = useState(false);
+
+	const property: PropertyResponse | null = propertyData || null;
+
+	// Move all hooks to the top level (unconditionally)
+	const isLikedByUser = useMemo(() => {
+		if (!user || !property?.likedBy) return false;
+
+		return property.likedBy.some((likedUser) => {
+			const likedUserId =
+				typeof likedUser === "string" ? likedUser : likedUser._id;
+			return String(likedUserId) === String(user._id);
+		});
+	}, [user, property?.likedBy]);
+
+	const handleSaveToggle = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (property) {
+			toggleLikeMutation.mutate(property._id);
+		}
+	};
 
 	if (isLoading)
 		return (
@@ -160,16 +107,28 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 			gym: <Dumbbell className="h-4 w-4" />,
 			park: <TreePine className="h-4 w-4" />,
 			security: <Shield className="h-4 w-4" />,
-			pool: <Snowflake className="h-4 w-4" />, // Using snowflake as pool placeholder
+			pool: <Snowflake className="h-4 w-4" />,
 		};
 
 		return amenityIcons[amenity.toLowerCase()] || <Star className="h-4 w-4" />;
 	};
 
+	const images = Array.isArray(property.images) ? property.images : [];
+	const imageUrl =
+		images.length > 0 && images[currentImageIndex] != null
+			? `${process.env.NEXT_PUBLIC_API_URL_IMG}/${images[currentImageIndex]}`
+			: "/placeholder-property.jpg";
+
+	const statusColors = {
+		active: "bg-green-100 text-green-800",
+		sold: "bg-purple-100 text-purple-800",
+		rented: "bg-blue-100 text-blue-800",
+		inactive: "bg-gray-100 text-gray-800",
+		pending: "bg-amber-100 text-amber-800",
+	};
+
 	return (
 		<div className="max-w-6xl mx-auto p-4 md:p-6">
-			{/* Breadcrumb */}
-
 			{/* Header Section */}
 			<div className="mb-6">
 				<h1 className="text-3xl font-bold mb-2">{property.title}</h1>
@@ -204,12 +163,13 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 			{/* Image Gallery */}
 			<div className="relative mb-8 rounded-xl overflow-hidden">
 				<div className="relative h-80 md:h-96 bg-gray-100">
-					{property.images && property.images.length > 0 ? (
+					{images.length > 0 ? (
 						<Image
-							src={property.images[currentImageIndex]}
-							alt={property.title}
 							fill
+							src={imageError ? "/placeholder-property.jpg" : imageUrl}
+							alt={property.title}
 							className="object-cover"
+							onError={() => setImageError(true)}
 						/>
 					) : (
 						<div className="w-full h-full flex items-center justify-center bg-gray-200">
@@ -218,7 +178,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 					)}
 
 					{/* Navigation Arrows */}
-					{property.images && property.images.length > 1 && (
+					{images.length > 1 && (
 						<>
 							<button
 								onClick={prevImage}
@@ -234,9 +194,9 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 					)}
 
 					{/* Image Counter */}
-					{property.images && property.images.length > 1 && (
+					{images.length > 1 && (
 						<div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-							{currentImageIndex + 1} / {property.images.length}
+							{currentImageIndex + 1} / {images.length}
 						</div>
 					)}
 
@@ -246,10 +206,10 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 							size="icon"
 							variant="secondary"
 							className="rounded-full bg-white text-gray-700 hover:bg-gray-100"
-							onClick={() => setIsFavorite(!isFavorite)}>
+							onClick={handleSaveToggle}>
 							<Heart
 								className={`h-5 w-5 ${
-									isFavorite ? "fill-red-500 text-red-500" : ""
+									isLikedByUser ? "fill-red-500 text-red-500" : ""
 								}`}
 							/>
 						</Button>
@@ -263,9 +223,9 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 				</div>
 
 				{/* Thumbnails */}
-				{property.images && property.images.length > 1 && (
+				{images.length > 1 && (
 					<div className="flex gap-2 mt-2 overflow-x-auto py-2">
-						{property.images.map((img, idx) => (
+						{images.map((img, idx) => (
 							<div
 								key={idx}
 								className={`relative h-16 w-16 min-w-[4rem] rounded-md overflow-hidden cursor-pointer ${
@@ -275,9 +235,9 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 								}`}
 								onClick={() => setCurrentImageIndex(idx)}>
 								<Image
-									src={img}
-									alt={`${property.title} ${idx + 1}`}
 									fill
+									src={`${process.env.NEXT_PUBLIC_API_URL_IMG}/${img}`}
+									alt={`${property.title} ${idx + 1}`}
 									className="object-cover"
 								/>
 							</div>
@@ -466,7 +426,6 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 										</p>
 									</div>
 								)}
-								{/* Add more features as needed */}
 							</div>
 						</div>
 					)}
@@ -616,10 +575,10 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
 						<div className="space-y-4">
 							<div>
 								<h3 className="text-sm text-gray-600">Contact Person</h3>
-								{/* <p className="font-medium">{property.contact?.title}</p>
+								<p className="font-medium">{property.contact?.name}</p>
 								<p className="text-sm text-gray-600 capitalize">
 									{property.contact?.type}
-								</p> */}
+								</p>
 							</div>
 
 							<div>

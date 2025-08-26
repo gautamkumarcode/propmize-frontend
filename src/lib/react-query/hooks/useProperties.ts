@@ -10,10 +10,12 @@ import { PropertyService } from "../../services/propertyService";
 import { useSocket } from "../../socket/socketContext";
 import {
 	ApiResponse,
-	Property,
 	PropertyCreateData,
 	PropertyFilters,
+	PropertyResponse,
 } from "../../types/api";
+
+import { triggerToast } from "@/components/ui/Toaster";
 import { QueryKeys } from "../queryClient";
 
 // Define proper error interface for HTTP errors
@@ -55,7 +57,7 @@ export const useInfiniteProperties = (filters: PropertyFilters = {}) => {
 		queryFn: ({ pageParam = 1 }) =>
 			PropertyService.getProperties({ ...filters, page: pageParam }),
 		getNextPageParam: (lastPage, _pages) => {
-			const { meta } = lastPage as ApiResponse<Property[]>;
+			const { meta } = lastPage as ApiResponse<PropertyResponse[]>;
 			if (meta && meta.page && meta.totalPages && meta.page < meta.totalPages) {
 				return meta.page + 1;
 			}
@@ -192,7 +194,7 @@ export const useUpdateProperty = () => {
 			// Update the specific property in cache
 			queryClient.setQueryData(
 				QueryKeys.property(variables.id),
-				(old: ApiResponse<Property> | undefined) =>
+				(old: ApiResponse<PropertyResponse> | undefined) =>
 					old ? { ...old, data: data.data } : data
 			);
 
@@ -245,12 +247,16 @@ export const useToggleLike = () => {
 
 	return useMutation({
 		mutationFn: (propertyId: string) => PropertyService.toggleLike(propertyId),
-		onSuccess: () => {
-			// Invalidate liked properties
+		onSuccess: (data) => {
 			queryClient.invalidateQueries({ queryKey: QueryKeys.likedProperties });
-
-			// You might also want to update the property's like count in the cache
-			console.log("Property like toggled successfully!");
+			queryClient.invalidateQueries({
+				queryKey: QueryKeys.properties,
+			});
+			triggerToast({
+				title: "Success!",
+				description: data.message,
+				variant: "success",
+			});
 		},
 		onError: (error: unknown) => {
 			console.error(
@@ -290,26 +296,27 @@ export const useReportProperty = () => {
 export function useRealTimeProperties() {
 	const { socket } = useSocket();
 	const queryClient = useQueryClient();
-	const [newProperty, setNewProperty] = useState<Property | null>(null);
-	const [updatedProperty, setUpdatedProperty] = useState<Property | null>(null);
+	const [newProperty, setNewProperty] = useState<PropertyResponse | null>(null);
+	const [updatedProperty, setUpdatedProperty] =
+		useState<PropertyResponse | null>(null);
 
 	useEffect(() => {
 		if (!socket) return;
 
-		const handleNewProperty = (property: Property) => {
+		const handleNewProperty = (property: PropertyResponse) => {
 			setNewProperty(property);
 
 			// Invalidate all property lists to include new property
 			queryClient.invalidateQueries({ queryKey: ["properties"] });
 		};
 
-		const handlePropertyUpdate = (property: Property) => {
+		const handlePropertyUpdate = (property: PropertyResponse) => {
 			setUpdatedProperty(property);
 
 			// Update specific property in cache
 			queryClient.setQueryData(
 				["property", property._id],
-				(old: ApiResponse<Property> | undefined) => {
+				(old: ApiResponse<PropertyResponse> | undefined) => {
 					if (!old) return old;
 					return { ...old, data: property };
 				}
@@ -318,11 +325,11 @@ export function useRealTimeProperties() {
 			// Update property in all lists
 			queryClient.setQueriesData(
 				{ queryKey: ["properties"] },
-				(old: ApiResponse<Property[]> | undefined) => {
+				(old: ApiResponse<PropertyResponse[]> | undefined) => {
 					if (!old) return old;
 					return {
 						...old,
-						data: old.data.map((p: Property) =>
+						data: old.data.map((p: PropertyResponse) =>
 							p._id === property._id ? property : p
 						),
 					};
@@ -337,11 +344,13 @@ export function useRealTimeProperties() {
 			// Update all lists to remove deleted property
 			queryClient.setQueriesData(
 				{ queryKey: ["properties"] },
-				(old: ApiResponse<Property[]> | undefined) => {
+				(old: ApiResponse<PropertyResponse[]> | undefined) => {
 					if (!old) return old;
 					return {
 						...old,
-						data: old.data.filter((p: Property) => p._id !== propertyId),
+						data: old.data.filter(
+							(p: PropertyResponse) => p._id !== propertyId
+						),
 					};
 				}
 			);

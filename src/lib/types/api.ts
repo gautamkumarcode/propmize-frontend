@@ -1,5 +1,5 @@
 // Import existing types from the main types file
-import { Property, User } from "../../types/index";
+import { PropertyResponse, User } from "../../types/index";
 
 // API Response Types
 export interface ApiResponse<T> {
@@ -111,7 +111,7 @@ export interface Lead {
 	// Relations
 	buyer?: User;
 	seller?: User;
-	property?: Property;
+	property?: PropertyResponse;
 }
 
 // Chat Types
@@ -155,5 +155,5 @@ export interface UserUpdateData {
 }
 
 // Re-export existing types
-export type { Property, User } from "../../types/index";
+export type { PropertyResponse, User } from "../../types/index";
 

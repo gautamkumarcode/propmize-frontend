@@ -4,14 +4,8 @@ export interface Toast {
 	variant?: "default" | "destructive";
 }
 
-// Simple toast implementation using native browser alert/console
+import { triggerToast } from "@/components/ui/Toaster";
+
 export const toast = ({ title, description, variant }: Toast) => {
-	if (variant === "destructive") {
-		console.error(`❌ ${title}`, description);
-		alert(`❌ Error: ${title}${description ? `\n${description}` : ""}`);
-	} else {
-		console.log(`✅ ${title}`, description);
-		// For success, you could implement a better notification system later
-		// For now, we'll just log to console
-	}
+	triggerToast({ title, description, variant });
 };
