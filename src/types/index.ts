@@ -88,6 +88,7 @@ export interface PropertyResponse {
 	createdAt: string;
 	expiresAt?: string;
 	views?: number;
+	seller: string;
 	contact: {
 		name: string;
 		type: string;

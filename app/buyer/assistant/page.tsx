@@ -164,44 +164,46 @@ export default function AssistantPage() {
 	return (
 		<div className="fixed inset-x-0 top-16 bottom-20 md:bottom-6 bg-white flex flex-col mx-auto max-w-7xl">
 			{/* Header */}
-			<div className="border-b px-3 py-3 md:px-4 md:py-4 bg-white flex-shrink-0">
+			<div className="border-b px-4 py-3 md:px-6 md:py-4 bg-gray-50 flex-shrink-0">
 				<div className="flex items-center justify-between">
-					<div className="flex items-center space-x-2 min-w-0">
-						<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-							<Bot className="w-4 h-4 text-blue-600" />
+					<div className="flex items-center space-x-3 min-w-0">
+						<div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+							<Bot className="w-5 h-5 text-blue-600" />
 						</div>
-						<h1 className="text-lg md:text-xl font-semibold truncate">
+						<h1 className="text-xl md:text-2xl font-bold text-gray-800 truncate">
 							Propmize Assistant
 						</h1>
 						{user && (
-							<span className="text-xs md:text-sm text-gray-500 hidden sm:block">
+							<span className="text-sm text-gray-500 hidden sm:block">
 								Welcome, {user.name}!
 							</span>
 						)}
 						{!user && (
-							<span className="text-xs md:text-sm text-blue-600 hidden md:block">
-								Guest Mode - Sign up for personalized experience
+							<span className="text-sm text-blue-600/80 hidden md:block">
+								Guest Mode
 							</span>
 						)}
 					</div>
 
 					{/* New Chat and Mode selector buttons */}
 
-					<div className="flex gap-4 justify-center items-center">
+					<div className="flex gap-2 justify-center items-center">
 						<Button
-							variant="outline"
-							size="sm"
+							variant="ghost"
+							size="icon"
 							onClick={handleNewChat}
-							className="text-xs">
-							New Chat
+							className="text-gray-600 hover:text-blue-600 rounded-full"
+							aria-label="New Chat">
+							<Plus className="w-5 h-5" />
 						</Button>
 
 						<Button
-							variant="outline"
-							size="sm"
+							variant="ghost"
+							size="icon"
 							onClick={handleViewChatHistory}
-							className="text-xs">
-							History
+							className="text-gray-600 hover:text-blue-600 rounded-full"
+							aria-label="Chat History">
+							<History className="w-5 h-5" />
 						</Button>
 
 						<DropdownMenu>
@@ -211,7 +213,7 @@ export default function AssistantPage() {
 									size="icon"
 									className="text-gray-600 hover:text-blue-600 rounded-full flex-shrink-0"
 									aria-label="Chat Options">
-									<MoreVertical className="w-5 h-5" />
+									<MoreVertical className="w-6 h-6" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="w-48">
@@ -263,11 +265,11 @@ export default function AssistantPage() {
 
 				{/* Mode selector dropdown */}
 				{showModeSelector && (
-					<div className="mt-3 p-3 bg-gray-50 rounded-lg border">
-						<p className="text-sm font-medium text-gray-700 mb-2">
-							Chat Mode:
+					<div className="mt-4 p-4 bg-gray-100 rounded-xl border border-gray-200">
+						<p className="text-sm font-medium text-gray-700 mb-3">
+							Select Chat Mode:
 						</p>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 							{chatModes.map((mode) => (
 								<button
 									key={mode.mode}
@@ -275,12 +277,14 @@ export default function AssistantPage() {
 										handleModeChange(mode.mode);
 										setShowModeSelector(false);
 									}}
-									className={`p-2 text-left text-sm rounded border transition-colors ${
-										chatMode === mode.mode
-											? "bg-blue-100 border-blue-300 text-blue-800"
-											: "bg-white border-gray-200 hover:bg-gray-50"
-									}`}>
-									<div className="font-medium">{mode.title}</div>
+									className={`p-3 text-left text-sm rounded-lg border transition-all duration-200
+										${chatMode === mode.mode
+											? "bg-blue-50 border-blue-400 text-blue-800 shadow-sm"
+											: "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+										}`}>
+									<div className="font-semibold text-gray-800 mb-1">
+										{mode.title}
+									</div>
 									<div className="text-xs text-gray-600">
 										{mode.description}
 									</div>

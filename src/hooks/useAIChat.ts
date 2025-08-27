@@ -30,7 +30,7 @@ export const useAIChat = () => {
 		if (user) {
 			// User is authenticated
 			setUserInfo({
-				id: user.id,
+				id: user._id,
 				type: "user",
 				isGuest: false,
 				name: user.name,

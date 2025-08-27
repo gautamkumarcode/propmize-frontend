@@ -3,94 +3,47 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useMyInquiries } from "@/lib/react-query/hooks/useLeads";
+import { Lead } from "@/lib/types/api";
 import {
 	Bath,
 	Bed,
 	Calendar,
+	ChevronLeft,
+	ChevronRight,
 	MapPin,
 	MessageSquare,
 	Phone,
 	Square,
 	User,
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Contacted() {
-	const [contacts, /* setContacts */] = useState([
-		{
-			id: 1,
-			property: {
-				title: "3BHK Luxury Apartment",
-				location: "Koramangala, Bangalore",
-				price: "₹1.2 Cr",
-				beds: 3,
-				baths: 3,
-				area: "1450 sq ft",
-				image: "/api/placeholder/300/200",
-			},
-			owner: {
-				name: "Suresh Sharma",
-				phone: "+91 98765 43210",
-				avatar: "/api/placeholder/40/40",
-			},
-			contactDate: "2024-01-15T10:30:00",
-			status: "Responded",
-			lastMessage:
-				"Property is available for viewing. When would you like to visit?",
-			messageCount: 5,
-		},
-		{
-			id: 2,
-			property: {
-				title: "2BHK Modern Flat",
-				location: "Whitefield, Bangalore",
-				price: "₹85 Lakh",
-				beds: 2,
-				baths: 2,
-				area: "1200 sq ft",
-				image: "/api/placeholder/300/200",
-			},
-			owner: {
-				name: "Priya Reddy",
-				phone: "+91 87654 32109",
-				avatar: "/api/placeholder/40/40",
-			},
-			contactDate: "2024-01-14T15:45:00",
-			status: "Pending",
-			lastMessage: "Interested in viewing this property",
-			messageCount: 1,
-		},
-		{
-			id: 3,
-			property: {
-				title: "4BHK Villa with Garden",
-				location: "HSR Layout, Bangalore",
-				price: "₹2.5 Cr",
-				beds: 4,
-				baths: 4,
-				area: "2800 sq ft",
-				image: "/api/placeholder/300/200",
-			},
-			owner: {
-				name: "Rakesh Kumar",
-				phone: "+91 76543 21098",
-				avatar: "/api/placeholder/40/40",
-			},
-			contactDate: "2024-01-12T09:15:00",
-			status: "Not Interested",
-			lastMessage:
-				"Thank you for your interest, but the property is no longer available.",
-			messageCount: 3,
-		},
-	]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [inquiriesPerPage, setInquiriesPerPage] = useState(10);
+
+	const { data, isLoading, isError } = useMyInquiries({
+		page: currentPage,
+		limit: inquiriesPerPage,
+	});
+
+	const inquiries = data;
+	const totalPages = 1;
+	const totalInquiries = 0;
+	const router = useRouter();
 
 	const getStatusColor = (status: string) => {
 		switch (status) {
-			case "Responded":
+			case "qualified":
+			case "converted":
 				return "bg-green-100 text-green-800";
-			case "Pending":
+			case "new":
+			case "contacted":
 				return "bg-yellow-100 text-yellow-800";
-			case "Not Interested":
+			case "rejected":
 				return "bg-red-100 text-red-800";
 			default:
 				return "bg-gray-100 text-gray-800";
@@ -114,8 +67,8 @@ export default function Contacted() {
 		window.open(`tel:${phone}`);
 	};
 
-	const handleMessage = (contactId: number) => {
-		console.log("Opening messages for contact:", contactId);
+	const handleMessage = (contactId: string) => {
+		router.push(`/chat/${contactId}`); // Assuming a chat route exists
 	};
 
 	return (
@@ -130,126 +83,170 @@ export default function Contacted() {
 									<Phone className="w-6 h-6 mr-3 text-green-500" />
 									Contacted Owners
 								</h1>
-								<p className="text-gray-600 mt-1">
-									{contacts.length} property owners contacted
-								</p>
+								{isLoading ? (
+									<p className="text-gray-600 mt-1">Loading contacts...</p>
+								) : isError ? (
+									<p className="text-red-600 mt-1">Error loading contacts.</p>
+								) : (
+									<p className="text-gray-600 mt-1">
+										{totalInquiries} property owners contacted
+									</p>
+								)}
 							</div>
 							<div className="flex space-x-2">
-								<Badge variant="secondary">
-									{contacts.filter((c) => c.status === "Responded").length}{" "}
-									Responded
-								</Badge>
-								<Badge variant="secondary">
-									{contacts.filter((c) => c.status === "Pending").length}{" "}
-									Pending
-								</Badge>
+								{!isLoading && !isError && (
+									<>
+										<Badge variant="secondary">
+											{inquiries?.filter(
+												(c) =>
+													c.status === "qualified" || c.status === "converted"
+											).length || 0}{" "}
+											Responded
+										</Badge>
+										<Badge variant="secondary">
+											{inquiries?.filter(
+												(c) => c.status === "new" || c.status === "contacted"
+											).length || 0}{" "}
+											Pending
+										</Badge>
+									</>
+								)}
 							</div>
 						</div>
 					</div>
 
 					{/* Contacts List */}
-					{contacts.length > 0 ? (
-						<div className="space-y-4">
-							{contacts.map((contact) => (
-								<Card key={contact.id} className="overflow-hidden">
-									<div className="flex flex-col lg:flex-row">
-										<div className="lg:w-80">
-											<img
-												src={contact.property.image}
-												alt={contact.property.title}
-												className="w-full h-48 lg:h-full object-cover"
-											/>
+					{isLoading ? (
+						<p>Loading inquiries...</p>
+					) : isError ? (
+						<p>Error loading inquiries.</p>
+					) : inquiries && inquiries.length > 0 ? (
+						<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+							{inquiries.map((contact: Lead) => (
+								<Card
+									key={contact._id}
+									className="overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 bg-white">
+									<img
+										src={
+											contact.property?.images[0] || "/api/placeholder/400/250"
+										}
+										alt={contact.property?.title || "Property Image"}
+										className="w-full h-48 object-cover"
+									/>
+									<div className="p-5">
+										<div className="flex items-start justify-between mb-3">
+											<Link href={`/property/${contact.property?._id}`}>
+												<h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 transition-colors leading-tight">
+													{contact.property?.title || "N/A"}
+												</h3>
+											</Link>
+											<Badge
+												className={`${getStatusColor(
+													contact.status || "new"
+												)} text-xs font-medium px-2.5 py-0.5 rounded-full`}>
+												{contact.status === "new" ||
+												contact.status === "contacted"
+													? "Pending"
+													: contact.status}
+											</Badge>
 										</div>
 
-										<div className="flex-1 p-6">
-											<div className="flex items-start justify-between mb-4">
-												<div className="flex-1">
-													<div className="flex items-center justify-between mb-2">
-														<h3 className="text-xl font-semibold text-gray-900">
-															{contact.property.title}
-														</h3>
-														<Badge className={getStatusColor(contact.status)}>
-															{contact.status}
-														</Badge>
-													</div>
-													<p className="text-gray-600 flex items-center mb-2">
-														<MapPin className="w-4 h-4 mr-1" />
-														{contact.property.location}
-													</p>
-													<p className="text-lg font-semibold text-blue-600 mb-3">
-														{contact.property.price}
-													</p>
+										<p className="text-2xl font-bold text-blue-700 mb-3">
+											{contact.property?.price || "N/A"}
+										</p>
 
-													<div className="flex items-center space-x-6 text-sm text-gray-600 mb-4">
-														<span className="flex items-center">
-															<Bed className="w-4 h-4 mr-1" />
-															{contact.property.beds} Beds
-														</span>
-														<span className="flex items-center">
-															<Bath className="w-4 h-4 mr-1" />
-															{contact.property.baths} Baths
-														</span>
-														<span className="flex items-center">
-															<Square className="w-4 h-4 mr-1" />
-															{contact.property.area}
-														</span>
-													</div>
-												</div>
+										<div className="flex items-center text-gray-600 text-sm mb-4 space-x-4">
+											<span className="flex items-center">
+												<MapPin className="w-4 h-4 mr-1" />{" "}
+												{contact.property?.address.city},{" "}
+												{contact.property?.address.state}
+											</span>
+										</div>
+
+										<div className="grid grid-cols-3 gap-2 text-sm text-gray-700 border-t border-b py-3 mb-4">
+											<span className="flex items-center">
+												<Bed className="w-4 h-4 mr-1" />{" "}
+												{contact.property?.bedrooms} Beds
+											</span>
+											<span className="flex items-center">
+												<Bath className="w-4 h-4 mr-1" />{" "}
+												{contact.property?.bathrooms} Baths
+											</span>
+											<span className="flex items-center">
+												<Square className="w-4 h-4 mr-1" />{" "}
+												{contact.property?.area?.value}{" "}
+												{contact.property?.area?.unit}
+											</span>
+										</div>
+
+										<div className="flex items-center space-x-3 mb-4">
+											<div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
+												{contact.seller?.avatar ? (
+													<img
+														src={contact.seller.avatar}
+														alt={contact.seller.name || "Seller"}
+														className="w-full h-full object-cover"
+													/>
+												) : (
+													<User className="w-5 h-5 text-gray-500" />
+												)}
 											</div>
-
-											<div className="border-t pt-4">
-												<div className="flex items-start justify-between mb-3">
-													<div className="flex items-center space-x-3">
-														<div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-															<User className="w-5 h-5 text-gray-600" />
-														</div>
-														<div>
-															<p className="font-medium text-gray-900">
-																{contact.owner.name}
-															</p>
-															<p className="text-sm text-gray-600">
-																{contact.owner.phone}
-															</p>
-														</div>
-													</div>
-													<div className="text-right text-sm text-gray-500">
-														<div className="flex items-center">
-															<Calendar className="w-4 h-4 mr-1" />
-															{formatContactDate(contact.contactDate)}
-														</div>
-														<div className="flex items-center mt-1">
-															<MessageSquare className="w-4 h-4 mr-1" />
-															{contact.messageCount} messages
-														</div>
-													</div>
-												</div>
-
-												<div className="bg-gray-50 rounded-lg p-3 mb-4">
-													<p className="text-sm text-gray-700">
-														<span className="font-medium">Last message:</span>{" "}
-														{contact.lastMessage}
-													</p>
-												</div>
-
-												<div className="flex items-center space-x-3">
-													<Button
-														size="sm"
-														onClick={() => handleCall(contact.owner.phone)}
-														variant="outline">
-														<Phone className="w-4 h-4 mr-1" />
-														Call
-													</Button>
-													<Button
-														size="sm"
-														onClick={() => handleMessage(contact.id)}>
-														<MessageSquare className="w-4 h-4 mr-1" />
-														Message
-													</Button>
-													<Button size="sm" variant="outline">
-														View Property
-													</Button>
-												</div>
+											<div>
+												<p className="font-medium text-gray-800">
+													{contact.seller?.name || "Unknown Seller"}
+												</p>
+												<p className="text-xs text-gray-500 flex items-center">
+													<Phone className="w-3 h-3 mr-1" />{" "}
+													{contact.seller?.phone || "N/A"}
+												</p>
 											</div>
+										</div>
+
+										<div className="bg-gray-100 rounded-md p-3 text-sm text-gray-700 mb-4">
+											<p className="font-semibold mb-2">Last Message:</p>
+											<p className="text-gray-700 mb-2">
+												{contact.followUps?.[contact.followUps.length - 1]
+													?.notes ||
+													contact.message ||
+													"No messages yet"}
+											</p>
+											<div className="flex items-center text-xs text-gray-500">
+												<Calendar className="w-3 h-3 mr-1" />
+												<span>
+													{formatContactDate(
+														contact.createdAt?.toString() || ""
+													)}
+												</span>
+												<MessageSquare className="w-3 h-3 ml-4 mr-1" />
+												<span>
+													{(contact.message ? 1 : 0) +
+														(contact.followUps?.length || 0)}{" "}
+													messages
+												</span>
+											</div>
+										</div>
+
+										<div className="flex flex-wrap gap-2 justify-center">
+											<Button
+												size="sm"
+												onClick={() => handleCall(contact.seller?.phone || "")}
+												variant="outline"
+												className="flex-1">
+												<Phone className="w-4 h-4 mr-2" /> Call
+											</Button>
+											<Button
+												size="sm"
+												onClick={() => handleMessage(contact._id || "")}
+												className="flex-1">
+												<MessageSquare className="w-4 h-4 mr-2" /> Message
+											</Button>
+											<Link
+												href={`/property/${contact.property?._id}`}
+												className="flex-1">
+												<Button size="sm" variant="outline" className="w-full">
+													View Property
+												</Button>
+											</Link>
 										</div>
 									</div>
 								</Card>
@@ -266,6 +263,31 @@ export default function Contacted() {
 							</p>
 							<Button>Explore Properties</Button>
 						</Card>
+					)}
+
+					{/* Pagination Controls */}
+					{totalPages > 1 && (
+						<div className="flex justify-center items-center space-x-2 mt-6">
+							<Button
+								variant="outline"
+								size="icon"
+								onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+								disabled={currentPage === 1}>
+								<ChevronLeft className="h-4 w-4" />
+							</Button>
+							<span className="text-sm text-gray-700">
+								Page {currentPage} of {totalPages}
+							</span>
+							<Button
+								variant="outline"
+								size="icon"
+								onClick={() =>
+									setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+								}
+								disabled={currentPage === totalPages}>
+								<ChevronRight className="h-4 w-4" />
+							</Button>
+						</div>
 					)}
 				</div>
 			</div>

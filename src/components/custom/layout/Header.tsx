@@ -14,9 +14,10 @@ interface HeaderProps {
   onShowAuthModal: (redirectTo?: string) => void;
   navItems: NavigationItem[];
   bottomNavItems: NavigationItem[];
+  isAuthenticated: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ mode, onShowAuthModal, navItems, bottomNavItems }) => {
+const Header: React.FC<HeaderProps> = ({ mode, onShowAuthModal, navItems, bottomNavItems, isAuthenticated }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const navigation = useNavigation();
@@ -51,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ mode, onShowAuthModal, navItems, bottom
             <nav className="flex flex-col h-full">
               <div className="flex-1 py-4">
                 {currentNavItems
-                  .filter((item) => !item.isBottom)
+                  .filter((item) => !item.isBottom && (!item.route.protected || isAuthenticated))
                   .map((item) => {
                     const isActive = pathname === item.route.path;
                     const IconComponent =
@@ -80,7 +81,7 @@ const Header: React.FC<HeaderProps> = ({ mode, onShowAuthModal, navItems, bottom
 
               <div className="border-t py-4">
                 {currentNavItems
-                  .filter((item) => item.isBottom)
+                  .filter((item) => item.isBottom && (!item.route.protected || isAuthenticated))
                   .map((item) => {
                     const IconComponent =
                       iconMap[item.icon as keyof typeof iconMap];

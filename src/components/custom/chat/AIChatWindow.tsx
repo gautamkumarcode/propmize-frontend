@@ -11,7 +11,6 @@ import {
 	MessageAction,
 } from "@/services/aiChatService";
 import { AIAction } from "@/types";
-import { PropertySuggestion } from "@/types/aiChat";
 import {
 	Bot,
 	Calendar,
@@ -39,7 +38,6 @@ export default function AIChatWindow({
 	onPropertyClick,
 	onActionClick,
 	onNewChat,
-	
 }: AIChatWindowProps) {
 	const [message, setMessage] = useState("");
 
@@ -119,6 +117,8 @@ export default function AIChatWindow({
 		const isAI = msg.role === "assistant";
 		const isUser = msg.role === "user";
 
+		const ImageBaseUrl = process.env.NEXT_PUBLIC_API_URL_IMG;
+
 		return (
 			<div
 				key={msg._id || index}
@@ -154,90 +154,85 @@ export default function AIChatWindow({
 										}`}>
 										Suggested Properties:
 									</p>
-									{msg.properties.map(
-										(property: PropertySuggestion, idx: number) => (
-											<Card
-												key={idx}
-												className="cursor-pointer hover:shadow-md transition-shadow border-gray-200">
-												<CardContent className="p-2 md:p-3">
-													<div className="flex gap-2 md:gap-3">
-														<img
-															src={
-																property?.images && property.images[0]
-																	? property.images[0]
-																	: "/api/placeholder/80/60"
-															}
-															alt={property.title}
-															className="w-16 h-12 md:w-20 md:h-15 object-cover rounded flex-shrink-0"
-														/>
-														<div className="flex-1 min-w-0">
-															<h4 className="font-medium text-sm truncate">
-																{property.title}
-															</h4>
-															<p className="text-xs text-gray-600 flex items-center gap-1 truncate">
-																<MapPin className="w-3 h-3 flex-shrink-0" />
-																<span className="truncate">
-																	{typeof property.location === "string"
-																		? property.location
-																		: property.location
-																		? [
-																				property.location.area,
-																				property.location.city,
-																		  ]
-																				.filter(Boolean)
-																				.join(", ")
-																		: ""}
-																</span>
-															</p>
-															<p className="text-sm font-bold text-green-600">
-																{formatPrice(property.price)}
-															</p>
-															<div className="flex gap-1 md:gap-2 mt-1">
-																<Badge
-																	variant="secondary"
-																	className="text-xs px-1.5 py-0.5">
-																	{property.type}
-																</Badge>
-																{property.size && (
-																	<Badge
-																		variant="outline"
-																		className="text-xs px-1.5 py-0.5">
-																		{property.size}
-																	</Badge>
-																)}
-															</div>
-														</div>
+									{msg.properties.map((property, idx) => (
+										<Card
+											key={property.id || idx}
+											className="cursor-pointer hover:shadow-lg transition-all border border-gray-100 rounded-xl overflow-hidden">
+											<CardContent className="p-0">
+												{/* Image Section */}
+												<div className="relative h-36 md:h-40 w-full">
+													<img
+														src={
+															property?.images && property.images[0]
+																? `${ImageBaseUrl}/${property.images[0]}`
+																: "/api/placeholder/160/120"
+														}
+														alt={property.title}
+														className="h-full w-full object-cover"
+													/>
+													<div className="absolute top-2 left-2 flex gap-1">
+														<Badge variant="featured" className="text-xs">
+															FEATURED
+														</Badge>
+														<Badge
+															variant="price"
+															className="bg-green-600 text-white text-xs shadow-md">
+															{formatPrice(property.price)}
+														</Badge>
 													</div>
+													<button
+														onClick={() =>
+															handlePropertyAction(
+																{ type: "save-property" },
+																property.id
+															)
+														}
+														className="absolute top-2 right-2 p-1.5 bg-white/80 hover:bg-white rounded-full shadow-md">
+														<Heart className="w-4 h-4 text-red-500" />
+													</button>
+												</div>
+
+												{/* Content */}
+												<div className="p-3">
+													<h4 className="font-semibold text-sm text-gray-900 truncate">
+														{property.title}
+													</h4>
+													<p className="text-xs text-gray-600 flex items-center gap-1 truncate mt-1">
+														<MapPin className="w-3 h-3 flex-shrink-0 text-blue-500" />
+														{[property?.address?.area, property?.address?.city]
+															.filter(Boolean)
+															.join(", ")}
+													</p>
+
+													{/* Badges */}
 													<div className="flex gap-2 mt-2">
+														<Badge
+															variant="secondary"
+															className="text-xs capitalize">
+															{property.type}
+														</Badge>
+														{property.size && (
+															<Badge variant="outline" className="text-xs">
+																{property.size}
+															</Badge>
+														)}
+													</div>
+
+													{/* Actions */}
+													<div className="flex gap-2 mt-3">
 														<Button
 															size="sm"
-															variant="outline"
+															variant="default"
 															onClick={() => onPropertyClick?.(property.id)}
-															className="text-xs h-7 flex-1 md:flex-none">
-															<Home className="w-3 h-3 mr-1" />
-															<span className="hidden sm:inline">
-																View Details
-															</span>
-															<span className="sm:hidden">View</span>
-														</Button>
-														<Button
-															size="sm"
-															variant="outline"
-															onClick={() =>
-																handlePropertyAction(
-																	{ type: "save-property" },
-																	property.id
-																)
-															}
-															className="text-xs h-7 flex-1 md:flex-none">
-															<Heart className="w-3 h-3 mr-1" />
-															Save
+															className="text-xs h-8 flex-1">
+															<Home className="w-4 h-4 mr-1" />
+															View Details
 														</Button>
 													</div>
-												</CardContent>
-											</Card>
-										)
-									)}
+												</div>
+											</CardContent>
+										</Card>
+									))}
 								</div>
 							)}
 

@@ -93,10 +93,16 @@ export interface LeadCreateData {
 	message?: string;
 	interestedInSite?: boolean;
 	preferredContactTime?: "morning" | "afternoon" | "evening";
+	buyerContact: {
+		phone?: string;
+		email?: string;
+		preferredContactTime?: string;
+		contactMethod: "phone" | "email" | "whatsapp" | "any";
+	};
 }
 
 export interface Lead {
-	id: string;
+	_id: string; // Changed from id to _id to match backend
 	buyerId: string;
 	sellerId: string;
 	propertyId: string;
@@ -108,10 +114,33 @@ export interface Lead {
 	contactedAt?: Date;
 	createdAt: Date;
 	updatedAt: Date;
+	followUps?: {
+		date: Date;
+		method: "phone" | "email" | "whatsapp" | "meeting";
+		status: "scheduled" | "completed" | "missed";
+		notes?: string;
+		nextFollowUp?: Date;
+	}[];
 	// Relations
 	buyer?: User;
 	seller?: User;
 	property?: PropertyResponse;
+	priority?: "low" | "medium" | "high" | "urgent";
+	source?: string;
+	buyerContact?: {
+		phone?: string;
+		email?: string;
+		preferredContactTime?: string;
+		contactMethod?: "phone" | "email" | "whatsapp" | "any";
+	};
+}
+
+export interface LeadAnalyticsData {
+	totalLeads: number;
+	converted: number;
+	conversionRate: string;
+	byStatus: { _id: string; count: number }[];
+	byPriority: { _id: string; count: number }[];
 }
 
 // Chat Types

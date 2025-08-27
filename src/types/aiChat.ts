@@ -133,12 +133,10 @@ export interface PropertySuggestion {
 	_id?: string;
 	title: string;
 	price: number;
-	location:
-		| string
-		| {
-				city?: string;
-				area?: string;
-		  };
+	address: {
+		city?: string;
+		area?: string;
+	};
 	type: string;
 	area?: string;
 	images?: string[];

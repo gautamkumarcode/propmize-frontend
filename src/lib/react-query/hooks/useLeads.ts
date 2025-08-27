@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LeadService } from "../../services/leadService";
-import { ApiResponse, Lead, LeadCreateData } from "../../types/api";
+import {
+	ApiResponse,
+	Lead,
+	LeadAnalyticsData,
+	LeadCreateData,
+} from "../../types/api";
 import { QueryKeys } from "../queryClient";
 
 // Define proper error interface for HTTP errors
@@ -33,12 +38,12 @@ export const useMyLeads = (
 		limit?: number;
 		sortBy?: "createdAt" | "status";
 		sortOrder?: "asc" | "desc";
+		search?: string; // Add this line
 	} = {}
 ) => {
 	return useQuery({
 		queryKey: [QueryKeys.myLeads, filters],
 		queryFn: () => LeadService.getMyLeads(filters),
-		select: (data) => data.data,
 	});
 };
 
@@ -91,10 +96,10 @@ export const useLeadAnalytics = (
 		propertyId?: string;
 	} = {}
 ) => {
-	return useQuery({
+	return useQuery<ApiResponse<LeadAnalyticsData>>({
 		queryKey: [QueryKeys.leadAnalytics, filters],
 		queryFn: () => LeadService.getLeadAnalytics(filters),
-		select: (data) => data.data,
+		select: (data) => data,
 	});
 };
 
@@ -160,25 +165,79 @@ export const useUpdateLeadStatus = () => {
 	});
 };
 
-export const useAddLeadNotes = () => {
+export const useAddFollowUp = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ leadId, notes }: { leadId: string; notes: string }) =>
-			LeadService.addLeadNotes(leadId, notes),
+		mutationFn: ({
+			leadId,
+			date,
+			method,
+			status,
+			notes,
+			nextFollowUp,
+		}: {
+			leadId: string;
+			date: Date;
+			method: "phone" | "email" | "whatsapp" | "meeting";
+			status: "scheduled" | "completed" | "missed";
+			notes?: string;
+			nextFollowUp?: Date;
+		}) =>
+			LeadService.addFollowUp(leadId, {
+				date,
+				method,
+				status,
+				notes,
+				nextFollowUp,
+			}),
 		onSuccess: (data, variables) => {
-			// Update the specific lead in cache
 			queryClient.setQueryData(
 				QueryKeys.lead(variables.leadId),
 				(old: ApiResponse<Lead> | undefined) =>
 					old ? { ...old, data: data.data } : data
 			);
-
-			console.log("Lead notes added successfully!");
+			queryClient.invalidateQueries({ queryKey: QueryKeys.myLeads });
+			console.log("Follow-up added successfully!");
 		},
 		onError: (error: unknown) => {
 			console.error(
-				"Failed to add lead notes:",
+				"Failed to add follow-up:",
+				isHttpError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Unknown error"
+			);
+		},
+	});
+};
+
+export const useConvertLead = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			leadId,
+			dealAmount,
+			commissionEarned,
+		}: {
+			leadId: string;
+			dealAmount: number;
+			commissionEarned?: number;
+		}) => LeadService.convertLead(leadId, dealAmount, commissionEarned),
+		onSuccess: (data, variables) => {
+			queryClient.setQueryData(
+				QueryKeys.lead(variables.leadId),
+				(old: ApiResponse<Lead> | undefined) =>
+					old ? { ...old, data: data.data } : data
+			);
+			queryClient.invalidateQueries({ queryKey: QueryKeys.myLeads });
+			queryClient.invalidateQueries({ queryKey: QueryKeys.leadAnalytics });
+
+			console.log("Lead converted successfully!");
+		},
+		onError: (error: unknown) => {
+			console.error(
+				"Failed to convert lead:",
 				isHttpError(error) && error.response?.data?.message
 					? error.response.data.message
 					: "Unknown error"

@@ -25,6 +25,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useToggleLike } from "../../../lib/react-query/hooks/useProperties";
+import { useCreateLead } from "@/lib/react-query/hooks/useLeads";
+import { toast } from "@/hooks/use-toast";
 
 interface PropertyCardProps {
 	property: PropertyResponse;
@@ -77,6 +79,10 @@ export default function PropertyCard({
 	const [imageError, setImageError] = useState(false);
 	const [imageLoading, setImageLoading] = useState(true);
 
+	const createLeadMutation = useCreateLead();
+
+	const isOwner = user && property.seller?.toString() === user._id;
+
 	// Check if the current user has liked this property
 	const isLikedByUser = React.useMemo(() => {
 		if (!user || !property?.likedBy) return false;
@@ -92,6 +98,51 @@ export default function PropertyCard({
 		e.preventDefault();
 		e.stopPropagation();
 		toggleLikeMutation.mutate(property._id);
+	};
+
+	const handleContactSeller = async (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (!user) {
+			// Ideally, trigger auth modal here
+			toast({
+				title: "Authentication Required",
+				description: "Please sign in to contact the seller.",
+				variant: "destructive",
+			});
+			return;
+		}
+
+		createLeadMutation.mutate(
+			{
+				propertyId: property._id,
+				message: "I am interested in this property.", // Default message
+				buyerContact: {
+					contactMethod: "any", // Default to 'any'
+					phone: user?.phone || undefined,
+				},
+				// You might want to add more details here, like buyer's contact from user object
+				// or open a modal for a custom message
+			},
+			{
+				onSuccess: () => {
+					toast({
+						title: "Inquiry Sent",
+						description: "Your inquiry has been sent to the seller.",
+					});
+				},
+				onError: (error) => {
+					console.error("Error creating lead:", error);
+					toast({
+						title: "Failed to Send Inquiry",
+						description:
+							"There was an error sending your inquiry. Please try again.",
+						variant: "destructive",
+					});
+				},
+			}
+		);
 	};
 
 	const handleImageError = () => {
@@ -328,6 +379,16 @@ export default function PropertyCard({
 										Sign in to view contact details
 									</p>
 								</div>
+							)}
+
+							{user && !isOwner && (
+								<Button
+									className="w-full mt-3"
+									onClick={handleContactSeller}
+									disabled={createLeadMutation.isPending}
+								>
+									{createLeadMutation.isPending ? "Sending Inquiry..." : "Contact Seller"}
+								</Button>
 							)}
 						</div>
 					</CardFooter>

@@ -106,7 +106,7 @@ export default function SellerAnalytics() {
 		{ day: "Tue", views: 287, inquiries: 18 },
 		{ day: "Wed", views: 193, inquiries: 9 },
 		{ day: "Thu", views: 321, inquiries: 22 },
-		{ day: "Fri", values: 298, inquiries: 15 },
+		{ day: "Fri", views: 298, inquiries: 15 },
 		{ day: "Sat", views: 412, inquiries: 28 },
 		{ day: "Sun", views: 356, inquiries: 19 },
 	];

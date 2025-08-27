@@ -1,5 +1,10 @@
 import apiClient from "../api";
-import { ApiResponse, Lead, LeadCreateData } from "../types/api";
+import {
+	ApiResponse,
+	Lead,
+	LeadAnalyticsData,
+	LeadCreateData,
+} from "../types/api";
 
 export class LeadService {
 	/**
@@ -32,9 +37,7 @@ export class LeadService {
 			}
 		});
 
-		const response = await apiClient.get(
-			`/leads/my-leads?${params.toString()}`
-		);
+		const response = await apiClient.get(`/leads?${params.toString()}`);
 		return response.data;
 	}
 
@@ -113,11 +116,20 @@ export class LeadService {
 	/**
 	 * Add notes to a lead (for sellers)
 	 */
-	static async addLeadNotes(
+	static async addFollowUp(
 		leadId: string,
-		notes: string
+		followUpData: {
+			date: Date;
+			method: "phone" | "email" | "whatsapp" | "meeting";
+			status: "scheduled" | "completed" | "missed";
+			notes?: string;
+			nextFollowUp?: Date;
+		}
 	): Promise<ApiResponse<Lead>> {
-		const response = await apiClient.put(`/leads/${leadId}/notes`, { notes });
+		const response = await apiClient.put(
+			`/leads/${leadId}/followup`,
+			followUpData
+		);
 		return response.data;
 	}
 
@@ -137,7 +149,7 @@ export class LeadService {
 			period?: "week" | "month" | "quarter" | "year";
 			propertyId?: string;
 		} = {}
-	): Promise<ApiResponse<unknown>> {
+	): Promise<ApiResponse<LeadAnalyticsData>> {
 		const params = new URLSearchParams();
 
 		Object.entries(filters).forEach(([key, value]) => {
@@ -175,6 +187,21 @@ export class LeadService {
 			responseType: "blob",
 		});
 
+		return response.data;
+	}
+
+	/**
+	 * Convert a lead to a customer
+	 */
+	static async convertLead(
+		leadId: string,
+		dealAmount: number,
+		commissionEarned?: number
+	): Promise<ApiResponse<Lead>> {
+		const response = await apiClient.put(`/leads/${leadId}/convert`, {
+			dealAmount,
+			commissionEarned,
+		});
 		return response.data;
 	}
 }

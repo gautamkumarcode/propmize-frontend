@@ -89,9 +89,7 @@ export default function SellerDashboard() {
 			{/* Stats Grid */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 				{stats.map((stat, index) => (
-					<div
-						key={index}
-						className="bg-white rounded-lg p-6 shadow-sm border">
+					<div key={index} className="bg-white rounded-lg p-6 shadow-sm border">
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="text-sm text-gray-600 font-medium">
@@ -126,7 +124,7 @@ export default function SellerDashboard() {
 						dashboardData.recentLeads.length > 0 ? (
 							dashboardData.recentLeads.map((lead) => (
 								<div
-									key={lead.id}
+									key={lead._id}
 									className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
 									<div className="flex-shrink-0">
 										<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -242,9 +240,7 @@ export default function SellerDashboard() {
 					<button className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg text-left transition-colors">
 						<MessageSquare className="h-8 w-8 text-purple-600 mb-2" />
 						<p className="font-medium text-gray-900">Manage Inquiries</p>
-						<p className="text-sm text-gray-600">
-							Respond to buyer inquiries
-						</p>
+						<p className="text-sm text-gray-600">Respond to buyer inquiries</p>
 					</button>
 				</div>
 			</div>

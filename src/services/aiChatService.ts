@@ -537,11 +537,11 @@ export const formatAIMessage = (message: AIMessage): ChatMessage => {
 				title: prop.title || "Property Title Not Available",
 				price: formatPrice(prop.price),
 				location:
-					typeof prop.location === "object"
-						? prop.location?.city ||
-						  prop.location?.area ||
-						  "Location not specified"
-						: prop.location || "Location not specified",
+					typeof prop.address === "object"
+						? prop.address?.city ||
+						  prop.address?.area ||
+						  "address not specified"
+						: prop.address || "Location not specified",
 				type: prop.type || "Type not specified",
 				size: prop.area || prop.size || "Area not specified",
 				image: prop.images?.[0] || prop.image || "/api/placeholder/300/200",

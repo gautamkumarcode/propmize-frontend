@@ -25,7 +25,7 @@ export default function Navbar({
 	// activeTab = "properties",
 	// onTabChange,
 	onShowAuthModal,
-	mode = "buyer",
+	mode,
 }: NavbarProps) {
 	const [showNavDropdown, setShowNavDropdown] = useState(false);
 	const [showNotifications, setShowNotifications] = useState(false);
@@ -178,7 +178,11 @@ export default function Navbar({
 									<div className="py-2">
 										{/* Navigation Items */}
 										{navItems
-											.filter((item) => !item.isBottom)
+											.filter(
+												(item) =>
+													!item.isBottom &&
+													(!item.route.protected || isAuthenticated)
+											)
 											.map((item, index) => {
 												const IconComponent =
 													iconMap[item.icon as keyof typeof iconMap];
@@ -325,7 +329,11 @@ export default function Navbar({
 
 										{/* Bottom Items */}
 										{navItems
-											.filter((item) => item.isBottom)
+											.filter(
+												(item) =>
+													item.isBottom &&
+													(!item.route.protected || isAuthenticated)
+											)
 											.map((item, index) => {
 												const IconComponent =
 													iconMap[item.icon as keyof typeof iconMap];

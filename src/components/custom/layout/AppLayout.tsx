@@ -2,9 +2,14 @@
 
 import AuthModal from "@/components/custom/auth-modal/AuthModal";
 import Header from "@/components/custom/layout/Header";
+import {
+	buyerBottomNavItems,
+	buyerNavItems,
+	sellerBottomNavItems,
+	sellerNavItems,
+} from "@/lib/routing/routes";
 import { useAuthStore } from "@/store/app-store";
-import React, { useState } from "react";
-import { buyerNavItems, sellerNavItems, buyerBottomNavItems, sellerBottomNavItems } from "@/lib/routing/routes";
+import React, { useEffect, useState } from "react";
 
 interface AppLayoutProps {
 	children: React.ReactNode;
@@ -14,24 +19,34 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 	const [showAuthModal, setShowAuthModal] = useState(false);
 	const [authRedirectTo, setAuthRedirectTo] = useState<string | undefined>();
 	const { user, userMode } = useAuthStore(); // Get mode from global store or local storage
+	const { isAuthenticated } = useAuthStore();
 
+	// State to track if the component has mounted
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	return (
 		<div className="min-h-screen bg-gray-50 pb-20">
-			<Header
-				mode={userMode || "buyer"} // Default to buyer if not set
-				onShowAuthModal={(redirectTo) => {
-					setAuthRedirectTo(redirectTo);
-					setShowAuthModal(true);
-				}}
-				navItems={userMode === "seller" ? sellerNavItems : buyerNavItems}
-				bottomNavItems={userMode === "seller" ? sellerBottomNavItems : buyerBottomNavItems}
-			/>
+			{mounted && (
+				<Header
+					mode={userMode || "buyer"} // Default to buyer if not set
+					onShowAuthModal={(redirectTo) => {
+						setAuthRedirectTo(redirectTo);
+						setShowAuthModal(true);
+					}}
+					navItems={userMode === "seller" ? sellerNavItems : buyerNavItems}
+					bottomNavItems={
+						userMode === "seller" ? sellerBottomNavItems : buyerBottomNavItems
+					}
+					isAuthenticated={isAuthenticated}
+				/>
+			)}
 
 			{/* Main Content */}
-			<main className="container mx-auto px-4 py-6">
-				{children}
-			</main>
+			<main className=" px-4 py-6">{children}</main>
 
 			{/* Auth Modal */}
 			<AuthModal
