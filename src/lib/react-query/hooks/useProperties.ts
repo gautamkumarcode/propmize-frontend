@@ -31,7 +31,7 @@ interface HttpError {
 }
 
 // Type guard to check if error is an HttpError
-function isHttpError(error: unknown): error is HttpError {
+export function isHttpError(error: unknown): error is HttpError {
 	return (
 		typeof error === "object" &&
 		error !== null &&
@@ -160,7 +160,11 @@ export const usePropertyAnalytics = (propertyId: string) => {
 export const useCreateProperty = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation({
+	return useMutation<
+		ApiResponse<PropertyResponse>,
+		HttpError,
+		PropertyFormData
+	>({
 		mutationFn: (propertyData: PropertyFormData) =>
 			PropertyService.createProperty(propertyData),
 		onSuccess: (data) => {

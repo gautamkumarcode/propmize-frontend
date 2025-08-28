@@ -123,7 +123,7 @@ export default function Support() {
 								Help & Support
 							</h1>
 							<p className="text-gray-600 mt-1">
-								We're here to help you with your property journey
+								We&apos;re here to help you with your property journey
 							</p>
 						</div>
 					</div>

@@ -187,7 +187,7 @@ export default function SellerGuide() {
 							<BookOpen className="w-8 h-8 text-white" />
 						</div>
 						<h1 className="text-4xl font-bold text-gray-900 mb-4">
-							Seller's Guide
+							Seller&apos;s Guide
 						</h1>
 						<p className="text-xl text-gray-600 max-w-3xl mx-auto">
 							A comprehensive guide to help you sell your property quickly and

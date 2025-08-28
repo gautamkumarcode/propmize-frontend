@@ -3,9 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { useCreateProperty } from "@/lib";
+import { isHttpError } from "@/lib/react-query/hooks/useProperties";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod";
 import React from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { Path, useForm, type SubmitHandler } from "react-hook-form";
 import type { PropertyFormData } from "../validation/propertySchema";
 import { propertySchema } from "../validation/propertySchema";
 import PropertyBasicDetails from "./PropertyBasicDetails";
@@ -106,7 +107,7 @@ export default function PropertyForm({
 	const propertyType = form.watch("propertyType");
 
 	// Get the correct step configuration based on listing type
-	const currentStepConfig = stepConfig[currentStep -1];
+	const currentStepConfig = stepConfig[currentStep - 1];
 
 	// Use static 4-step config to match parent
 	const steps = stepConfig;
@@ -130,15 +131,15 @@ export default function PropertyForm({
 	const isLoading = createProperty.isPending;
 	const isError = createProperty.isError;
 	const errorMessage =
-		(createProperty.error as any)?.response?.data?.message ||
-		(typeof createProperty.error === "string"
-			? createProperty.error
-			: "Failed to submit property");
+		createProperty.error && isHttpError(createProperty.error)
+			? createProperty.error.response?.data?.message ||
+			  createProperty.error.message
+			: "Failed to submit property";
 	const isSuccess = createProperty.isSuccess;
 
 	const [stepErrors, setStepErrors] = React.useState<string[]>([]);
 	const validateAndNext = async () => {
-		let fieldsToValidate: (keyof PropertyFormData | string)[] = [];
+		let fieldsToValidate: Path<PropertyFormData>[] = [];
 		const currentStepKey = steps[currentStep - 1]?.key;
 		switch (currentStepKey) {
 			case "basic":
@@ -183,12 +184,18 @@ export default function PropertyForm({
 				];
 				break;
 			case "contactNotes":
-				fieldsToValidate = ["contact.name", "contact.phone", "contact.whatsapp", "contact.type", "nearbyPlaces"];
+				fieldsToValidate = [
+					"contact.name",
+					"contact.phone",
+					"contact.whatsapp",
+					"contact.type",
+					"nearbyPlaces",
+				];
 				break;
 			default:
 				break;
 		}
-		const isValid = await form.trigger(fieldsToValidate as any);
+		const isValid = await form.trigger(fieldsToValidate);
 		if (isValid) {
 			setStepErrors([]);
 			nextStep();
@@ -196,7 +203,7 @@ export default function PropertyForm({
 			// Collect errors for current step
 			const errors = fieldsToValidate
 				.map((field) => {
-					const err = form.getFieldState(field as any).error;
+					const err = form.getFieldState(field).error;
 					return err?.message;
 				})
 				.filter(Boolean) as string[];
@@ -254,9 +261,9 @@ export default function PropertyForm({
 					</div>
 				)}
 				{/* Success message */}
-				
+
 				{/* Submitted data log */}
-			
+
 				<div className="flex justify-between mt-8">
 					<Button
 						disabled={currentStep === 1 || isLoading}

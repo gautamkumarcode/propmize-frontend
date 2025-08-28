@@ -56,7 +56,7 @@ export default function PropertySearch({
 	};
 
 	// Handle filter changes
-	const handleFilterChange = (key: keyof PropertyFilters, value: any) => {
+	const handleFilterChange = (key: keyof PropertyFilters, value: unknown) => {
 		setFilters((prev) => {
 			// Convert 'any' value to undefined to clear the filter
 			const processedValue = value === "any" ? undefined : value;

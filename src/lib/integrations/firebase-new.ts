@@ -16,12 +16,15 @@ export interface NotificationPayload {
 	body: string;
 	icon?: string;
 	badge?: string;
-	data?: Record<string, any>;
+	data?: Record<string, unknown>;
 }
 
+import type { FirebaseApp } from "firebase/app";
+import type { MessagePayload, Messaging } from "firebase/messaging";
+
 export class FirebaseNotificationService {
-	private app: any = null;
-	private messaging: any = null;
+	private app: FirebaseApp | null = null;
+	private messaging: Messaging | null = null;
 	private isInitialized = false;
 
 	constructor(config: FirebaseConfig) {
@@ -98,14 +101,14 @@ export class FirebaseNotificationService {
 		try {
 			const { onMessage } = await import("firebase/messaging");
 
-			onMessage(this.messaging, (payload: any) => {
+			onMessage(this.messaging, (payload: MessagePayload) => {
 				console.log("Foreground message received:", payload);
 
 				const notification: NotificationPayload = {
 					title: payload.notification?.title || "E-State Platform",
 					body: payload.notification?.body || "New notification",
 					icon: payload.notification?.icon || "/favicon.ico",
-					data: payload.data,
+					data: payload.data as Record<string, unknown> | undefined,
 				};
 
 				callback(notification);

@@ -31,11 +31,9 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 
-interface PropertyDetailsProps {
-	propertyId: string;
-}
 
-const PropertyDetails: React.FC<PropertyDetailsProps> = ({ propertyId }) => {
+
+const PropertyDetails = () => {
 	const params = useParams();
 	const { user } = useAuth();
 	const { data: propertyData, isLoading } = useProperty(

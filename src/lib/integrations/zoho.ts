@@ -116,7 +116,7 @@ export class ZohoCRMService {
 		}
 	}
 
-	async createLead(leadData: ZohoLead): Promise<any> {
+	async createLead(leadData: ZohoLead): Promise<string> {
 		if (!this.accessToken) {
 			throw new Error("Access token not available");
 		}
@@ -147,7 +147,7 @@ export class ZohoCRMService {
 	async updateLead(
 		leadId: string,
 		updateData: Partial<ZohoLead>
-	): Promise<any> {
+	): Promise<string> {
 		if (!this.accessToken) {
 			throw new Error("Access token not available");
 		}
@@ -175,7 +175,7 @@ export class ZohoCRMService {
 		}
 	}
 
-	async getLeads(page: number = 1, perPage: number = 20): Promise<any> {
+	async getLeads(page: number = 1, perPage: number = 20): Promise<string> {
 		if (!this.accessToken) {
 			throw new Error("Access token not available");
 		}
@@ -247,7 +247,7 @@ export class ZohoBooksService {
 		}
 	}
 
-	async createInvoice(invoiceData: ZohoInvoice): Promise<any> {
+	async createInvoice(invoiceData: ZohoInvoice): Promise<string> {
 		if (!this.accessToken) {
 			throw new Error("Access token not available");
 		}
@@ -276,7 +276,7 @@ export class ZohoBooksService {
 		}
 	}
 
-	async getInvoices(page: number = 1, perPage: number = 20): Promise<any> {
+	async getInvoices(page: number = 1, perPage: number = 20): Promise<string> {
 		if (!this.accessToken) {
 			throw new Error("Access token not available");
 		}
@@ -307,8 +307,8 @@ export class ZohoBooksService {
 		company_name?: string;
 		email: string;
 		phone?: string;
-		billing_address?: any;
-	}): Promise<any> {
+		billing_address?: string;
+	}): Promise<string> {
 		if (!this.accessToken) {
 			throw new Error("Access token not available");
 		}

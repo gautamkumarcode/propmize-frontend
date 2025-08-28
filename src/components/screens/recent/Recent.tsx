@@ -3,12 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRecentlyViewedProperties } from "@/lib/react-query/hooks/useProperties";
-import { Property } from "@/types";
+import { PropertyResponse } from "@/types";
 import { Bath, Bed, Eye, MapPin, Phone, Square, Trash2 } from "lucide-react";
 
 export default function Recent() {
-	const { data: recentPropertiesData, isLoading } = useRecentlyViewedProperties();
-	const recentProperties: Property[] = recentPropertiesData?.data || [];
+	const { data: recentPropertiesData, isLoading } =
+		useRecentlyViewedProperties();
+	const recentProperties: PropertyResponse[] = recentPropertiesData?.data || [];
 
 	// Example clearAllHistory handler (implement API if needed)
 	const clearAllHistory = () => {
@@ -46,14 +47,11 @@ export default function Recent() {
 						<div className="text-center py-12">Loading...</div>
 					) : recentProperties.length > 0 ? (
 						<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-							{recentProperties.map((property: Property) => (
+							{recentProperties.map((property: PropertyResponse) => (
 								<Card key={property._id} className="overflow-hidden">
 									<div className="relative">
 										<img
-											src={
-												property.images?.[0]?.url ||
-												"/api/placeholder/300/200"
-											}
+											src={property.images?.[0] || "/api/placeholder/300/200"}
 											alt={property.title}
 											className="w-full h-48 object-cover"
 										/>
@@ -81,7 +79,7 @@ export default function Recent() {
 												</span>
 												<span className="flex items-center">
 													<Square className="w-4 h-4 mr-1" />
-													{property.area?.size} {property.area?.unit}
+													{property.area?.value} {property.area?.unit}
 												</span>
 											</div>
 										</div>
@@ -107,8 +105,8 @@ export default function Recent() {
 								No Recently Viewed Properties
 							</h3>
 							<p className="text-gray-600 mb-6">
-								Start exploring properties and your recently viewed will
-								appear here
+								Start exploring properties and your recently viewed will appear
+								here
 							</p>
 							<Button>Explore Properties</Button>
 						</Card>

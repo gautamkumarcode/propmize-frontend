@@ -48,9 +48,15 @@ import React from "react";
 export default function SellerLeads() {
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [leadsPerPage, setLeadsPerPage] = React.useState(10);
-	const [statusFilter, setStatusFilter] = React.useState<string | undefined>(
-		undefined
-	);
+	const [statusFilter, setStatusFilter] = React.useState<
+		| "new"
+		| "contacted"
+		| "qualified"
+		| "converted"
+		| "rejected"
+		| "all"
+		| undefined
+	>(undefined);
 	const [searchQuery, setSearchQuery] = React.useState<string | undefined>(
 		undefined
 	);
@@ -58,7 +64,7 @@ export default function SellerLeads() {
 	const { data, isLoading, isError } = useMyLeads({
 		page: currentPage,
 		limit: leadsPerPage,
-		status: statusFilter === "all" ? undefined : (statusFilter as any),
+		status: statusFilter === "all" ? undefined : statusFilter,
 		search: searchQuery,
 	});
 
@@ -129,7 +135,15 @@ export default function SellerLeads() {
 						</div>
 						<Select
 							value={statusFilter || "all"}
-							onValueChange={(value) => {
+							onValueChange={(
+								value:
+									| "new"
+									| "contacted"
+									| "qualified"
+									| "converted"
+									| "rejected"
+									| "all"
+							) => {
 								setStatusFilter(value);
 								setCurrentPage(1);
 							}}>

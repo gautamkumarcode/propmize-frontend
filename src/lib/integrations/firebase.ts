@@ -1,6 +1,9 @@
 // Firebase Push Notifications Service
 // This service will work when Firebase is installed and configured
 
+import { FirebaseApp } from "firebase/app";
+import type { MessagePayload, Messaging } from "firebase/messaging";
+
 export interface FirebaseConfig {
 	apiKey: string;
 	authDomain: string;
@@ -16,12 +19,12 @@ export interface NotificationPayload {
 	body: string;
 	icon?: string;
 	badge?: string;
-	data?: Record<string, any>;
+	data?: Record<string, unknown>;
 }
 
 export class FirebaseNotificationService {
-	private app: any = null;
-	private messaging: any = null;
+	private app: FirebaseApp | null = null;
+	private messaging: Messaging | null = null;
 	private isInitialized = false;
 
 	constructor(config: FirebaseConfig) {
@@ -38,7 +41,7 @@ export class FirebaseNotificationService {
 			this.app = getApps().length === 0 ? initializeApp(config) : getApp();
 
 			// Initialize messaging only in browser environment
-			if (typeof window !== "undefined") {
+			if (typeof window !== "undefined" && this.app) {
 				try {
 					const { getMessaging } = await import("firebase/messaging");
 					this.messaging = getMessaging(this.app);
@@ -98,14 +101,14 @@ export class FirebaseNotificationService {
 		try {
 			const { onMessage } = await import("firebase/messaging");
 
-			onMessage(this.messaging, (payload: any) => {
+			onMessage(this.messaging, (payload: MessagePayload) => {
 				console.log("Foreground message received:", payload);
 
 				const notification: NotificationPayload = {
 					title: payload.notification?.title || "E-State Platform",
 					body: payload.notification?.body || "New notification",
 					icon: payload.notification?.icon || "/favicon.ico",
-					data: payload.data,
+					data: payload.data as Record<string, unknown> | undefined,
 				};
 
 				callback(notification);

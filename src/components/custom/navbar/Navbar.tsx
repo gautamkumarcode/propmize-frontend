@@ -1,5 +1,6 @@
 "use client";
 
+import LogoImage from "@/assests/logo1.png";
 import NotificationDropdown from "@/components/custom/notifications/NotificationDropdown";
 import { toast } from "@/hooks/use-toast";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -10,6 +11,7 @@ import { buyerNavItems, sellerNavItems } from "@/lib/routing/routes";
 import { useAuthStore } from "@/store/app-store";
 import { AxiosError } from "axios";
 import { Bell, LogIn, LogOut, Menu, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -124,21 +126,20 @@ export default function Navbar({
 			<nav className="bg-white border-b border-gray-200 px-6 py-4">
 				<div className="flex items-center justify-between">
 					{/* Left Side - Logo Only */}
-					<div className="flex items-center">
-						<h1
+					<div className="flex items-center w-full">
+						{/* <h1
 							onClick={() => navigation.goBuyerDashboard()}
-							className="text-2xl font-bold text-blue-600 cursor-pointer">
-							Propmize
-						</h1>
+							className="text-2xl font-bold text-blue-600 cursor-pointer"> */}
+						<Image
+							src={LogoImage}
+							alt="Propmize Logo"
+							className="h-12 w-auto cursor-pointer object-contain text-green-600"
+						/>
+						{/* </h1> */}
 					</div>
 
 					{/* Right Side Actions */}
 					<div className="flex items-center space-x-4">
-						<Link
-							href={mode === "seller" ? "/property" : "/property"}
-							className="text-gray-600 hover:text-gray-800">
-							Properties
-						</Link>
 						{/* Notifications */}
 						<div className="relative" ref={notificationRef}>
 							<button
@@ -176,6 +177,11 @@ export default function Navbar({
 							{showNavDropdown && (
 								<div className="absolute top-full right-0 mt-1 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
 									<div className="py-2">
+										<Link
+											href={mode === "seller" ? "/property" : "/property"}
+											className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 font-semibold">
+											Properties
+										</Link>
 										{/* Navigation Items */}
 										{navItems
 											.filter(

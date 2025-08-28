@@ -14,9 +14,7 @@ export class UserService {
 	/**
 	 * Update user profile
 	 */
-	static async updateProfile(
-		updateData: FormData | any
-	): Promise<ApiResponse<User>> {
+	static async updateProfile(updateData: FormData): Promise<ApiResponse<User>> {
 		let config: AxiosRequestConfig = {};
 
 		console.log("Update data received in service:", updateData);

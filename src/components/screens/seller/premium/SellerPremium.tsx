@@ -185,8 +185,8 @@ export default function SellerPremium() {
 							Premium Features
 						</h1>
 						<p className="text-xl text-gray-600 max-w-3xl mx-auto">
-							Unlock powerful tools and exclusive features to sell your
-							property faster and for better prices
+							Unlock powerful tools and exclusive features to sell your property
+							faster and for better prices
 						</p>
 					</div>
 
@@ -282,9 +282,7 @@ export default function SellerPremium() {
 										<h3 className="text-xl font-bold text-gray-900 mb-2">
 											{feature.title}
 										</h3>
-										<p className="text-gray-600 mb-4">
-											{feature.description}
-										</p>
+										<p className="text-gray-600 mb-4">{feature.description}</p>
 
 										{selectedFeature === feature.id && (
 											<div className="space-y-3">
@@ -340,7 +338,7 @@ export default function SellerPremium() {
 										</Badge>
 									</div>
 									<blockquote className="text-gray-700 mb-4">
-										"{testimonial.text}"
+										{testimonial.text}
 									</blockquote>
 									<div>
 										<p className="font-semibold text-gray-900">

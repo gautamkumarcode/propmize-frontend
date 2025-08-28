@@ -6,6 +6,7 @@ import {
 	AuthResponse,
 	LoginCredentials,
 	RegisterData,
+	User,
 } from "../../types/api";
 import { QueryKeys } from "../queryClient";
 
@@ -224,7 +225,7 @@ export const useUpdateProfile = () => {
 
 			return UserService.updateProfile(profileData);
 		},
-		onSuccess: (data: ApiResponse<any>) => {
+		onSuccess: (data: ApiResponse<User>) => {
 			queryClient.setQueryData(QueryKeys.profile, data.data);
 			queryClient.invalidateQueries({ queryKey: QueryKeys.profile });
 		},

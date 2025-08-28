@@ -69,7 +69,7 @@ export default function LandingPage() {
 								<Search className="h-10 w-10 text-blue-600" />
 							</div>
 							<CardTitle className="text-2xl text-blue-900">
-								I'm Looking to Buy
+								I&apos;m Looking to Buy
 							</CardTitle>
 							<CardDescription className="text-gray-600">
 								Find your dream property with AI-powered assistance

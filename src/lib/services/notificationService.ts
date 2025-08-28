@@ -8,7 +8,7 @@ export interface Notification {
 	type: "lead" | "property" | "payment" | "system" | "promotion";
 	title: string;
 	message: string;
-	data?: Record<string, any>;
+	data?: Record<string, unknown>;
 	isRead: boolean;
 	createdAt: Date;
 	updatedAt: Date;

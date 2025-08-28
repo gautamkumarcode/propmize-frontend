@@ -132,8 +132,8 @@ export default function SellerSupport() {
 							Support Center
 						</h1>
 						<p className="text-xl text-gray-600 max-w-3xl mx-auto">
-							Get help with your questions and issues. We're here to support
-							your selling journey
+							Get help with your questions and issues. We&apos;re here to
+							support your selling journey
 						</p>
 					</div>
 
@@ -199,18 +199,14 @@ export default function SellerSupport() {
 										<th className="text-left py-3 px-4 font-semibold">
 											Ticket ID
 										</th>
-										<th className="text-left py-3 px-4 font-semibold">
-											Title
-										</th>
+										<th className="text-left py-3 px-4 font-semibold">Title</th>
 										<th className="text-left py-3 px-4 font-semibold">
 											Status
 										</th>
 										<th className="text-left py-3 px-4 font-semibold">
 											Priority
 										</th>
-										<th className="text-left py-3 px-4 font-semibold">
-											Date
-										</th>
+										<th className="text-left py-3 px-4 font-semibold">Date</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -234,9 +230,7 @@ export default function SellerSupport() {
 													{ticket.priority}
 												</Badge>
 											</td>
-											<td className="py-3 px-4 text-gray-600">
-												{ticket.date}
-											</td>
+											<td className="py-3 px-4 text-gray-600">{ticket.date}</td>
 										</tr>
 									))}
 								</tbody>
@@ -322,8 +316,8 @@ export default function SellerSupport() {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 							<div>
 								<p className="text-gray-600 mb-6">
-									Can't find the answer you're looking for? Send us a message
-									and we'll get back to you as soon as possible.
+									Can&apos;t find the answer you&apos;re looking for? Send us a
+									message and we&apos;ll get back to you as soon as possible.
 								</p>
 								<div className="space-y-4">
 									<div>

@@ -185,7 +185,7 @@ export default function Guide() {
 							<div>
 								<h1 className="text-2xl font-bold text-gray-900 flex items-center">
 									<BookOpen className="w-6 h-6 mr-3 text-blue-500" />
-									Buyer's Guide & Advice
+									Buyer&apos;s Guide & Advice
 								</h1>
 								<p className="text-gray-600 mt-1">
 									Expert guidance for your property buying journey
@@ -297,9 +297,7 @@ export default function Guide() {
 
 					{/* Additional Resources */}
 					<div className="bg-white rounded-lg shadow-sm p-6">
-						<h2 className="text-xl font-semibold mb-4">
-							Additional Resources
-						</h2>
+						<h2 className="text-xl font-semibold mb-4">Additional Resources</h2>
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 							<Card className="p-6 text-center">
 								<div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">

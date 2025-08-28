@@ -4,12 +4,9 @@ const PropertyDetailsPage = dynamic(() => import("./PropertyDetails"), {
 	ssr: true,
 });
 
-type PropertyDetailsHOCProps = {
-	propertyId: string;
-};
 
-const PropertyDetailsHOC = ({ propertyId }: PropertyDetailsHOCProps) => {
-	return <PropertyDetailsPage propertyId={propertyId} />;
+const PropertyDetailsHOC = () => {
+	return <PropertyDetailsPage />;
 };
 
 export default PropertyDetailsHOC;

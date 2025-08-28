@@ -4,29 +4,38 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-	Calendar, // For follow-up dates
-	MessageSquare, // For messages/follow-ups
-	Phone, // For contact info
-	User, // For buyer info
-} from "lucide-react";
-import { useParams } from "next/navigation";
-import { useLead } from "@/lib/react-query/hooks/useLeads";
-import { format } from "date-fns";
-import Link from "next/link";
-import React from "react";
-import { useAddFollowUp, useConvertLead, useUpdateLeadStatus } from "@/lib/react-query/hooks/useLeads";
-import { toast } from "@/hooks/use-toast";
-import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
+import {
+	useAddFollowUp,
+	useConvertLead,
+	useLead,
+	useUpdateLeadStatus,
+} from "@/lib/react-query/hooks/useLeads";
+import { isHttpError } from "@/lib/react-query/hooks/useProperties";
+import { format } from "date-fns";
+import {
+	MessageSquare, // For contact info
+	User,
+} from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import React from "react";
 
 const isValidObjectId = (id: string) => /^[0-9a-fA-F]{24}$/.test(id);
 
@@ -37,22 +46,16 @@ export default function SellerLeadDetails() {
 
 	const { data: lead, isLoading, isError } = useLead(leadId || ""); // Pass empty string if leadId is undefined, let 'enabled' handle it.
 
-	const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = React.useState(false);
-	const [isAddFollowUpModalOpen, setIsAddFollowUpModalOpen] = React.useState(false);
-	const [isConvertLeadModalOpen, setIsConvertLeadModalOpen] = React.useState(false);
+	const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] =
+		React.useState(false);
+	const [isAddFollowUpModalOpen, setIsAddFollowUpModalOpen] =
+		React.useState(false);
+	const [isConvertLeadModalOpen, setIsConvertLeadModalOpen] =
+		React.useState(false);
 
 	const updateLeadStatusMutation = useUpdateLeadStatus();
 	const addFollowUpMutation = useAddFollowUp();
 	const convertLeadMutation = useConvertLead();
-
-	const isHttpError = (error: unknown): error is { response: { data: { message: string } } } => {
-		return (
-			typeof error === "object" &&
-			error !== null &&
-			"response" in error &&
-			typeof (error as any).response?.data?.message === "string"
-		);
-	};
 
 	const getStatusColor = (status: string) => {
 		switch (status) {
@@ -86,16 +89,30 @@ export default function SellerLeadDetails() {
 		}
 	};
 
-	const handleUpdateStatus = async (newStatus: string, notes: string) => {
+	const handleUpdateStatus = async (
+		newStatus: "new" | "contacted" | "qualified" | "converted" | "rejected",
+		notes: string
+	) => {		
 		await updateLeadStatusMutation.mutateAsync(
-			{ leadId: leadId!, status: newStatus as any, notes },
+			{ leadId: leadId!, status: newStatus, notes },
 			{
 				onSuccess: () => {
-					toast({ title: "Lead Status Updated", description: "The lead status has been updated successfully." });
+					toast({
+						title: "Lead Status Updated",
+						description: "The lead status has been updated successfully.",
+					});
 					setIsUpdateStatusModalOpen(false);
 				},
 				onError: (error: unknown) => {
-					toast({ title: "Error", description: `Failed to update status: ${isHttpError(error) ? error.response.data.message : "Unknown error"}`, variant: "destructive" });
+					toast({
+						title: "Error",
+						description: `Failed to update status: ${
+							isHttpError(error)
+								? error.response?.data?.message || error.message
+								: "Unknown error"
+						}`,
+						variant: "destructive",
+					});
 				},
 			}
 		);
@@ -112,26 +129,51 @@ export default function SellerLeadDetails() {
 			{ leadId: leadId!, date, method, status, notes, nextFollowUp },
 			{
 				onSuccess: () => {
-					toast({ title: "Follow-up Added", description: "A new follow-up has been added to the lead." });
+					toast({
+						title: "Follow-up Added",
+						description: "A new follow-up has been added to the lead.",
+					});
 					setIsAddFollowUpModalOpen(false);
 				},
 				onError: (error: unknown) => {
-					toast({ title: "Error", description: `Failed to add follow-up: ${isHttpError(error) ? error.response.data.message : "Unknown error"}`, variant: "destructive" });
+					toast({
+						title: "Error",
+						description: `Failed to add follow-up: ${
+							isHttpError(error)
+								? error.response?.data?.message || error.message
+								: "Unknown error"
+						}`,
+						variant: "destructive",
+					});
 				},
 			}
 		);
 	};
 
-	const handleConvertLead = async (dealAmount: number, commissionEarned?: number) => {
+	const handleConvertLead = async (
+		dealAmount: number,
+		commissionEarned?: number
+	) => {
 		await convertLeadMutation.mutateAsync(
 			{ leadId: leadId!, dealAmount, commissionEarned },
 			{
 				onSuccess: () => {
-					toast({ title: "Lead Converted", description: "The lead has been successfully converted." });
+					toast({
+						title: "Lead Converted",
+						description: "The lead has been successfully converted.",
+					});
 					setIsConvertLeadModalOpen(false);
 				},
 				onError: (error: unknown) => {
-					toast({ title: "Error", description: `Failed to convert lead: ${isHttpError(error) ? error.response.data.message : "Unknown error"}`, variant: "destructive" });
+					toast({
+						title: "Error",
+						description: `Failed to convert lead: ${
+							isHttpError(error)
+								? error.response?.data?.message || error.message
+								: "Unknown error"
+						}`,
+						variant: "destructive",
+					});
 				},
 			}
 		);
@@ -143,7 +185,9 @@ export default function SellerLeadDetails() {
 				<Card className="p-8 text-center">
 					<CardTitle className="text-red-600 mb-4">Invalid Lead ID</CardTitle>
 					<CardContent>
-						<p className="text-gray-700">The provided lead ID is not valid. Please check the URL.</p>
+						<p className="text-gray-700">
+							The provided lead ID is not valid. Please check the URL.
+						</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -162,9 +206,13 @@ export default function SellerLeadDetails() {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
 				<Card className="p-8 text-center">
-					<CardTitle className="text-red-600 mb-4">Error Loading Lead</CardTitle>
+					<CardTitle className="text-red-600 mb-4">
+						Error Loading Lead
+					</CardTitle>
 					<CardContent>
-						<p className="text-gray-700">Failed to load lead details. Please try again later.</p>
+						<p className="text-gray-700">
+							Failed to load lead details. Please try again later.
+						</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -172,11 +220,7 @@ export default function SellerLeadDetails() {
 	}
 
 	if (!lead) {
-		return (
-			<div className="text-center p-8 text-gray-600">
-				Lead not found.
-			</div>
-		);
+		return <div className="text-center p-8 text-gray-600">Lead not found.</div>;
 	}
 
 	return (
@@ -187,28 +231,24 @@ export default function SellerLeadDetails() {
 						Lead Details for {lead.buyer?.name || "N/A"}
 					</CardTitle>
 					<p className="text-gray-600">
-						Property: "
+						Property: 
 						<Link
 							href={`/property/${lead.property?._id}`}
-							className="font-medium hover:text-blue-600"
-						>
+							className="font-medium hover:text-blue-600">
 							{lead.property?.title || "N/A"}
-						</Link>"
+						</Link>
+						
 					</p>
 					<div className="flex flex-wrap gap-2 mt-2">
 						<Badge
-							className={`capitalize ${
-								getStatusColor(lead.status || "new")
-							}`}
-						>
+							className={`capitalize ${getStatusColor(lead.status || "new")}`}>
 							{lead.status}
 						</Badge>
 						{lead.priority && (
 							<Badge
-								className={`capitalize ${
-									getPriorityColor(lead.priority as string)
-								}`}
-							>
+								className={`capitalize ${getPriorityColor(
+									lead.priority as string
+								)}`}>
 								Priority: {lead.priority}
 							</Badge>
 						)}
@@ -223,9 +263,13 @@ export default function SellerLeadDetails() {
 					</div>
 					{/* Action Buttons */}
 					<div className="flex flex-wrap gap-3 mt-4">
-						<Dialog open={isUpdateStatusModalOpen} onOpenChange={setIsUpdateStatusModalOpen}>
+						<Dialog
+							open={isUpdateStatusModalOpen}
+							onOpenChange={setIsUpdateStatusModalOpen}>
 							<DialogTrigger asChild>
-								<Button variant="outline" size="sm">Update Status</Button>
+								<Button variant="outline" size="sm">
+									Update Status
+								</Button>
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
@@ -239,9 +283,13 @@ export default function SellerLeadDetails() {
 							</DialogContent>
 						</Dialog>
 
-						<Dialog open={isAddFollowUpModalOpen} onOpenChange={setIsAddFollowUpModalOpen}>
+						<Dialog
+							open={isAddFollowUpModalOpen}
+							onOpenChange={setIsAddFollowUpModalOpen}>
 							<DialogTrigger asChild>
-								<Button variant="outline" size="sm">Add Follow-up</Button>
+								<Button variant="outline" size="sm">
+									Add Follow-up
+								</Button>
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
@@ -254,7 +302,9 @@ export default function SellerLeadDetails() {
 							</DialogContent>
 						</Dialog>
 
-						<Dialog open={isConvertLeadModalOpen} onOpenChange={setIsConvertLeadModalOpen}>
+						<Dialog
+							open={isConvertLeadModalOpen}
+							onOpenChange={setIsConvertLeadModalOpen}>
 							<DialogTrigger asChild>
 								<Button size="sm" disabled={lead.status === "converted"}>
 									{lead.status === "converted" ? "Converted" : "Convert Lead"}
@@ -303,7 +353,8 @@ export default function SellerLeadDetails() {
 								)}
 								{lead.buyerContact.contactMethod && (
 									<p>
-										<strong>Contact Method:</strong> {lead.buyerContact.contactMethod}
+										<strong>Contact Method:</strong>{" "}
+										{lead.buyerContact.contactMethod}
 									</p>
 								)}
 							</>
@@ -321,7 +372,8 @@ export default function SellerLeadDetails() {
 								{lead.followUps.map((followUp, index) => (
 									<Card key={index} className="p-4">
 										<p className="text-sm text-gray-700">
-											<strong>Date:</strong> {format(new Date(followUp.date), "MMM d, yyyy HH:mm")}
+											<strong>Date:</strong>{" "}
+											{format(new Date(followUp.date), "MMM d, yyyy HH:mm")}
 										</p>
 										<p className="text-sm text-gray-700">
 											<strong>Method:</strong> {followUp.method}
@@ -362,15 +414,18 @@ export default function SellerLeadDetails() {
 }
 
 interface UpdateStatusFormProps {
-	onSubmit: (newStatus: string, notes: string) => void;
-	initialStatus: string;
+	onSubmit: (
+		newStatus: "new" | "contacted" | "qualified" | "converted" | "rejected",
+		notes: string
+	) => void;
+	initialStatus: "new" | "contacted" | "qualified" | "converted" | "rejected";
 	isLoading: boolean;
 }
 
 const UpdateStatusForm: React.FC<UpdateStatusFormProps> = ({
 	onSubmit, initialStatus, isLoading
 }) => {
-	const [status, setStatus] = React.useState(initialStatus);
+	const [status, setStatus] = React.useState<"new" | "contacted" | "qualified" | "converted" | "rejected">(initialStatus as "new" | "contacted" | "qualified" | "converted" | "rejected");
 	const [notes, setNotes] = React.useState("");
 
 	const handleSubmit = (e: React.FormEvent) => {

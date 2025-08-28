@@ -6,7 +6,7 @@ interface RazorpayOptions {
 	name: string;
 	description: string;
 	order_id: string;
-	handler: (response: any) => void;
+	handler: (response: unknown) => void;
 	prefill?: {
 		name?: string;
 		email?: string;
@@ -19,7 +19,13 @@ interface RazorpayOptions {
 
 declare global {
 	interface Window {
-		Razorpay: any;
+		Razorpay: {
+			new (options: RazorpayOptions): {
+				open(): void;
+				on(eventName: string, callback: (response: unknown) => void): void;
+				close(): void;
+			};
+		};
 	}
 }
 
@@ -45,7 +51,7 @@ export class RazorpayService {
 		});
 	}
 
-	async createOrder(amount: number, currency: string = "INR"): Promise<any> {
+	async createOrder(amount: number, currency: string = "INR"): Promise<string> {
 		try {
 			const response = await fetch("/api/payments/create-order", {
 				method: "POST",
