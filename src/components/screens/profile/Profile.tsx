@@ -242,8 +242,8 @@ export default function Profile() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
-			<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 ">
+			<div className="max-w-6xl mx-auto px-2 sm:px-2 lg:px-8">
 				{/* Header Section */}
 				<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
 					<div>
@@ -372,9 +372,7 @@ export default function Profile() {
 											<div className="flex items-center p-3 bg-gray-50 rounded-lg">
 												<UserIcon className="w-5 h-5 text-gray-500 mr-3" />
 												<div>
-													<p className="text-sm text-gray-600">
-														Member since
-													</p>
+													<p className="text-sm text-gray-600">Member since</p>
 													<p className="font-medium">
 														{new Date(
 															profile?.createdAt || Date.now()
@@ -748,8 +746,7 @@ export default function Profile() {
 											</div>
 										) : (
 											<div className="p-3 bg-gray-50 rounded-md">
-												{formData.preferences.priceRange.min.toLocaleString()}{" "}
-												-{" "}
+												{formData.preferences.priceRange.min.toLocaleString()} -{" "}
 												{formData.preferences.priceRange.max.toLocaleString()}
 											</div>
 										)}
@@ -776,8 +773,7 @@ export default function Profile() {
 											/>
 										) : (
 											<div className="p-3 bg-gray-50 rounded-md">
-												{formData.preferences.locations.join(", ") ||
-													"Not set"}
+												{formData.preferences.locations.join(", ") || "Not set"}
 											</div>
 										)}
 									</div>
@@ -798,9 +794,7 @@ export default function Profile() {
 											<p className="text-2xl font-bold text-gray-900">
 												{profile?.savedProperties?.length || 0}
 											</p>
-											<p className="text-sm text-gray-600">
-												Saved Properties
-											</p>
+											<p className="text-sm text-gray-600">Saved Properties</p>
 										</div>
 									</div>
 								</CardContent>
@@ -816,9 +810,7 @@ export default function Profile() {
 											<p className="text-2xl font-bold text-gray-900">
 												{profile?.viewedProperties?.length || 0}
 											</p>
-											<p className="text-sm text-gray-600">
-												Properties Viewed
-											</p>
+											<p className="text-sm text-gray-600">Properties Viewed</p>
 										</div>
 									</div>
 								</CardContent>
@@ -834,9 +826,7 @@ export default function Profile() {
 											<p className="text-2xl font-bold text-gray-900">
 												{profile?.contactedOwners?.length || 0}
 											</p>
-											<p className="text-sm text-gray-600">
-												Owners Contacted
-											</p>
+											<p className="text-sm text-gray-600">Owners Contacted</p>
 										</div>
 									</div>
 								</CardContent>

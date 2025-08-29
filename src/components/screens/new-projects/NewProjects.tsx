@@ -103,16 +103,15 @@ export default function NewProjects() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-6">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div className="min-h-screen bg-gray-50">
+			<div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
 				<div className="space-y-6">
 					{/* Header */}
-					<div className="bg-white rounded-lg shadow-sm p-6">
-						<div className="flex items-center justify-between">
+					<div className="bg-white rounded-lg shadow-sm p-4">
+						<div className="flex lg:items-center justify-between lg:flex-row flex-col gap-4">
 							<div>
 								<h1 className="text-2xl font-bold text-gray-900 flex items-center">
-									<Building className="w-6 h-6 mr-3 text-purple-500" />
-									New Projects in Bangalore
+									New Projects
 								</h1>
 								<p className="text-gray-600 mt-1">
 									{projects.length} new residential projects available
@@ -126,8 +125,8 @@ export default function NewProjects() {
 					</div>
 
 					{/* Filter Tabs */}
-					<div className="bg-white rounded-lg shadow-sm p-4">
-						<div className="flex space-x-4">
+					<div className="bg-white rounded-lg shadow-sm p-4 ">
+						<div className="flex space-x-4 flex-wrap gap-4 justify-between">
 							<Button
 								variant={filter === "all" ? "default" : "outline"}
 								size="sm"
@@ -210,9 +209,7 @@ export default function NewProjects() {
 											</div>
 											<div>
 												<p className="text-sm text-gray-500">Configuration</p>
-												<p className="font-semibold">
-													{project.configuration}
-												</p>
+												<p className="font-semibold">{project.configuration}</p>
 											</div>
 											<div>
 												<p className="text-sm text-gray-500">Total Units</p>
@@ -248,16 +245,14 @@ export default function NewProjects() {
 												Key Amenities
 											</h4>
 											<div className="flex flex-wrap gap-2">
-												{project.amenities
-													.slice(0, 4)
-													.map((amenity, index) => (
-														<Badge
-															key={index}
-															variant="outline"
-															className="text-xs">
-															{amenity}
-														</Badge>
-													))}
+												{project.amenities.slice(0, 4).map((amenity, index) => (
+													<Badge
+														key={index}
+														variant="outline"
+														className="text-xs">
+														{amenity}
+													</Badge>
+												))}
 												{project.amenities.length > 4 && (
 													<Badge variant="outline" className="text-xs">
 														+{project.amenities.length - 4} more

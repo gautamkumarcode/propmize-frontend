@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import { useLikedProperties } from "@/lib";
-import { Heart, Share2 } from "lucide-react";
+import { Heart } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Saved() {
 	const { data: savedProperties = [], isLoading: _isLoading } =
 		useLikedProperties();
+
+	const router = useRouter();
 
 	// const handleUnsave = (propertyId: string) => {
 	// 	// unsaveMutation.mutate(propertyId);
@@ -21,25 +24,25 @@ export default function Saved() {
 	// };
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-6">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div className="space-y-6">
+		<div className="min-h-screen bg-gray-50 ">
+			<div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+				<div className="space-y-4">
 					{/* Header */}
-					<div className="bg-white rounded-lg shadow-sm p-6">
-						<div className="flex items-center justify-between">
+					<div className="bg-white rounded-lg shadow-sm p-4">
+						<div className="flex flex-col  justify-between">
 							<div>
 								<h1 className="text-2xl font-bold text-gray-900 flex items-center">
-									<Heart className="w-6 h-6 mr-3 text-red-500" />
+									{/* <Heart className="w-6 h-6 mr-3 text-red-500" /> */}
 									Saved Properties
 								</h1>
 								<p className="text-gray-600 mt-1">
 									{savedProperties.length} properties saved
 								</p>
 							</div>
-							<Button variant="outline">
+							{/* <Button variant="outline">
 								<Share2 className="w-4 h-4 mr-2" />
 								Share List
-							</Button>
+							</Button> */}
 						</div>
 					</div>
 
@@ -59,7 +62,9 @@ export default function Saved() {
 							<p className="text-gray-600 mb-6">
 								Start exploring properties and save your favorites here
 							</p>
-							<Button>Explore Properties</Button>
+							<Button onClick={() => router.push("/property")}>
+								Explore Properties
+							</Button>
 						</Card>
 					)}
 				</div>

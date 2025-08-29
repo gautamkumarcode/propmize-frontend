@@ -120,7 +120,7 @@ export const Toaster: React.FC = () => {
 	};
 
 	return (
-		<div className={`fixed z-50 space-y-3 ${getPositionStyles()}`}>
+		<div className={`fixed z-[999999] space-y-3 ${getPositionStyles()}`}>
 			{toasts.map((toast) => (
 				<Toast
 					key={toast.id}

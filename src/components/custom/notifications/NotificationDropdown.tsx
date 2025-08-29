@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/app-store";
 import {
 	Bell,
 	Check,
@@ -147,7 +146,7 @@ export default function NotificationDropdown({
 	return (
 		<div
 			ref={dropdownRef}
-			className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-hidden">
+			className="absolute -right-16 mt-2 w-92 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-hidden">
 			{/* Header */}
 			<div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
 				<div className="flex items-center space-x-2">

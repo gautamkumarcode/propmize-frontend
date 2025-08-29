@@ -17,12 +17,12 @@ export default function Recent() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-6">
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div className="min-h-screen bg-gray-50 ">
+			<div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
 				<div className="space-y-6">
 					{/* Header */}
-					<div className="bg-white rounded-lg shadow-sm p-6">
-						<div className="flex items-center justify-between">
+					<div className="bg-white rounded-lg shadow-sm p-4">
+						<div className="flex lg:items-center justify-between lg:flex-row flex-col gap-4">
 							<div>
 								<h1 className="text-2xl font-bold text-gray-900 flex items-center">
 									<Eye className="w-6 h-6 mr-3 text-blue-500" />

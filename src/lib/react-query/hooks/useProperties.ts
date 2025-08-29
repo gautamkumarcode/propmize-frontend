@@ -171,6 +171,12 @@ export const useCreateProperty = () => {
 			// Invalidate and refetch
 			queryClient.invalidateQueries({ queryKey: QueryKeys.properties });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myProperties });
+			triggerToast({
+				title: "Success!",
+				description: data.message || "Property added successfully!",
+				variant: "success",
+			});
+			
 		},
 		onError: (error: unknown) => {
 			console.error(

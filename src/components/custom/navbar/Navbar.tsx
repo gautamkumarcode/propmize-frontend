@@ -175,11 +175,11 @@ export default function Navbar({
 
 							{/* Navigation Dropdown - positioned to the left of menu button */}
 							{showNavDropdown && (
-								<div className="absolute top-full right-0 mt-1 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+								<div className="absolute top-full right-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 h-[70vh] overflow-y-scroll">
 									<div className="py-2">
 										<Link
 											href={mode === "seller" ? "/property" : "/property"}
-											className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 font-semibold">
+											className="flex items-center justify-center space-x-3 px-4 py-3 w-full text-left hover:bg-gray-50 transition-colors text-gray-700 bg-gray-100">
 											Properties
 										</Link>
 										{/* Navigation Items */}

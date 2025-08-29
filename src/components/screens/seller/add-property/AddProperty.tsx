@@ -31,12 +31,12 @@ export default function AddProperty() {
 	};
 
 	return (
-		<div className="min-h-screen py-10">
-			<div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+		<div className="min-h-screen">
+			<div className="max-w-5xl mx-auto  sm:px-2 lg:px-8">
 				<div className="space-y-10">
 					{/* Header */}
 					<div className="text-center">
-						<h1 className="text-4xl font-extrabold text-blue-700 drop-shadow-sm">
+						<h1 className="lg:text-4xl  font-extrabold text-blue-700 drop-shadow-sm text-2xl">
 							Add New Property
 						</h1>
 						<p className="text-gray-700 mt-3 text-lg">
@@ -45,54 +45,56 @@ export default function AddProperty() {
 					</div>
 
 					{/* Responsive Steps and Form */}
-					<div className="flex flex-col md:flex-row gap-8 items-start">
+					<div className="flex flex-col md:flex-row gap-8 items-start ">
 						{/* Stepper: horizontal scroll on mobile, vertical on desktop */}
-						<Card className="p-4 shadow-md w-full md:w-[220px] md:p-6 md:mx-auto">
-							<div className="w-full">
-								<div className="flex md:flex-col flex-row items-center justify-center w-full overflow-x-auto scrollbar-hide">
-									{steps.map((step, index) => {
-										const IconComponent = step.icon;
-										const isActive = currentStep === step.number;
-										const isCompleted = currentStep > step.number;
-										return (
+						<Card className="py-6 px-4 shadow-lg w-full max-w-3xl mx-auto bg-white rounded-2xl">
+							<div className="flex items-center justify-between relative w-full">
+								{steps.map((step, index) => {
+									const IconComponent = step.icon;
+									const isActive = currentStep === step.number;
+									const isCompleted = currentStep > step.number;
+
+									return (
+										<div
+											key={step.number}
+											className="flex-1 flex flex-col items-center relative">
+											{/* Connector Line - behind the circle */}
+											{index < steps.length - 1 && (
+												<div
+													className={`absolute top-6 left-1/2 w-full h-1 z-0 md:ml-6 rounded-full transition-all duration-300 ease-in-out
+														${isCompleted ? "bg-green-400" : "bg-gray-300"}
+														${isActive ? "bg-blue-300" : ""}`}
+													style={{ right: '-50%', left: '50%' }}
+												></div>
+											)}
+											{/* Circle with Icon */}
 											<div
-												key={step.number}
-												className={`flex md:flex-col flex-row items-center md:mb-6 min-w-[80px] relative`}>
-												<div className="flex flex-col items-center z-10">
-													<div
-														className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ease-in-out
-																	${isActive
-																		? "bg-blue-600 text-white border-blue-600 shadow-lg scale-105"
-																		: isCompleted
-																		? "bg-green-500 text-white border-green-500"
-																		: "bg-gray-100 text-gray-500 border-gray-300"
-																	}`}>
-														<IconComponent className="w-5 h-5" />
-													</div>
-													<span
-														className={`mt-3 text-sm font-medium text-center min-w-max
-																	${isActive
-																		? "text-blue-800"
-																		: isCompleted
-																		? "text-green-700"
-																		: "text-gray-500"
-																	}`}>
-														{step.title}
-													</span>
-												</div>
-												{index < steps.length - 1 && (
-													<div
-														className={`absolute md:static top-1/2 left-full -translate-y-1/2 md:translate-y-0 md:left-auto md:top-auto 
-																	md:w-1 md:h-10 w-10 h-1 mx-2 md:mx-0 rounded-full transition-all duration-300 ease-in-out
-																	${isCompleted ? "bg-green-400" : "bg-gray-300"}
-																	${isActive ? "md:!bg-blue-300" : ""}`
-																}>
-																</div>
-												)}
+												className={`relative z-10 w-12 h-12 flex items-center justify-center rounded-full border-2 transition-all duration-300 ease-in-out
+													${isActive
+														? "bg-blue-600 text-white border-blue-600 shadow-lg scale-110"
+														: isCompleted
+														? "bg-green-500 text-white border-green-500"
+														: "bg-gray-200 text-gray-500 border-gray-300"}
+												`}
+											>
+												<IconComponent className="w-6 h-6" />
 											</div>
-										);
-									})}
-								</div>
+
+											{/* Label */}
+											<span
+												className={`mt-2 text-xs md:text-sm font-medium text-center transition-colors
+													${isActive
+														? "text-blue-700"
+														: isCompleted
+														? "text-green-600"
+														: "text-gray-500"}
+												`}
+											>
+												{step.title}
+											</span>
+										</div>
+									);
+								})}
 							</div>
 						</Card>
 

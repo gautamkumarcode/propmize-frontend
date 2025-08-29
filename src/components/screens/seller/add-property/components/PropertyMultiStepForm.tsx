@@ -5,6 +5,7 @@ import { Form } from "@/components/ui/form";
 import { useCreateProperty } from "@/lib";
 import { isHttpError } from "@/lib/react-query/hooks/useProperties";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { Path, useForm, type SubmitHandler } from "react-hook-form";
 import type { PropertyFormData } from "../validation/propertySchema";
@@ -103,6 +104,7 @@ export default function PropertyForm({
 		defaultValues: getPropertyDefaultValues(),
 	});
 
+	const router = useRouter();
 	const listingType = form.watch("listingType");
 	const propertyType = form.watch("propertyType");
 
@@ -119,8 +121,10 @@ export default function PropertyForm({
 	const submit: SubmitHandler<PropertyFormData> = (data) => {
 		setValidationFailed(false);
 		setSubmittedData(data);
-		console.log(data);
 		createProperty.mutate(data);
+		router.push("/property");
+		// Reset form and go to next step
+		form.reset();
 	};
 
 	const onInvalid = () => {
