@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ChevronDown } from "lucide-react";
@@ -19,7 +19,8 @@ import { UseFormReturn } from "react-hook-form";
 import { PropertyFormData } from "../validation/propertySchema";
 
 interface PropertyMediaAndPricingProps {
-  form: UseFormReturn<PropertyFormData>;
+	form: UseFormReturn<PropertyFormData>;
+	isEditMode?: string | false | null;
 }
 
 type PricingFieldNames = "basePrice" | "maintenanceCharges" | "securityDeposit";
@@ -43,9 +44,9 @@ export default function PropertyMediaAndPricing({
 		);
 	}
 
-	const [selectedVideos, setSelectedVideos] = useState<File[]>([]);
-	const [videoDragActive, setVideoDragActive] = useState(false);
-	const videoInputRef = useRef<HTMLInputElement>(null);
+	// const [selectedVideos, setSelectedVideos] = useState<File[]>([]);
+	// const [videoDragActive, setVideoDragActive] = useState(false);
+	// const videoInputRef = useRef<HTMLInputElement>(null);
 	const [selectedImages, setSelectedImages] = useState<File[]>([]);
 	const [dragActive, setDragActive] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -74,120 +75,119 @@ export default function PropertyMediaAndPricing({
 		form.setValue("images", newImages);
 	};
 
-	const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const files = Array.from(event.target.files || []);
-		const newVideos = [...selectedVideos, ...files];
-		setSelectedVideos(newVideos);
-		form.setValue("videos", newVideos);
-	};
+	// const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	// 	const files = Array.from(event.target.files || []);
+	// 	const newVideos = [...selectedVideos, ...files];
+	// 	setSelectedVideos(newVideos);
+	// 	form.setValue("videos", newVideos);
+	// };
 
-	const handleRemoveVideo = (index: number) => {
-		const newVideos = selectedVideos.filter((_, i) => i !== index);
-		setSelectedVideos(newVideos);
-		form.setValue("videos", newVideos);
-	};
+	// const handleRemoveVideo = (index: number) => {
+	// 	const newVideos = selectedVideos.filter((_, i) => i !== index);
+	// 	setSelectedVideos(newVideos);
+	// 	form.setValue("videos", newVideos);
+	// };
 
 	return (
 		<div className="space-y-6 bg-white rounded-xl shadow p-6 border-t-4 border-green-500">
 			<h3 className="text-xl font-semibold text-gray-800 mb-4">
 				Property Media
 			</h3>
-			{propertyType !== "plot" && (
-				<FormField
-					control={form.control}
-					name="images"
-					render={() => (
-						<FormItem>
-							<FormLabel className="text-md font-semibold text-gray-700">
-								Images
-							</FormLabel>
-							<FormControl>
-								<div
-									className={`relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 transition-colors ${
-										dragActive
-											? "border-primary bg-primary/10"
-											: "border-muted bg-background"
-									}`}
-									onDrop={handleDrop}
-									onDragOver={(e) => {
-										e.preventDefault();
-										setDragActive(true);
-									}}
-									onDragLeave={() => setDragActive(false)}
-									style={{ cursor: "pointer" }}
-									onClick={() => inputRef.current && inputRef.current.click()}>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										className="h-10 w-10 text-muted-foreground mb-2"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor">
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12l4-4a2 2 0 012.828 0l2.828 2.828a2 2 0 002.828 0L20 8m-4 4v4m0 0h-4m4 0h4"
-										/>
-									</svg>
-									<span className="text-sm text-muted-foreground mb-2">
-										Drag & drop images here, or click to select
-									</span>
-									<input
-										ref={inputRef}
-										type="file"
-										accept="image/*"
-										multiple
-										className="absolute inset-0 opacity-0 cursor-pointer"
-										style={{ zIndex: 2, pointerEvents: "none" }}
-										onChange={handleImageChange}
-										tabIndex={-1}
+			{/* {propertyType !== "plot" && ( */}
+			<FormField
+				control={form.control}
+				name="images"
+				render={() => (
+					<FormItem>
+						<FormLabel className="text-md font-semibold text-gray-700">
+							Images
+						</FormLabel>
+						<FormControl>
+							<div
+								className={`relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 transition-colors ${
+									dragActive
+										? "border-primary bg-primary/10"
+										: "border-muted bg-background"
+								}`}
+								onDrop={handleDrop}
+								onDragOver={(e) => {
+									e.preventDefault();
+									setDragActive(true);
+								}}
+								onDragLeave={() => setDragActive(false)}
+								style={{ cursor: "pointer" }}
+								onClick={() => inputRef.current && inputRef.current.click()}>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-10 w-10 text-muted-foreground mb-2"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor">
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12l4-4a2 2 0 012.828 0l2.828 2.828a2 2 0 002.828 0L20 8m-4 4v4m0 0h-4m4 0h4"
 									/>
+								</svg>
+								<span className="text-sm text-muted-foreground mb-2">
+									Drag & drop images here, or click to select
+								</span>
+								<input
+									ref={inputRef}
+									type="file"
+									accept="image/*"
+									multiple
+									className="absolute inset-0 opacity-0 cursor-pointer"
+									style={{ zIndex: 2, pointerEvents: "none" }}
+									onChange={handleImageChange}
+									tabIndex={-1}
+								/>
+							</div>
+						</FormControl>
+						<div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+							{selectedImages.map((file, index) => (
+								<div key={file.name + index} className="relative group">
+									<img
+										src={URL.createObjectURL(file)}
+										alt={file.name}
+										className="h-32 w-full object-cover rounded-lg border shadow-sm"
+									/>
+									<button
+										type="button"
+										className="absolute top-2 right-2 bg-destructive text-white rounded-full p-1 opacity-80 hover:opacity-100 transition"
+										onClick={() => handleRemoveImage(index)}
+										title="Remove">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-5 w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor">
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M6 18L18 6M6 6l12 12"
+											/>
+										</svg>
+									</button>
+									<span className="absolute bottom-2 left-2 bg-black/60 text-xs text-white px-2 py-1 rounded">
+										{file.name}
+									</span>
 								</div>
-							</FormControl>
-							<div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-								{selectedImages.map((file, index) => (
-									<div key={file.name + index} className="relative group">
-										<img
-											src={URL.createObjectURL(file)}
-											alt={file.name}
-											className="h-32 w-full object-cover rounded-lg border shadow-sm"
-										/>
-										<button
-											type="button"
-											className="absolute top-2 right-2 bg-destructive text-white rounded-full p-1 opacity-80 hover:opacity-100 transition"
-											onClick={() => handleRemoveImage(index)}
-											title="Remove">
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												className="h-5 w-5"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor">
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M6 18L18 6M6 6l12 12"
-												/>
-											</svg>
-										</button>
-										<span className="absolute bottom-2 left-2 bg-black/60 text-xs text-white px-2 py-1 rounded">
-											{file.name}
-										</span>
-									</div>
-								))}
-							</div>
-							<div className="text-xs text-muted-foreground mt-2">
-								You can upload up to 10 images. Supported formats: JPG, PNG,
-								WEBP.
-							</div>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-			)}
+							))}
+						</div>
+						<div className="text-xs text-muted-foreground mt-2">
+							You can upload up to 10 images. Supported formats: JPG, PNG, WEBP.
+						</div>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+			{/* )} */}
 
-			{propertyType !== "plot" && (
+			{/* {propertyType !== "plot" && (
 				<FormField
 					control={form.control}
 					name="videos"
@@ -291,7 +291,7 @@ export default function PropertyMediaAndPricing({
 						</FormItem>
 					)}
 				/>
-			)}
+			)} */}
 
 			<h3 className="text-xl font-semibold text-gray-800 mb-4 mt-6">
 				Pricing Details

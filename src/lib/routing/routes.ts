@@ -98,6 +98,20 @@ export const routes: Record<string, Route> = {
 		layout: "buyer",
 		protected: false,
 	},
+	myProperty: {
+		path: "/seller/my-property",
+		name: "My Property",
+		description: "Manage your property listings",
+		layout: "seller",
+		protected: false,
+	},
+	properties: {
+		path: "/property",
+		name: "Properties",
+		description: "Manage your property listings",
+		layout: "buyer",
+		protected: true,
+	},
 
 	// Seller routes
 	seller: {
@@ -189,6 +203,7 @@ export const getPublicRoutes = (): Route[] => {
 // Navigation items for different layouts
 export const buyerNavItems: NavigationItem[] = [
 	{ route: routes.buyerAssistant, icon: "Home" },
+
 	// { route: routes.buyerProfile, icon: "User" },
 	{
 		route: {
@@ -210,6 +225,7 @@ export const buyerNavItems: NavigationItem[] = [
 
 export const sellerNavItems: NavigationItem[] = [
 	// { route: routes.sellerProfile, icon: "User" },
+	{ route: routes.myProperty, icon: "Building" },
 	{
 		route: {
 			path: "/buyer/assistant",
@@ -220,6 +236,7 @@ export const sellerNavItems: NavigationItem[] = [
 		icon: "RotateCcw",
 		isHighlighted: true,
 	},
+
 	{ route: routes.sellerPlans, icon: "Crown" },
 	{ route: routes.sellerGuide, icon: "BookOpen" },
 	{ route: routes.sellerSupport, icon: "HelpCircle" },

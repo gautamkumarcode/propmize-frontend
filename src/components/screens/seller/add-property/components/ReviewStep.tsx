@@ -7,8 +7,7 @@ import {
 	Image as ImageIcon,
 	IndianRupee,
 	MapPin,
-	User,
-	Video as VideoIcon,
+	User
 } from "lucide-react";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -16,10 +15,21 @@ import { PropertyFormData } from "../validation/propertySchema";
 
 interface StepProps {
 	form: UseFormReturn<PropertyFormData>;
+	isEditMode?: string | false | null;
 }
 
-export default function ReviewStep({ form }: StepProps) {
+export default function ReviewStep({ form, isEditMode }: StepProps) {
 	const values = form.getValues();
+
+	// Map file objects to their URLs
+	const mappedFiles = values?.images?.map((file) => {
+		if (isEditMode) {
+			return `${process.env.NEXT_PUBLIC_API_URL_IMG}/${file}`;
+		}
+		return URL.createObjectURL(file);
+	});
+
+	
 
 	return (
 		<div className="max-w-3xl mx-auto py-8 px-2 md:px-0">
@@ -148,7 +158,7 @@ export default function ReviewStep({ form }: StepProps) {
 							values.images.map((file: File, idx: number) => (
 								<div key={idx} className="relative group">
 									<img
-										src={URL.createObjectURL(file)}
+										src={mappedFiles ? mappedFiles[idx] : ""}
 										alt={file.name}
 										className="h-24 w-24 object-cover rounded-lg border shadow-md transition-transform group-hover:scale-105"
 									/>
@@ -164,11 +174,11 @@ export default function ReviewStep({ form }: StepProps) {
 						)}
 					</div>
 
-					<div className="flex items-center gap-2 mb-4">
+					{/* <div className="flex items-center gap-2 mb-4">
 						<VideoIcon className="text-red-500" size={22} />
 						<h3 className="font-semibold text-xl text-gray-800">Videos</h3>
-					</div>
-					<div className="flex flex-wrap gap-3">
+					</div> */}
+					{/* <div className="flex flex-wrap gap-3">
 						{Array.isArray(values.videos) && values.videos.length > 0 ? (
 							values.videos.map((file: File, idx: number) => (
 								<div key={idx} className="relative group">
@@ -187,7 +197,7 @@ export default function ReviewStep({ form }: StepProps) {
 								No videos uploaded
 							</span>
 						)}
-					</div>
+					</div> */}
 				</div>
 
 				{/* Pricing & Legal */}

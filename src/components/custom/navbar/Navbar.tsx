@@ -131,6 +131,11 @@ export default function Navbar({
 							onClick={() => navigation.goBuyerDashboard()}
 							className="text-2xl font-bold text-blue-600 cursor-pointer"> */}
 						<Image
+							onClick={() =>
+								mode === "seller"
+									? router.push("/seller")
+									: router.push("/buyer/assistant")
+							}
 							src={LogoImage}
 							alt="Propmize Logo"
 							className="h-12 w-auto cursor-pointer object-contain text-green-600"

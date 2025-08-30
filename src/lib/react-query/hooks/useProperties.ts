@@ -10,12 +10,12 @@ import { PropertyService } from "../../services/propertyService";
 import { useSocket } from "../../socket/socketContext";
 import {
 	ApiResponse,
-	PropertyCreateData,
 	PropertyFilters,
 	PropertyResponse,
 } from "../../types/api";
 
 import { triggerToast } from "@/components/ui/Toaster";
+import { useRouter } from "next/navigation";
 import { QueryKeys } from "../queryClient";
 
 // Define proper error interface for HTTP errors
@@ -72,10 +72,10 @@ export const useInfiniteProperties = (filters: PropertyFilters = {}) => {
 };
 
 // Get single property
-export const useProperty = (id: string) => {
+export const useProperty = (id: string | null) => {
 	return useQuery({
-		queryKey: QueryKeys.property(id),
-		queryFn: () => PropertyService.getProperty(id),
+		queryKey: QueryKeys.property(id!),
+		queryFn: () => PropertyService.getProperty(id!),
 		select: (data) => data.data,
 		enabled: !!id,
 	});
@@ -159,6 +159,7 @@ export const usePropertyAnalytics = (propertyId: string) => {
 // Mutations
 export const useCreateProperty = () => {
 	const queryClient = useQueryClient();
+	const router = useRouter();
 
 	return useMutation<
 		ApiResponse<PropertyResponse>,
@@ -171,12 +172,12 @@ export const useCreateProperty = () => {
 			// Invalidate and refetch
 			queryClient.invalidateQueries({ queryKey: QueryKeys.properties });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myProperties });
+			router.push("/seller/my-property");
 			triggerToast({
 				title: "Success!",
 				description: data.message || "Property added successfully!",
 				variant: "success",
 			});
-			
 		},
 		onError: (error: unknown) => {
 			console.error(
@@ -193,13 +194,45 @@ export const useUpdateProperty = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({
-			id,
-			data,
-		}: {
-			id: string;
-			data: Partial<PropertyCreateData>;
-		}) => PropertyService.updateProperty(id, data),
+		mutationFn: ({ id, data }: { id: string; data: PropertyFormData }) => {
+			// Transform area to match PropertyCreateData
+			const { area, features, ...rest } = data;
+			const transformedArea =
+				area && typeof area.value === "string"
+					? {
+							size: Number(area.value),
+							unit:
+								area.unit === "sqm" || area.unit === "hectare"
+									? "sqft"
+									: area.unit === "sqft" ||
+									  area.unit === "acre" ||
+									  area.unit === "sqyard"
+									? area.unit
+									: "sqft",
+					  }
+					: undefined;
+
+			// Transform features object to string[]
+			const transformedFeatures =
+				features && typeof features === "object"
+					? Object.entries(features)
+							.filter(([_, value]) => !!value)
+							.map(([key, value]) =>
+								typeof value === "boolean"
+									? key
+									: typeof value === "string"
+									? `${key}:${value}`
+									: key
+							)
+					: undefined;
+
+			const updateData = {
+				...rest,
+				...(transformedArea ? { area: transformedArea } : {}),
+				...(transformedFeatures ? { features: transformedFeatures } : {}),
+			};
+			return PropertyService.updateProperty(id, updateData);
+		},
 		onSuccess: (data, variables) => {
 			// Update the specific property in cache
 			queryClient.setQueryData(
@@ -238,8 +271,11 @@ export const useDeleteProperty = () => {
 			// Invalidate lists
 			queryClient.invalidateQueries({ queryKey: QueryKeys.properties });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myProperties });
-
-			console.log("Property deleted successfully!");
+			triggerToast({
+				title: "Success!",
+				description: "Property deleted successfully!",
+				variant: "success",
+			});
 		},
 		onError: (error: unknown) => {
 			console.error(

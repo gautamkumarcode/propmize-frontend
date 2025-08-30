@@ -3,7 +3,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/providers/AuthProvider";
+import { useCreateLead } from "@/lib/react-query/hooks/useLeads";
 import { cn } from "@/lib/utils";
 import { PropertyResponse } from "@/types";
 import {
@@ -25,8 +27,6 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useToggleLike } from "../../../lib/react-query/hooks/useProperties";
-import { useCreateLead } from "@/lib/react-query/hooks/useLeads";
-import { toast } from "@/hooks/use-toast";
 
 interface PropertyCardProps {
 	property: PropertyResponse;
@@ -181,10 +181,6 @@ export default function PropertyCard({
 			: []),
 	];
 
-	const imgUrl = property.images?.[0]
-		? `${process.env.NEXT_PUBLIC_API_URL_IMG}/${property.images[0]}`
-		: "/placeholder-property.jpg";
-
 	const statusColors = {
 		active: "bg-green-100 text-green-800",
 		sold: "bg-purple-100 text-purple-800",
@@ -210,7 +206,9 @@ export default function PropertyCard({
 						)}
 
 						<Image
-							src={imageError ? "/placeholder-property.jpg" : imgUrl}
+							src={
+								imageError ? "/placeholder-property.jpg" : property.images[0]
+							}
 							alt={property.title}
 							fill
 							className="object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-2xl"
@@ -385,9 +383,10 @@ export default function PropertyCard({
 								<Button
 									className="w-full mt-3"
 									onClick={handleContactSeller}
-									disabled={createLeadMutation.isPending}
-								>
-									{createLeadMutation.isPending ? "Sending Inquiry..." : "Contact Seller"}
+									disabled={createLeadMutation.isPending}>
+									{createLeadMutation.isPending
+										? "Sending Inquiry..."
+										: "Contact Seller"}
 								</Button>
 							)}
 						</div>

@@ -15,17 +15,17 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
-import React from "react";
-import { Textarea } from "@/components/ui/textarea";
 import { PropertyFormData } from "../validation/propertySchema";
 
 interface StepProps {
 	form: UseFormReturn<PropertyFormData>;
+	isEditMode?: string | false | null;
 }
 
-export default function PropertyBasicDetails({ form }: StepProps) {
+export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 	const propertyType = form.watch("propertyType");
 	const listingType = form.watch("listingType");
 
@@ -65,15 +65,23 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 
 	return (
 		<div className="space-y-6 bg-white rounded-xl shadow p-6 border-t-4 border-blue-500">
-			<h3 className="text-xl font-semibold text-gray-800 mb-4">Basic Property Details</h3>
+			<h3 className="text-xl font-semibold text-gray-800 mb-4">
+				Basic Property Details
+			</h3>
 			<FormField
 				control={form.control}
 				name="title"
 				render={({ field }) => (
 					<FormItem>
-						<FormLabel className="text-md font-semibold text-gray-700">Property Title</FormLabel>
+						<FormLabel className="text-md font-semibold text-gray-700">
+							Property Title
+						</FormLabel>
 						<FormControl>
-							<Input placeholder="Luxury Apartment in Mumbai" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+							<Input
+								placeholder="Luxury Apartment in Mumbai"
+								{...field}
+								className="h-[40px] px-3 py-2 text-sm"
+							/>
 						</FormControl>
 						<FormMessage />
 					</FormItem>
@@ -85,9 +93,16 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 				name="description"
 				render={({ field }) => (
 					<FormItem>
-						<FormLabel className="text-md font-semibold text-gray-700">Description</FormLabel>
+						<FormLabel className="text-md font-semibold text-gray-700">
+							Description
+						</FormLabel>
 						<FormControl>
-							<Textarea placeholder="Describe the property..." {...field} rows={5} className="min-h-[100px] px-3 py-2 text-sm"/>
+							<Textarea
+								placeholder="Describe the property..."
+								{...field}
+								rows={5}
+								className="min-h-[100px] px-3 py-2 text-sm"
+							/>
 						</FormControl>
 						<FormMessage />
 					</FormItem>
@@ -100,14 +115,15 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 					name="propertyType"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-md font-semibold text-gray-700">Property Type</FormLabel>
+							<FormLabel className="text-md font-semibold text-gray-700">
+								Property Type
+							</FormLabel>
 							<FormControl>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
 											variant="outline"
-											className="w-full flex justify-between h-[40px] px-3 py-2 text-sm"
-										>
+											className="w-full flex justify-between h-[40px] px-3 py-2 text-sm">
 											<span>
 												{propertyTypes.find((pt) => pt.value === field.value)
 													?.label || "Select Type"}
@@ -119,8 +135,7 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 										{propertyTypes.map((pt) => (
 											<DropdownMenuItem
 												key={pt.value}
-												onSelect={() => field.onChange(pt.value)}
-											>
+												onSelect={() => field.onChange(pt.value)}>
 												{pt.label}
 											</DropdownMenuItem>
 										))}
@@ -137,14 +152,15 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 					name="listingType"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-md font-semibold text-gray-700">Listing Type</FormLabel>
+							<FormLabel className="text-md font-semibold text-gray-700">
+								Listing Type
+							</FormLabel>
 							<FormControl>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
 											variant="outline"
-											className="w-full flex justify-between h-[40px] px-3 py-2 text-sm"
-										>
+											className="w-full flex justify-between h-[40px] px-3 py-2 text-sm">
 											<span>
 												{listingTypes.find((lt) => lt.value === field.value)
 													?.label || "Select Listing"}
@@ -156,8 +172,7 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 										{listingTypes.map((lt) => (
 											<DropdownMenuItem
 												key={lt.value}
-												onSelect={() => field.onChange(lt.value)}
-											>
+												onSelect={() => field.onChange(lt.value)}>
 												{lt.label}
 											</DropdownMenuItem>
 										))}
@@ -176,14 +191,15 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 					name="currency"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-md font-semibold text-gray-700">Currency</FormLabel>
+							<FormLabel className="text-md font-semibold text-gray-700">
+								Currency
+							</FormLabel>
 							<FormControl>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button
 											variant="outline"
-											className="w-full flex justify-between h-[40px] px-3 py-2 text-sm"
-										>
+											className="w-full flex justify-between h-[40px] px-3 py-2 text-sm">
 											<span>
 												{currencyOptions.find((c) => c.value === field.value)
 													?.label || "Select Currency"}
@@ -195,8 +211,7 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 										{currencyOptions.map((c) => (
 											<DropdownMenuItem
 												key={c.value}
-												onSelect={() => field.onChange(c.value)}
-											>
+												onSelect={() => field.onChange(c.value)}>
 												{c.label}
 											</DropdownMenuItem>
 										))}
@@ -214,9 +229,16 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 						name="area.value"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Area</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Area
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 1200" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 1200"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -227,14 +249,15 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 						name="area.unit"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Unit</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Unit
+								</FormLabel>
 								<FormControl>
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button
 												variant="outline"
-												className="w-full flex justify-between h-[40px] px-3 py-2 text-sm"
-											>
+												className="w-full flex justify-between h-[40px] px-3 py-2 text-sm">
 												<span>
 													{areaUnits.find((au) => au.value === field.value)
 														?.label || "Select Unit"}
@@ -246,8 +269,7 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 											{areaUnits.map((au) => (
 												<DropdownMenuItem
 													key={au.value}
-													onSelect={() => field.onChange(au.value)}
-												>
+													onSelect={() => field.onChange(au.value)}>
 													{au.label}
 												</DropdownMenuItem>
 											))}
@@ -261,16 +283,23 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 				</div>
 			</div>
 
-			{(!isPlot && isResidential) && (
+			{!isPlot && isResidential && (
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 					<FormField
 						control={form.control}
 						name="bedrooms"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Bedrooms</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Bedrooms
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 3" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 3"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -281,9 +310,16 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 						name="bathrooms"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Bathrooms</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Bathrooms
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 2" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 2"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -294,9 +330,16 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 						name="balconies"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Balconies</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Balconies
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 1" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 1"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -305,16 +348,23 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 				</div>
 			)}
 
-			{(!isPlot) && (
+			{!isPlot && (
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 					<FormField
 						control={form.control}
 						name="parking"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Parking</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Parking
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 1" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 1"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -325,17 +375,19 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 						name="furnished"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Furnishing Status</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Furnishing Status
+								</FormLabel>
 								<FormControl>
 									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button
 												variant="outline"
-												className="w-full flex justify-between h-[40px] px-3 py-2 text-sm"
-											>
+												className="w-full flex justify-between h-[40px] px-3 py-2 text-sm">
 												<span>
-													{furnishedOptions.find((fo) => fo.value === field.value)
-														?.label || "Select Status"}
+													{furnishedOptions.find(
+														(fo) => fo.value === field.value
+													)?.label || "Select Status"}
 												</span>
 												<ChevronDown className="w-4 h-4 text-muted-foreground" />
 											</Button>
@@ -344,8 +396,7 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 											{furnishedOptions.map((fo) => (
 												<DropdownMenuItem
 													key={fo.value}
-													onSelect={() => field.onChange(fo.value)}
-												>
+													onSelect={() => field.onChange(fo.value)}>
 													{fo.label}
 												</DropdownMenuItem>
 											))}
@@ -361,9 +412,16 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 						name="age"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Property Age (Years)</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Property Age (Years)
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 5" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 5"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -372,16 +430,23 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 				</div>
 			)}
 
-			{(!isPlot && (isResidential || isCommercial)) && (
+			{!isPlot && (isResidential || isCommercial) && (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<FormField
 						control={form.control}
 						name="floor"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Floor No.</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Floor No.
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 3" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 3"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -392,9 +457,16 @@ export default function PropertyBasicDetails({ form }: StepProps) {
 						name="totalFloors"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">Total Floors</FormLabel>
+								<FormLabel className="text-md font-semibold text-gray-700">
+									Total Floors
+								</FormLabel>
 								<FormControl>
-									<Input type="number" placeholder="e.g., 10" {...field} className="h-[40px] px-3 py-2 text-sm"/>
+									<Input
+										type="number"
+										placeholder="e.g., 10"
+										{...field}
+										className="h-[40px] px-3 py-2 text-sm"
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>

@@ -47,8 +47,14 @@ export interface PropertyResponse {
 			currency: string;
 		};
 		priceNegotiable?: boolean;
-		maintenanceCharges?: number;
-		securityDeposit?: number;
+		maintenanceCharges?: {
+			value: number;
+			currency: string;
+		};
+		securityDeposit?: {
+			value: number;
+			currency: string;
+		};
 		brokeragePercentage?: number;
 	};
 	bedrooms?: number;

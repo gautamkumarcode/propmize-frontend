@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ChevronDown } from "lucide-react";
@@ -19,6 +19,7 @@ import { PropertyFormData } from "../validation/propertySchema";
 
 interface PropertyLocationAndFeaturesProps {
 	form: UseFormReturn<PropertyFormData>;
+	isEditMode?: string | false | null;
 }
 
 type AddressFieldKey = `address.${keyof PropertyFormData["address"]}`;

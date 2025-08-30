@@ -38,7 +38,7 @@ export const propertySchema = z.object({
 	age: z.string().min(0).optional().or(z.literal("")),
 
 	images: z.array(z.any()).optional(),
-	videos: z.array(z.any()).optional(),
+	// videos: z.array(z.any()).optional(),
 
 	amenities: z.array(z.string()).optional(),
 

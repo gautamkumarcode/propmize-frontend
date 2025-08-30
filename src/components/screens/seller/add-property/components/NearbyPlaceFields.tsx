@@ -14,31 +14,26 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
-import {
-	FieldPath,
-	UseFormReturn,
-	useFieldArray,
-} from "react-hook-form";
+import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { PropertyFormData } from "../validation/propertySchema";
 
 interface NearbyPlaceFieldsProps {
 	form: UseFormReturn<PropertyFormData>;
 	place: "schools" | "hospitals" | "malls" | "transport"; // Explicitly define allowed literal strings
 	distanceUnits: string[];
-}
-
-interface NearbyPlaceItem {
-	name: string;
-	distance: string;
-	unit: "meter" | "km";
+	isEditMode?: string | false | null;
 }
 
 export default function NearbyPlaceFields({
 	form,
 	place,
 	distanceUnits,
+	isEditMode,
 }: NearbyPlaceFieldsProps) {
-	const { fields, append, remove } = useFieldArray<PropertyFormData, `nearbyPlaces.${typeof place}`>({
+	const { fields, append, remove } = useFieldArray<
+		PropertyFormData,
+		`nearbyPlaces.${typeof place}`
+	>({
 		control: form.control,
 		name: `nearbyPlaces.${place}`,
 	});
@@ -101,7 +96,11 @@ export default function NearbyPlaceFields({
 											step={0.1}
 											className="w-24 border-none rounded-none h-[44px] px-4 text-sm focus:ring-0 focus:border-none focus:bg-primary/5 transition"
 											// Ensure value is a string for uncontrolled component
-											value={field.value !== undefined && field.value !== null ? String(field.value) : ''}
+											value={
+												field.value !== undefined && field.value !== null
+													? String(field.value)
+													: ""
+											}
 											onChange={(e) => field.onChange(e.target.value)}
 										/>
 										<FormMessage />
