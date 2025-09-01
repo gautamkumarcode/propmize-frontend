@@ -93,6 +93,9 @@ const stepConfig = [
 	{ key: "preview", label: "Preview" },
 ];
 
+// Helper type for nested object comparison
+type NestedObject = Record<string, unknown>;
+
 export default function PropertyForm({
 	currentStep,
 	nextStep,
@@ -139,10 +142,8 @@ export default function PropertyForm({
 				)
 					? existingProperty.listingType
 					: "sale") as PropertyFormData["listingType"],
-				currency: (["INR", "USD", "EUR"].includes(
-					(existingProperty as any).currency
-				)
-					? (existingProperty as any).currency
+				currency: (["INR", "USD", "EUR"].includes(existingProperty.currency)
+					? existingProperty.currency
 					: "INR") as PropertyFormData["currency"],
 				area: {
 					value:
@@ -337,8 +338,31 @@ export default function PropertyForm({
 		}
 	}, [isEditMode, existingProperty, form]);
 
+	// Helper function to check if two values are equal
+	const isEqual = (a: unknown, b: unknown): boolean => {
+		if (a === b) return true;
+		if (typeof a !== typeof b) return false;
+		
+		if (typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) {
+			if (Array.isArray(a) && Array.isArray(b)) {
+				if (a.length !== b.length) return false;
+				return a.every((item, index) => isEqual(item, b[index]));
+			}
+			
+			const keysA = Object.keys(a);
+			const keysB = Object.keys(b);
+			if (keysA.length !== keysB.length) return false;
+			
+			return keysA.every(key => 
+				isEqual((a as NestedObject)[key], (b as NestedObject)[key])
+			);
+		}
+		
+		return a === b;
+	};
+
 	// Function to get only changed fields
-	const getChangedFields = (currentData: PropertyFormData) => {
+	const getChangedFields = (currentData: PropertyFormData): Partial<PropertyFormData> => {
 		if (!originalDataRef.current || !isEditMode) {
 			return currentData; // Return all data for new properties
 		}
@@ -350,45 +374,21 @@ export default function PropertyForm({
 			const currentValue = currentData[key];
 			const originalValue = originalDataRef.current![key];
 
-			// Handle nested objects and arrays
-			if (
-				typeof currentValue === "object" &&
-				currentValue !== null &&
-				typeof originalValue === "object" &&
-				originalValue !== null
-			) {
-				// Special handling for arrays (images, amenities)
-				if (Array.isArray(currentValue) && Array.isArray(originalValue)) {
-					if (JSON.stringify(currentValue) !== JSON.stringify(originalValue)) {
-						(changedData as any)[key] = currentValue;
-					}
+			if (!isEqual(currentValue, originalValue)) {
+				// For nested objects, we need to check if they're actually different
+				if (typeof currentValue === 'object' && currentValue !== null && 
+					typeof originalValue === 'object' && originalValue !== null) {
+					
+					// Check if the objects are actually different
+					const currentObj = currentValue as NestedObject;
+					const originalObj = originalValue as NestedObject;
+					
+					// If they're different, add to changed data
+					(changedData as NestedObject)[key] = currentValue;
+				} else {
+					// For primitive values or arrays, just compare directly
+					(changedData as NestedObject)[key] = currentValue;
 				}
-				// Handle nested objects (address, pricing, features, etc.)
-				else {
-					const currentObj = currentValue as Record<string, any>;
-					const originalObj = originalValue as Record<string, any>;
-
-					const nestedChanges: Record<string, any> = {};
-					let hasNestedChanges = false;
-
-					Object.keys(currentObj).forEach((nestedKey) => {
-						if (
-							JSON.stringify(currentObj[nestedKey]) !==
-							JSON.stringify(originalObj[nestedKey])
-						) {
-							nestedChanges[nestedKey] = currentObj[nestedKey];
-							hasNestedChanges = true;
-						}
-					});
-
-					if (hasNestedChanges) {
-						(changedData as any)[key] = nestedChanges;
-					}
-				}
-			}
-			// Handle primitive values
-			else if (currentValue !== originalValue) {
-				(changedData as any)[key] = currentValue;
 			}
 		});
 

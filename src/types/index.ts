@@ -125,6 +125,7 @@ export interface PropertyResponse {
 			_id: string;
 		}
 	];
+	currency: "INR" | "USD" | "EUR";
 }
 export interface PropertyImage {
 	id: string;

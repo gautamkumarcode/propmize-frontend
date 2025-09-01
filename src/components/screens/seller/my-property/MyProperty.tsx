@@ -1,6 +1,7 @@
 "use client";
 
-import { useDeleteProperty, useMyProperties } from "@/lib";
+import { PropertyResponse, useDeleteProperty, useMyProperties } from "@/lib";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -15,9 +16,10 @@ const MyProperty = () => {
 	const deleteProperty = useDeleteProperty();
 
 	const [showModal, setShowModal] = useState(false);
-	const [selectedProperty, setSelectedProperty] = useState<any>(null);
+	const [selectedProperty, setSelectedProperty] =
+		useState<PropertyResponse | null>(null);
 
-	const handleEditClick = (property: any) => {
+	const handleEditClick = (property: PropertyResponse) => {
 		router.push(`/seller/add-property?mode=edit&id=${property._id}`);
 	};
 
@@ -25,14 +27,14 @@ const MyProperty = () => {
 		router.push("/seller/add-property?mode=create");
 	};
 
-	const handleDeleteClick = (property: any) => {
+	const handleDeleteClick = (property: PropertyResponse) => {
 		setSelectedProperty(property);
 		setShowModal(true);
 	};
 
 	const handleConfirmDelete = () => {
 		// Call your delete property mutation here, e.g.:
-		deleteProperty.mutate(selectedProperty._id);
+		deleteProperty.mutate(selectedProperty?._id as string);
 		setShowModal(false);
 		setSelectedProperty(null);
 	};
@@ -118,13 +120,13 @@ const MyProperty = () => {
 				</div>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{properties.map((property: any) => (
+					{properties.map((property: PropertyResponse) => (
 						<div
 							key={property._id}
 							className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
 							{/* ...existing property card code... */}
 							<div className="relative">
-								<img
+								<Image
 									src={property.images[0]}
 									alt={property.title}
 									className="w-full h-48 object-cover"
@@ -134,6 +136,7 @@ const MyProperty = () => {
 											.nextElementSibling as HTMLElement;
 										if (fallback) fallback.classList.remove("hidden");
 									}}
+									fill
 								/>
 								<div className="hidden absolute inset-0 bg-gray-200  items-center justify-center">
 									<svg
@@ -260,7 +263,7 @@ const MyProperty = () => {
 								<div className="flex justify-between items-center mb-4">
 									<div className="text-lg font-bold text-blue-600">
 										{property.pricing?.basePrice?.value}{" "}
-										{property.pricing?.basePrice?.unit}
+										{property.pricing?.basePrice?.currency}
 										{property.pricing?.priceNegotiable && (
 											<span className="text-sm font-normal text-gray-500 ml-1">
 												(Negotiable)

@@ -278,7 +278,9 @@ const PropertyDetails = () => {
 									<div>
 										<div className="text-sm text-gray-600">Maintenance</div>
 										<div className="font-medium">
-											₹{formatPrice(property.pricing.maintenanceCharges)}/month
+											₹
+											{formatPrice(Number(property.pricing.maintenanceCharges))}
+											/month
 										</div>
 									</div>
 								)}
@@ -288,7 +290,7 @@ const PropertyDetails = () => {
 											Security Deposit
 										</div>
 										<div className="font-medium">
-											₹{formatPrice(property.pricing.securityDeposit)}
+											₹{formatPrice(Number(property.pricing.securityDeposit))}
 										</div>
 									</div>
 								)}
