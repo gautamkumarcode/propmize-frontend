@@ -349,7 +349,7 @@ export default function AIChatWindow({
 	return (
 		<div className="flex-1 flex flex-col h-full">
 			{/* Messages */}
-			<div className="flex-1 overflow-y-auto overscroll-contain">
+			<div className=" overflow-y-scroll flex-1">
 				<div className="p-2 md:p-4 space-y-0">
 					{/* New chat state */}
 					{isNewChat && !isLoading && (

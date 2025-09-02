@@ -11,6 +11,7 @@ import {
 	X,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 export interface Notification {
 	id: string;
@@ -114,6 +115,7 @@ export default function NotificationDropdown({
 	onNotificationClick,
 }: NotificationDropdownProps) {
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const router = useRouter();
 	// const { userMode } = useAuthStore();
 
 	// Close dropdown when clicking outside
@@ -289,7 +291,11 @@ export default function NotificationDropdown({
 					<Button
 						variant="ghost"
 						size="sm"
-						className="w-full text-sm text-gray-600 hover:text-gray-800">
+						className="w-full text-sm text-gray-600 hover:text-gray-800"
+						onClick={() => {
+							onClose();
+							router.push('/notifications');
+						}}>
 						View All Notifications
 					</Button>
 				</div>

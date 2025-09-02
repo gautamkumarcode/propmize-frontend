@@ -2,6 +2,7 @@
 
 import AuthModal from "@/components/custom/auth-modal/AuthModal";
 import Header from "@/components/custom/layout/Header";
+import NotificationListener from "@/components/custom/notifications/NotificationListener";
 import {
 	buyerBottomNavItems,
 	buyerNavItems,
@@ -57,6 +58,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 				}}
 				redirectTo={authRedirectTo}
 			/>
+
+			{/* Socket Notification Listener */}
+			<NotificationListener />
 		</div>
 	);
 };
