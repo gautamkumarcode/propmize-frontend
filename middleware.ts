@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// Check if the user is authenticated (check for the actual token cookie that backend sets)
-  const isAuthenticated = request.cookies.has("isAuthenticated");
+  const isAuthenticated = request.cookies.get("isAuthenticated")?.value;
 	console.log(
 		"Middleware - isAuthenticated:",
 		isAuthenticated,
