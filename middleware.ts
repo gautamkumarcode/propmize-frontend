@@ -26,10 +26,13 @@ export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// Check if the user is authenticated (check for the actual token cookie that backend sets)
-	const isAuthenticated =
-		request.cookies.has("token") ||
-		request.cookies.has("auth-token") ||
-		request.cookies.has("next-auth.session-token");
+  const isAuthenticated = request.cookies.has("isAuthenticated");
+	console.log(
+		"Middleware - isAuthenticated:",
+		isAuthenticated,
+		"for path:",
+		pathname
+	);
 
 	// Allow access to public routes
 	if (publicRoutes.includes(pathname)) {
