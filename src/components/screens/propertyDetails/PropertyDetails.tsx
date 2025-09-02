@@ -234,9 +234,10 @@ const PropertyDetails = () => {
 								onClick={() => setCurrentImageIndex(idx)}>
 								<Image
 									fill
-									src={`${process.env.NEXT_PUBLIC_API_URL_IMG}/${img}`}
+									src={img}
 									alt={`${property.title} ${idx + 1}`}
 									className="object-cover"
+									unoptimized
 								/>
 							</div>
 						))}

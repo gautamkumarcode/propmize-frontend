@@ -214,6 +214,7 @@ export default function PropertyCard({
 							className="object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-2xl"
 							onError={handleImageError}
 							onLoad={handleImageLoad}
+							unoptimized
 						/>
 
 						{/* Gradient overlay */}

@@ -69,6 +69,8 @@ const MyProperty = () => {
 
 	const properties = myPropertyData || [];
 
+	console.log("My Properties:", properties);
+
 	return (
 		<div className="container mx-auto px-4 py-8">
 			<div className="flex justify-between items-center mb-8">
@@ -125,20 +127,21 @@ const MyProperty = () => {
 							key={property._id}
 							className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
 							{/* ...existing property card code... */}
-							<div className="relative">
+							<div className="relative h-[20rem]">
 								<Image
 									src={property.images[0]}
 									alt={property.title}
 									className="w-full h-48 object-cover"
-									onError={(e) => {
-										e.currentTarget.style.display = "none";
-										const fallback = e.currentTarget
-											.nextElementSibling as HTMLElement;
-										if (fallback) fallback.classList.remove("hidden");
-									}}
+									// onError={(e) => {
+									// 	e.currentTarget.style.display = "none";
+									// 	const fallback = e.currentTarget
+									// 		.nextElementSibling as HTMLElement;
+									// 	if (fallback) fallback.classList.remove("hidden");
+									// }}
 									fill
+									unoptimized
 								/>
-								<div className="hidden absolute inset-0 bg-gray-200  items-center justify-center">
+								{/* <div className="hidden absolute inset-0 bg-gray-200  items-center justify-center">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										className="h-12 w-12 text-gray-400"
@@ -158,7 +161,7 @@ const MyProperty = () => {
 											d="M9 22V12h6v10"
 										/>
 									</svg>
-								</div>
+								</div> */}
 								<div className="absolute top-3 right-3">
 									<span
 										className={`px-2 py-1 rounded-full text-xs font-semibold ${
