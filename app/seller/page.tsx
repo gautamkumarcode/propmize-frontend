@@ -1,6 +1,7 @@
 "use client";
 
 import useNavigation from "@/hooks/useNavigation";
+import { useAuth } from "@/lib";
 import { useSellerDashboard } from "@/lib/react-query/hooks/useAnalytics";
 import { format } from "date-fns";
 import {
@@ -16,6 +17,16 @@ export default function SellerDashboard() {
 	const { goToAddProperty } = useNavigation();
 	const { data: dashboardData, isLoading, isError } = useSellerDashboard();
 
+	const { user } = useAuth();
+
+	if (!user) {
+		return (
+			<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
+				<p>Please log in to view your dashboard.</p>
+			</div>
+		);
+	}
+
 	if (isLoading) {
 		return (
 			<div className="space-y-6">
@@ -27,7 +38,8 @@ export default function SellerDashboard() {
 					{[1, 2, 3, 4].map((i) => (
 						<div
 							key={i}
-							className="bg-white rounded-lg p-6 shadow-sm border h-32 animate-pulse" />
+							className="bg-white rounded-lg p-6 shadow-sm border h-32 animate-pulse"
+						/>
 					))}
 				</div>
 			</div>

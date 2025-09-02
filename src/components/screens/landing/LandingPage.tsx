@@ -32,18 +32,8 @@ export default function LandingPage() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-			{/* Header */}
-			<header className="container mx-auto px-4 py-6">
-				<div className="flex items-center justify-center">
-					<div className="flex items-center space-x-2">
-						<Building2 className="h-8 w-8 text-blue-600" />
-						<h1 className="text-2xl font-bold text-gray-900">Propmize</h1>
-					</div>
-				</div>
-			</header>
-
 			{/* Main Content */}
-			<main className="container mx-auto px-4 py-12">
+			<main className=" mx-auto px-4 ">
 				<div className="text-center mb-12">
 					<h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
 						Welcome to Propmize
