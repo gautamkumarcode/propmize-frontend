@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// Check if the user is authenticated (check for the actual token cookie that backend sets)
-  const isAuthenticated = request.cookies.get("isAuthenticated")?.value;
+	const isAuthenticated = request.cookies.get("isAuthenticated")?.value;
 	console.log(
 		"Middleware - isAuthenticated:",
 		isAuthenticated,
@@ -45,12 +45,12 @@ export function middleware(request: NextRequest) {
 	);
 
 	// Redirect to login/home if trying to access protected route without authentication
-	if (isProtectedRoute && !isAuthenticated) {
-		const url = request.nextUrl.clone();
-		url.pathname = "/";
-		url.searchParams.set("redirect", pathname);
-		return NextResponse.redirect(url);
-	}
+	// if (isProtectedRoute && !isAuthenticated) {
+	// 	const url = request.nextUrl.clone();
+	// 	url.pathname = "/";
+	// 	url.searchParams.set("redirect", pathname);
+	// 	return NextResponse.redirect(url);
+	// }
 
 	return NextResponse.next();
 }
