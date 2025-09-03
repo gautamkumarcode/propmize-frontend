@@ -21,7 +21,7 @@ import {
 	Settings,
 	X,
 } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function AssistantPage() {
 	const { user } = useAuth();
@@ -167,10 +167,10 @@ export default function AssistantPage() {
 			<div className="border-b px-4 py-3 md:px-6 md:py-4 bg-gray-50 flex-shrink-0">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center space-x-3 min-w-0">
-						<div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-							<Bot className="w-5 h-5 text-blue-600" />
+						<div className="lg:w-9 lg:h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 w-7 h-7">
+							<Bot className="lg:w-5 lg:h-5 w-4 h-4 text-blue-600" />
 						</div>
-						<h1 className="text-xl md:text-2xl font-bold text-gray-800 truncate">
+						<h1 className="lg:text-xl md:text-lg font-bold text-gray-800 truncate text-md">
 							Propmize Assistant
 						</h1>
 						{user && (
@@ -278,9 +278,10 @@ export default function AssistantPage() {
 										setShowModeSelector(false);
 									}}
 									className={`p-3 text-left text-sm rounded-lg border transition-all duration-200
-										${chatMode === mode.mode
-											? "bg-blue-50 border-blue-400 text-blue-800 shadow-sm"
-											: "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+										${
+											chatMode === mode.mode
+												? "bg-blue-50 border-blue-400 text-blue-800 shadow-sm"
+												: "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
 										}`}>
 									<div className="font-semibold text-gray-800 mb-1">
 										{mode.title}

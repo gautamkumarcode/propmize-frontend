@@ -20,6 +20,7 @@ export const getPropertyDefaultValues = (): PropertyFormData => ({
 	title: "",
 	description: "",
 	propertyType: "apartment",
+	price: "",
 	listingType: "sale",
 	currency: "INR",
 	area: { value: "", unit: "sqft" },
@@ -43,9 +44,9 @@ export const getPropertyDefaultValues = (): PropertyFormData => ({
 		landmark: "",
 	},
 	pricing: {
-		basePrice: { value: "", unit: "Lakh" },
-		maintenanceCharges: { value: "", unit: "Thousand" },
-		securityDeposit: { value: "", unit: "Thousand" },
+		basePrice: "",
+		maintenanceCharges: "",
+		securityDeposit: "",
 		priceNegotiable: false,
 	},
 	nearbyPlaces: {
@@ -185,44 +186,22 @@ export default function PropertyForm({
 				},
 				pricing: existingProperty.pricing
 					? {
-							basePrice: {
-								value: existingProperty.pricing.basePrice?.value
-									? String(existingProperty.pricing.basePrice.value)
-									: "",
-								unit: (["Lakh", "Thousand", "Crore"].includes(
-									existingProperty.pricing.basePrice?.currency || ""
-								)
-									? existingProperty.pricing.basePrice?.currency
-									: "Lakh") as "Lakh" | "Thousand" | "Crore",
-							},
-							maintenanceCharges: {
-								value: existingProperty.pricing.maintenanceCharges
-									? String(existingProperty.pricing.maintenanceCharges)
-									: "",
-								unit: (["Lakh", "Thousand", "Crore"].includes(
-									(existingProperty.pricing.maintenanceCharges
-										?.currency as string) || ""
-								)
-									? existingProperty.pricing.maintenanceCharges?.currency
-									: "Thousand") as "Lakh" | "Thousand" | "Crore",
-							},
-							securityDeposit: {
-								value: existingProperty.pricing.securityDeposit?.value
-									? String(existingProperty.pricing.securityDeposit.value)
-									: "",
-								unit: (["Lakh", "Thousand", "Crore"].includes(
-									existingProperty.pricing.securityDeposit?.currency || ""
-								)
-									? existingProperty.pricing.securityDeposit?.currency
-									: "Thousand") as "Lakh" | "Thousand" | "Crore",
-							},
+							basePrice: existingProperty.pricing.basePrice
+								? String(existingProperty.pricing.basePrice)
+								: "",
+							maintenanceCharges: existingProperty.pricing.maintenanceCharges
+								? String(existingProperty.pricing.maintenanceCharges)
+								: "",
+							securityDeposit: existingProperty.pricing.securityDeposit
+								? String(existingProperty.pricing.securityDeposit)
+								: "",
 							priceNegotiable:
 								existingProperty.pricing.priceNegotiable || false,
 					  }
 					: {
-							basePrice: { value: "", unit: "Lakh" },
-							maintenanceCharges: { value: "", unit: "Thousand" },
-							securityDeposit: { value: "", unit: "Thousand" },
+							basePrice: "",
+							maintenanceCharges: "",
+							securityDeposit: "",
 							priceNegotiable: false,
 					  },
 				nearbyPlaces: existingProperty.nearbyPlaces
@@ -342,27 +321,34 @@ export default function PropertyForm({
 	const isEqual = (a: unknown, b: unknown): boolean => {
 		if (a === b) return true;
 		if (typeof a !== typeof b) return false;
-		
-		if (typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) {
+
+		if (
+			typeof a === "object" &&
+			a !== null &&
+			typeof b === "object" &&
+			b !== null
+		) {
 			if (Array.isArray(a) && Array.isArray(b)) {
 				if (a.length !== b.length) return false;
 				return a.every((item, index) => isEqual(item, b[index]));
 			}
-			
+
 			const keysA = Object.keys(a);
 			const keysB = Object.keys(b);
 			if (keysA.length !== keysB.length) return false;
-			
-			return keysA.every(key => 
+
+			return keysA.every((key) =>
 				isEqual((a as NestedObject)[key], (b as NestedObject)[key])
 			);
 		}
-		
+
 		return a === b;
 	};
 
 	// Function to get only changed fields
-	const getChangedFields = (currentData: PropertyFormData): Partial<PropertyFormData> => {
+	const getChangedFields = (
+		currentData: PropertyFormData
+	): Partial<PropertyFormData> => {
 		if (!originalDataRef.current || !isEditMode) {
 			return currentData; // Return all data for new properties
 		}
@@ -376,13 +362,16 @@ export default function PropertyForm({
 
 			if (!isEqual(currentValue, originalValue)) {
 				// For nested objects, we need to check if they're actually different
-				if (typeof currentValue === 'object' && currentValue !== null && 
-					typeof originalValue === 'object' && originalValue !== null) {
-					
+				if (
+					typeof currentValue === "object" &&
+					currentValue !== null &&
+					typeof originalValue === "object" &&
+					originalValue !== null
+				) {
 					// Check if the objects are actually different
 					const currentObj = currentValue as NestedObject;
 					const originalObj = originalValue as NestedObject;
-					
+
 					// If they're different, add to changed data
 					(changedData as NestedObject)[key] = currentValue;
 				} else {
@@ -424,6 +413,7 @@ export default function PropertyForm({
 			return {
 				...getPropertyDefaultValues(),
 				...payloadObj,
+				price: payloadObj.price ?? data.price,
 				title: payloadObj.title ?? data.title,
 				description: payloadObj.description ?? data.description,
 				propertyType: payloadObj.propertyType ?? data.propertyType,
@@ -457,7 +447,20 @@ export default function PropertyForm({
 			});
 		} else {
 			// Create new property
-			createProperty.mutate(data);
+
+			const payload = {
+				...data,
+				price:
+					listingType === "sale"
+						? data.price
+						: (
+								Number(data?.pricing?.basePrice) +
+								Number(data?.pricing?.maintenanceCharges) +
+								Number(data?.pricing?.securityDeposit)
+						  ).toString(),
+			};
+			createProperty.mutate(payload);
+			createProperty.isSuccess ? router.push("/seller/my-property") : null;
 		}
 	};
 
@@ -526,10 +529,8 @@ export default function PropertyForm({
 			case "mediaPricing":
 				fieldsToValidate = [
 					"images",
-					"pricing.basePrice.value",
-					"pricing.basePrice.unit",
-					"pricing.priceNegotiable",
-				];
+					listingType === "sale" ? "price" : "pricing.priceNegotiable",
+				].filter(Boolean) as Path<PropertyFormData>[];
 				break;
 			case "contactNotes":
 				fieldsToValidate = [

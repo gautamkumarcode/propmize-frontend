@@ -51,29 +51,24 @@ export const propertySchema = z.object({
 		country: z.string().min(1, "Country is required"),
 		landmark: z.string().optional(),
 	}),
+	price: z.string().optional(),
 
-	pricing: z.object({
-		basePrice: z.object({
-			value: z.string(),
+	pricing: z
+		.object({
+			basePrice: z.string().optional(),
 
-			unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]).default("Lakh"),
-		}),
+			maintenanceCharges: z
+				.string()
 
-		maintenanceCharges: z
-			.object({
-				value: z.string().optional(),
-				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]),
-			})
-			.optional(),
-		securityDeposit: z
-			.object({
-				value: z.string().optional(),
-				unit: z.enum(["Hundred", "Thousand", "Lakh", "Crore"]),
-			})
-			.optional(),
+				.optional(),
+			securityDeposit: z
+				.string()
 
-		priceNegotiable: z.boolean(),
-	}),
+				.optional(),
+
+			priceNegotiable: z.boolean().optional(),
+		})
+		.optional(),
 
 	nearbyPlaces: z
 		.object({

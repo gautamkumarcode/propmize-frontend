@@ -5,6 +5,7 @@ import { Camera, Check, Contact, Home, MapPin } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import PropertyForm from "./components/PropertyMultiStepForm";
+import WhatsAppButton from "./whatsappbutton/WhatsappButton";
 
 // Removed outdated PropertyForm interface. Use PropertyFormData from propertySchema.ts
 
@@ -36,11 +37,13 @@ export default function AddProperty() {
 	};
 
 	return (
-		<div className="min-h-screen">
+		<div className="min-h-screen relative">
+			<WhatsAppButton />
+
 			<div className="max-w-5xl mx-auto  sm:px-2 lg:px-8">
-				<div className="space-y-10">
+				<div className="space-y-4 ">
 					{/* Header */}
-					<div className=" flex flex-col justify-center items-center rounded-lg mb-6">
+					<div className=" flex flex-col lg:justify-center lg:items-center rounded-lg mb-6">
 						<h2 className="text-xl font-semibold text-blue-800">
 							{isEditMode ? `Editing Property` : "Create New Property"}
 						</h2>

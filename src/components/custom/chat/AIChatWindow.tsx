@@ -21,7 +21,6 @@ import {
 	MapPin,
 	Phone,
 	Send,
-	User,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -114,10 +113,7 @@ export default function AIChatWindow({
 	};
 
 	const renderMessage = (msg: AIMessage, index: number) => {
-		const isAI = msg.role === "assistant";
 		const isUser = msg.role === "user";
-
-		const ImageBaseUrl = process.env.NEXT_PUBLIC_API_URL_IMG;
 
 		return (
 			<div
@@ -125,14 +121,6 @@ export default function AIChatWindow({
 				className={`flex gap-2 md:gap-3 ${
 					isUser ? "justify-end" : "justify-start"
 				} mb-3 md:mb-4 px-2 md:px-0`}>
-				{isAI && (
-					<div className="flex-shrink-0">
-						<div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-							<Bot className="w-3 h-3 md:w-4 md:h-4 text-white" />
-						</div>
-					</div>
-				)}
-
 				<div
 					className={`max-w-[85%] md:max-w-[80%] ${
 						isUser ? "order-first" : ""
@@ -164,7 +152,7 @@ export default function AIChatWindow({
 													<img
 														src={
 															property?.images && property.images[0]
-																? `${ImageBaseUrl}/${property.images[0]}`
+																? property.images[0]
 																: "/api/placeholder/160/120"
 														}
 														alt={property.title}
@@ -320,13 +308,13 @@ export default function AIChatWindow({
 					</div>
 				</div>
 
-				{isUser && (
+				{/* {isUser && (
 					<div className="flex-shrink-0">
 						<div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
 							<User className="w-3 h-3 md:w-4 md:h-4 text-white" />
 						</div>
 					</div>
-				)}
+				)} */}
 			</div>
 		);
 	};

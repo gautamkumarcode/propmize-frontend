@@ -86,9 +86,7 @@ export default function PropertyLocationAndFeatures({
 	return (
 		<div className="space-y-6 bg-white rounded-xl shadow p-6 border-t-4 border-purple-500">
 			{/* Address Fields */}
-			<h3 className="text-xl font-semibold text-gray-800 mb-4">
-				Location Details
-			</h3>
+
 			{[
 				{
 					key: "street",
@@ -125,8 +123,11 @@ export default function PropertyLocationAndFeatures({
 					name={`address.${key}` as AddressFieldKey}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-md font-semibold text-gray-700">
-								{label}
+							<FormLabel className="text-sm font-semibold text-gray-700">
+								{label.includes("(optional)") ? label : `${label} `}
+								<span style={{ color: "red" }}>
+									{!label.includes("(optional)") ? "*" : ""}
+								</span>
 							</FormLabel>
 							<FormControl>
 								<Input
@@ -138,7 +139,7 @@ export default function PropertyLocationAndFeatures({
 											? field.value
 											: ""
 									}
-									className="h-[40px] px-3 py-2 text-sm"
+									className="h-[40px] px-3 py-2 text-xs"
 								/>
 							</FormControl>
 							<FormMessage />
@@ -147,9 +148,6 @@ export default function PropertyLocationAndFeatures({
 				/>
 			))}
 
-			<h3 className="text-xl font-semibold text-gray-800 mb-4 mt-6">
-				Property Features
-			</h3>
 			{/* Facing Dropdown */}
 			{!isPlot && (
 				<FormField
@@ -157,14 +155,14 @@ export default function PropertyLocationAndFeatures({
 					name="features.facing"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="text-md font-semibold text-gray-700">
+							<FormLabel className="text-sm font-semibold text-gray-700">
 								Facing
 							</FormLabel>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button
 										variant="outline"
-										className="w-full flex justify-between items-center h-[40px] px-3 py-2 text-sm font-normal">
+										className="w-full flex justify-between items-center h-[40px] px-3 py-2 text-xs font-normal">
 										<span>
 											{field.value
 												? field.value.charAt(0).toUpperCase() +
@@ -198,14 +196,14 @@ export default function PropertyLocationAndFeatures({
 						name="features.flooringType"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">
+								<FormLabel className="text-sm font-semibold text-gray-700">
 									Flooring Type
 								</FormLabel>
 								<FormControl>
 									<Input
 										placeholder="Enter Flooring Type (e.g. Marble, Tile, Wood)"
 										{...field}
-										className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+										className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
 									/>
 								</FormControl>
 								<FormMessage />
@@ -218,14 +216,14 @@ export default function PropertyLocationAndFeatures({
 						name="features.waterSupply"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-md font-semibold text-gray-700">
+								<FormLabel className="text-sm font-semibold text-gray-700">
 									Water Supply
 								</FormLabel>
 								<FormControl>
 									<Input
 										placeholder="Enter Water Supply (e.g. Municipal, Borewell)"
 										{...field}
-										className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+										className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
 									/>
 								</FormControl>
 								<FormMessage />
@@ -238,7 +236,7 @@ export default function PropertyLocationAndFeatures({
 			{/* Boolean Features - Grid of Pills (all types except plot) */}
 			{!isPlot && (
 				<div>
-					<div className="text-xl font-semibold text-gray-800 mb-2">
+					<div className="text-md font-semibold text-gray-800 mb-2">
 						Other Features
 					</div>
 					<div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -249,14 +247,14 @@ export default function PropertyLocationAndFeatures({
 								name={`features.${feat.name}` as FeatureFieldKey}
 								render={({ field }) => (
 									<FormItem>
-										<label className="flex items-center gap-2 cursor-pointer ">
+										<label className="flex items-center gap-2 cursor-pointer  ">
 											<input
 												type="checkbox"
 												checked={field.value || false}
 												onChange={(e) => field.onChange(e.target.checked)}
 												className="accent-blue-500 w-4 h-4"
 											/>
-											<span className="text-md font-semibold text-gray-700">
+											<span className="text-sm font-semibold text-gray-700">
 												{feat.label}
 											</span>
 										</label>
@@ -272,10 +270,10 @@ export default function PropertyLocationAndFeatures({
 			{/* Amenities Selection (residential & commercial) */}
 			{!isPlot && (
 				<div className="">
-					<h3 className="text-xl font-semibold text-gray-800 mb-2">
+					<h3 className="text-md font-semibold text-gray-800 mb-2">
 						Select Amenities
 					</h3>
-					<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+					<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 						{AMENITIES_OPTIONS.map((amenity) => (
 							<label
 								key={amenity}
@@ -295,7 +293,7 @@ export default function PropertyLocationAndFeatures({
 									}}
 									className="accent-blue-500 h-4 w-4 rounded border-gray-300"
 								/>
-								<span className="text-md font-semibold text-gray-700">
+								<span className="text-sm font-semibold text-gray-700">
 									{amenity}
 								</span>
 							</label>

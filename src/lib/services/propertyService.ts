@@ -1,11 +1,6 @@
 import { PropertyFormData } from "@/components/screens/seller/add-property/validation/propertySchema";
 import apiClient from "../api";
-import {
-	ApiResponse,
-	PropertyCreateData,
-	PropertyFilters,
-	PropertyResponse,
-} from "../types/api";
+import { ApiResponse, PropertyFilters, PropertyResponse } from "../types/api";
 
 export class PropertyService {
 	/**
@@ -90,7 +85,7 @@ export class PropertyService {
 	 */
 	static async updateProperty(
 		id: string,
-		updateData: Partial<PropertyCreateData>
+		updateData: Partial<PropertyFormData>
 	): Promise<ApiResponse<PropertyResponse>> {
 		const formData = new FormData();
 

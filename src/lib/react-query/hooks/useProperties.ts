@@ -200,36 +200,27 @@ export const useUpdateProperty = () => {
 			const transformedArea =
 				area && typeof area.value === "string"
 					? {
-							size: Number(area.value),
+							value: area.value,
 							unit:
-								area.unit === "sqm" || area.unit === "hectare"
-									? "sqft"
-									: area.unit === "sqft" ||
-									  area.unit === "acre" ||
-									  area.unit === "sqyard"
+								area.unit === "sqm" ||
+								area.unit === "hectare" ||
+								area.unit === "sqft" ||
+								area.unit === "acre"
 									? area.unit
 									: "sqft",
 					  }
 					: undefined;
 
-			// Transform features object to string[]
-			const transformedFeatures =
-				features && typeof features === "object"
-					? Object.entries(features)
-							.filter(([_, value]) => !!value)
-							.map(([key, value]) =>
-								typeof value === "boolean"
-									? key
-									: typeof value === "string"
-									? `${key}:${value}`
-									: key
-							)
-					: undefined;
-
+			// Do not transform features; pass as original object
 			const updateData = {
 				...rest,
 				...(transformedArea ? { area: transformedArea } : {}),
-				...(transformedFeatures ? { features: transformedFeatures } : {}),
+				...(features ? { features } : {}),
+				...(rest.price !== undefined
+					? {
+							price: typeof rest.price === "string" ? rest.price : rest.price,
+					  }
+					: {}),
 			};
 			return PropertyService.updateProperty(id, updateData);
 		},

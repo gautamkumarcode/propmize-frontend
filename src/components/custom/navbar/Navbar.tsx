@@ -5,6 +5,7 @@ import NotificationDropdown from "@/components/custom/notifications/Notification
 import { toast } from "@/hooks/use-toast";
 import { useNavigation } from "@/hooks/useNavigation";
 import { useNotifications } from "@/hooks/useNotifications";
+import { apiClient } from "@/lib";
 import { useLogout } from "@/lib/react-query/hooks/useAuth";
 import { iconMap } from "@/lib/routing/iconMap";
 import { buyerNavItems, sellerNavItems } from "@/lib/routing/routes";
@@ -97,19 +98,34 @@ export default function Navbar({
 		});
 	};
 
-	const handleModeSwitch = (targetMode: "buyer" | "seller") => {
+	const handleModeSwitch = async (targetMode: "buyer" | "seller") => {
 		const redirectTo = targetMode === "seller" ? "/seller" : "/buyer/assistant";
 
 		// If user is authenticated, directly switch mode and navigate
-		if (isAuthenticated) {
-			setUserMode(targetMode);
-			router.push(redirectTo);
-			setShowNavDropdown(false);
 
-			toast({
-				title: "Mode switched",
-				description: `Switched to ${targetMode} mode successfully.`,
-			});
+		if (isAuthenticated) {
+			try {
+				const response = await apiClient.put(`/users/${user?._id}/role`, {
+					role: targetMode === "seller" ? "seller" : "buyer",
+				});
+
+				if (response.data.success) {
+					setUserMode(targetMode);
+					router.push(redirectTo);
+					setShowNavDropdown(false);
+					toast({
+						title: "Mode switched",
+						description: `Switched to ${targetMode} mode successfully.`,
+					});
+				} else {
+					toast({
+						title: "Mode switch failed",
+						description: `Failed to switch to ${targetMode} mode.`,
+					});
+				}
+			} catch (error) {
+				console.error("Error fetching user data:", error);
+			}
 		} else {
 			// Only show auth modal if user is not authenticated
 			onShowAuthModal?.(redirectTo);
@@ -117,13 +133,22 @@ export default function Navbar({
 		}
 	};
 
-	const isModeSwitchItem = (itemPath: string) => {
+	const isModeSwitchItem = async (itemPath: string) => {
+		try {
+			const response = await apiClient.put(`/api/users/${user?._id}/role`, {
+				role: itemPath === "/seller" ? "seller" : "buyer",
+			});
+
+			console.log(response);
+		} catch (error) {
+			console.error("Error fetching user data:", error);
+		}
 		return itemPath === "/seller" || itemPath === "/buyer/assistant";
 	};
 
 	return (
 		<>
-			<nav className="bg-white border-b border-gray-200 px-6 py-4">
+			<nav className="bg-white border-b border-gray-200 lg:px-6 py-4 px-0 md:px-4">
 				<div className="flex items-center justify-between">
 					{/* Left Side - Logo Only */}
 					<div className="flex items-center w-full">
@@ -203,7 +228,8 @@ export default function Navbar({
 												// Handle mode switching items specially
 												if (
 													item.isHighlighted &&
-													isModeSwitchItem(item.route.path)
+													(item.route.path === "/seller" ||
+														item.route.path === "/buyer/assistant")
 												) {
 													const targetMode =
 														item.route.path === "/seller" ? "seller" : "buyer";
