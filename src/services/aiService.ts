@@ -21,7 +21,7 @@ export interface ChatMessage {
 }
 
 export interface PropertyInfo {
-	id: string;
+	_id: string;
 	title: string;
 	price: string;
 	location: string;
@@ -31,7 +31,7 @@ export interface PropertyInfo {
 }
 
 export interface PropertySuggestion {
-	id: string;
+	_id: string;
 	title: string;
 	price: number;
 	address: {

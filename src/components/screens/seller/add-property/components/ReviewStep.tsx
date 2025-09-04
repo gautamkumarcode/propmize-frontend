@@ -62,8 +62,10 @@ export default function ReviewStep({ form, isEditMode }: StepProps) {
 		</div>
 	);
 
-	console.log(values);
-
+	// const propertyData = {
+	// 	...values,
+	// 	images: values?.images?.[0] ? URL.createObjectURL(values.images[0]) : [],
+	// };
 	return (
 		<div className="max-w-4xl mx-auto py-8 px-4">
 			<div className="text-center mb-8">
@@ -74,6 +76,8 @@ export default function ReviewStep({ form, isEditMode }: StepProps) {
 					Please review all details before submitting
 				</p>
 			</div>
+
+			{/* <PropertyCard property={propertyData as unknown as PropertyResponse} /> */}
 
 			<div className="space-y-6">
 				{/* Basic Details */}
@@ -148,11 +152,11 @@ export default function ReviewStep({ form, isEditMode }: StepProps) {
 								label="Sale Price"
 								value={formatPrice(Number(values.price))}
 							/>
-							<DetailItem
+							{/* <DetailItem
 								label="Price Negotiable"
 								value={values.pricing?.priceNegotiable ? "Yes" : "No"}
 								isBoolean={true}
-							/>
+							/> */}
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -168,11 +172,11 @@ export default function ReviewStep({ form, isEditMode }: StepProps) {
 								label="Security Deposit"
 								value={formatPrice(Number(values.pricing?.securityDeposit))}
 							/>
-							<DetailItem
+							{/* <DetailItem
 								label="Price Negotiable"
 								value={values.pricing?.priceNegotiable ? "Yes" : "No"}
 								isBoolean={true}
-							/>
+							/> */}
 						</div>
 					),
 					"border-amber-500"

@@ -1,5 +1,6 @@
 "use client";
 
+			
 import LogoImage from "@/assests/logo1.png";
 import NotificationDropdown from "@/components/custom/notifications/NotificationDropdown";
 import { toast } from "@/hooks/use-toast";
@@ -11,7 +12,7 @@ import { iconMap } from "@/lib/routing/iconMap";
 import { buyerNavItems, sellerNavItems } from "@/lib/routing/routes";
 import { useAuthStore } from "@/store/app-store";
 import { AxiosError } from "axios";
-import { Bell, LogIn, LogOut, Menu, User } from "lucide-react";
+import { Bell, LogIn, LogOut, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -196,22 +197,53 @@ export default function Navbar({
 						</div>
 
 						{/* Navigation Menu Button with Dropdown */}
-						<div className="relative" ref={navDropdownRef}>
+						<div className="relative mr-4" ref={navDropdownRef}>
 							<button
 								onClick={() => setShowNavDropdown(!showNavDropdown)}
 								className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg">
-								<Menu size={20} />
+								<User size={20} />
 							</button>
 
 							{/* Navigation Dropdown - positioned to the left of menu button */}
 							{showNavDropdown && (
-								<div className="absolute top-full right-0 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 h-[70vh] overflow-y-scroll">
+								<div className="absolute md:w-[25rem] w-[95vw] top-full right-0 mt-1  bg-white border border-gray-200 rounded-lg shadow-lg z-50 h-[70vh] overflow-y-scroll">
 									<div className="py-2">
-										<Link
-											href={mode === "seller" ? "/property" : "/property"}
-											className="flex items-center justify-center space-x-3 px-4 py-3 w-full text-left hover:bg-gray-50 transition-colors text-gray-700 bg-gray-100">
-											Properties
-										</Link>
+										<div className="px-4 py-2 border-b border-gray-200">
+											{" "}
+											{/* User Details */}
+											{isAuthenticated && user && (
+												<div className="flex items-center space-x-3 py-2">
+													{/* Avatar: fallback to initials if no avatar */}
+													{user.avatar ? (
+														<img
+															src={user.avatar}
+															alt={user.name}
+															className="w-10 h-10 rounded-full object-cover border border-gray-200"
+														/>
+													) : (
+														<div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg border border-gray-200">
+															{user.name?.[0] || "U"}
+														</div>
+													)}
+													<div className="flex flex-col">
+														<span className="font-semibold text-gray-800">
+															{user.name}
+														</span>
+														{user.email && (
+															<span className="text-xs text-gray-500">
+																{user.email}
+															</span>
+														)}
+														{user.role && (
+															<span className="text-xs text-gray-500">
+																{user.role.charAt(0).toUpperCase() +
+																	user.role.slice(1)}{" "}
+															</span>
+														)}
+													</div>
+												</div>
+											)}
+										</div>
 										{/* Navigation Items */}
 										{navItems
 											.filter(

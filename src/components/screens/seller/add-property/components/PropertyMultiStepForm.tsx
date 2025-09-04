@@ -11,7 +11,6 @@ import { Path, useForm, type SubmitHandler } from "react-hook-form";
 import type { PropertyFormData } from "../validation/propertySchema";
 import { propertySchema } from "../validation/propertySchema";
 import PropertyBasicDetails from "./PropertyBasicDetails";
-import PropertyContactAndNotes from "./PropertyContactAndNotes";
 import PropertyLocationAndFeatures from "./PropertyLocationAndFeatures";
 import PropertyMediaAndPricing from "./PropertyMediaAndPricing";
 import ReviewStep from "./ReviewStep";
@@ -47,7 +46,6 @@ export const getPropertyDefaultValues = (): PropertyFormData => ({
 		basePrice: "",
 		maintenanceCharges: "",
 		securityDeposit: "",
-		priceNegotiable: false,
 	},
 	nearbyPlaces: {
 		schools: [],
@@ -90,7 +88,6 @@ const stepConfig = [
 	{ key: "basic", label: "Basic Details" },
 	{ key: "locationFeatures", label: "Location & Features" },
 	{ key: "mediaPricing", label: "Media & Pricing" },
-	{ key: "contactNotes", label: "Contact & Notes" },
 	{ key: "preview", label: "Preview" },
 ];
 
@@ -195,14 +192,14 @@ export default function PropertyForm({
 							securityDeposit: existingProperty.pricing.securityDeposit
 								? String(existingProperty.pricing.securityDeposit)
 								: "",
-							priceNegotiable:
-								existingProperty.pricing.priceNegotiable || false,
+							// priceNegotiable:
+							// 	existingProperty.pricing.priceNegotiable || false,
 					  }
 					: {
 							basePrice: "",
 							maintenanceCharges: "",
 							securityDeposit: "",
-							priceNegotiable: false,
+							// priceNegotiable: false,
 					  },
 				nearbyPlaces: existingProperty.nearbyPlaces
 					? {
@@ -493,6 +490,7 @@ export default function PropertyForm({
 	const validateAndNext = async () => {
 		let fieldsToValidate: Path<PropertyFormData>[] = [];
 		const currentStepKey = steps[currentStep - 1]?.key;
+
 		switch (currentStepKey) {
 			case "basic":
 				fieldsToValidate = [
@@ -529,25 +527,31 @@ export default function PropertyForm({
 			case "mediaPricing":
 				fieldsToValidate = [
 					"images",
-					listingType === "sale" ? "price" : "pricing.priceNegotiable",
-				].filter(Boolean) as Path<PropertyFormData>[];
-				break;
-			case "contactNotes":
-				fieldsToValidate = [
+					listingType === "sale" ? "price" : "pricing.basePrice",
 					"contact.name",
 					"contact.phone",
 					"contact.whatsapp",
 					"contact.type",
-					"nearbyPlaces",
-				];
+				].filter(Boolean) as Path<PropertyFormData>[];
 				break;
+			case "preview":
+				// No validation needed for preview step, just go to next step
+				setStepErrors([]);
+				if (currentStep < steps.length) {
+					nextStep();
+				}
+				return; // Return early to avoid triggering validation
 			default:
 				break;
 		}
+
 		const isValid = await form.trigger(fieldsToValidate);
 		if (isValid) {
 			setStepErrors([]);
-			nextStep();
+			// Only go to next step if not on last step
+			if (currentStep < steps.length) {
+				nextStep();
+			}
 		} else {
 			// Collect errors for current step
 			const errors = fieldsToValidate
@@ -571,8 +575,7 @@ export default function PropertyForm({
 				);
 			case "mediaPricing":
 				return <PropertyMediaAndPricing form={form} isEditMode={isEditMode} />;
-			case "contactNotes":
-				return <PropertyContactAndNotes form={form} isEditMode={isEditMode} />;
+
 			case "preview":
 				// Show a read-only preview of all entered data
 				return <ReviewStep form={form} isEditMode={isEditMode} />;
@@ -593,7 +596,9 @@ export default function PropertyForm({
 	return (
 		<Form {...form}>
 			<form
-				onSubmit={form.handleSubmit(submit, onInvalid)}
+				onSubmit={(e) => {
+					e.preventDefault();
+				}}
 				className="space-y-8">
 				{/* Show mode indicator */}
 				{isEditMode && (
@@ -642,7 +647,7 @@ export default function PropertyForm({
 						variant="outline">
 						Back
 					</Button>
-					{currentStep < stepConfig.length ? (
+					{currentStep < steps.length ? (
 						<Button
 							type="button"
 							onClick={validateAndNext}
@@ -652,7 +657,7 @@ export default function PropertyForm({
 						</Button>
 					) : (
 						<Button
-							type="submit"
+							onClick={form.handleSubmit(submit, onInvalid)}
 							className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
 							disabled={isLoading}>
 							{isLoading ? (

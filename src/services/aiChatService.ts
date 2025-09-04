@@ -533,7 +533,7 @@ export const formatAIMessage = (message: AIMessage): ChatMessage => {
 		...(message.suggestions && { suggestions: message.suggestions }),
 		...(message.properties && {
 			propertyInfo: message.properties.map((prop: PropertySuggestion) => ({
-				id: prop.id || "unknown",
+				_id: prop._id || "unknown",
 				title: prop.title || "Property Title Not Available",
 				price: formatPrice(prop.price),
 				location:

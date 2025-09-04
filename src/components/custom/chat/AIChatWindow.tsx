@@ -144,7 +144,7 @@ export default function AIChatWindow({
 									</p>
 									{msg.properties.map((property, idx) => (
 										<Card
-											key={property.id || idx}
+											key={property._id || idx}
 											className="cursor-pointer hover:shadow-lg transition-all border border-gray-100 rounded-xl overflow-hidden">
 											<CardContent className="p-0">
 												{/* Image Section */}
@@ -172,7 +172,7 @@ export default function AIChatWindow({
 														onClick={() =>
 															handlePropertyAction(
 																{ type: "save-property" },
-																property.id
+																property._id
 															)
 														}
 														className="absolute top-2 right-2 p-1.5 bg-white/80 hover:bg-white rounded-full shadow-md">
@@ -211,7 +211,7 @@ export default function AIChatWindow({
 														<Button
 															size="sm"
 															variant="default"
-															onClick={() => onPropertyClick?.(property.id)}
+															onClick={() => onPropertyClick?.(property._id)}
 															className="text-xs h-8 flex-1">
 															<Home className="w-4 h-4 mr-1" />
 															View Details

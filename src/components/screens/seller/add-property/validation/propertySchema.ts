@@ -65,8 +65,6 @@ export const propertySchema = z.object({
 				.string()
 
 				.optional(),
-
-			priceNegotiable: z.boolean().optional(),
 		})
 		.optional(),
 
@@ -147,11 +145,6 @@ export const propertySchema = z.object({
 		.optional(),
 
 	notes: z.string().optional(),
-	legalInfo: z
-		.object({
-			ownershipType: z.string().optional(),
-		})
-		.optional(),
 });
 
 export type PropertyFormData = z.infer<typeof propertySchema>;

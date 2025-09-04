@@ -42,19 +42,10 @@ export interface PropertyResponse {
 	listingType: string;
 	price: number;
 	pricing?: {
-		basePrice?: {
-			value: number;
-			currency: string;
-		};
+		basePrice?: string;
 		priceNegotiable?: boolean;
-		maintenanceCharges?: {
-			value: number;
-			currency: string;
-		};
-		securityDeposit?: {
-			value: number;
-			currency: string;
-		};
+		maintenanceCharges?: string;
+		securityDeposit?: string;
 		brokeragePercentage?: number;
 	};
 	bedrooms?: number;

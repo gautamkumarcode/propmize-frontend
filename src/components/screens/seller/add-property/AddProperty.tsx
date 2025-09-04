@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Camera, Check, Contact, Home, MapPin } from "lucide-react";
+import { Camera, Check, Home, MapPin } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import PropertyForm from "./components/PropertyMultiStepForm";
@@ -19,9 +19,8 @@ export default function AddProperty() {
 	const steps = [
 		{ number: 1, title: "Basic Details", icon: Home },
 		{ number: 2, title: "Location & Features", icon: MapPin },
-		{ number: 3, title: "Media & Pricing", icon: Camera },
-		{ number: 4, title: "Contact & Notes", icon: Contact },
-		{ number: 5, title: "Review", icon: Check },
+		{ number: 3, title: "Media & Pricing & Contact", icon: Camera },
+		{ number: 4, title: "Review", icon: Check },
 	];
 
 	const nextStep = () => {
@@ -41,9 +40,9 @@ export default function AddProperty() {
 			<WhatsAppButton />
 
 			<div className="max-w-5xl mx-auto  sm:px-2 lg:px-8">
-				<div className="space-y-4 ">
+				<div className="space-y-2">
 					{/* Header */}
-					<div className=" flex flex-col lg:justify-center lg:items-center rounded-lg mb-6">
+					<div className="  flex-col lg:justify-center lg:items-center rounded-lg mb-6  hidden lg:flex">
 						<h2 className="text-xl font-semibold text-blue-800">
 							{isEditMode ? `Editing Property` : "Create New Property"}
 						</h2>
@@ -55,7 +54,7 @@ export default function AddProperty() {
 					</div>
 
 					{/* Responsive Steps and Form */}
-					<div className="flex flex-col  gap-8 items-start ">
+					<div className="flex flex-col  gap-6 items-start ">
 						{/* Stepper: horizontal scroll on mobile, vertical on desktop */}
 						<Card className="py-6 px-4 shadow-lg w-full max-w-3xl mx-auto bg-white rounded-2xl">
 							<div className="flex items-center justify-between relative w-full">
@@ -92,7 +91,7 @@ export default function AddProperty() {
 
 											{/* Label */}
 											<span
-												className={`mt-2 text-xs md:text-sm font-medium text-center transition-colors
+												className={`hidden md:flex mt-2 text-xs md:text-sm font-medium text-center transition-colors
 													${isActive ? "text-blue-700" : isCompleted ? "text-green-600" : "text-gray-500"}
 												`}>
 												{step.title}

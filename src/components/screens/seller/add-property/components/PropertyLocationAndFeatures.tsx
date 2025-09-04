@@ -149,89 +149,91 @@ export default function PropertyLocationAndFeatures({
 			))}
 
 			{/* Facing Dropdown */}
-			{!isPlot && (
-				<FormField
-					control={form.control}
-					name="features.facing"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-sm font-semibold text-gray-700">
-								Facing
-							</FormLabel>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										variant="outline"
-										className="w-full flex justify-between items-center h-[40px] px-3 py-2 text-xs font-normal">
-										<span>
-											{field.value
-												? field.value.charAt(0).toUpperCase() +
-												  field.value.slice(1)
-												: "Select Facing"}
-										</span>
-										<ChevronDown className="w-4 h-4 text-muted-foreground" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start">
-									{featureFacings.map((opt) => (
-										<DropdownMenuItem
-											key={opt}
-											onSelect={() => field.onChange(opt)}>
-											{opt.charAt(0).toUpperCase() + opt.slice(1)}
-										</DropdownMenuItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-			)}
-
-			{/* Flooring Type & Water Supply (residential only) */}
-			{isResidential && (
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				{!isPlot && (
 					<FormField
 						control={form.control}
-						name="features.flooringType"
+						name="features.facing"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="text-sm font-semibold text-gray-700">
-									Flooring Type
+									Facing
 								</FormLabel>
-								<FormControl>
-									<Input
-										placeholder="Enter Flooring Type (e.g. Marble, Tile, Wood)"
-										{...field}
-										className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-									/>
-								</FormControl>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant="outline"
+											className="w-full flex justify-between items-center h-[40px] px-3 py-2 text-xs font-normal">
+											<span>
+												{field.value
+													? field.value.charAt(0).toUpperCase() +
+													  field.value.slice(1)
+													: "Select Facing"}
+											</span>
+											<ChevronDown className="w-4 h-4 text-muted-foreground" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="start">
+										{featureFacings.map((opt) => (
+											<DropdownMenuItem
+												key={opt}
+												onSelect={() => field.onChange(opt)}>
+												{opt.charAt(0).toUpperCase() + opt.slice(1)}
+											</DropdownMenuItem>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
+				)}
 
-					<FormField
-						control={form.control}
-						name="features.waterSupply"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className="text-sm font-semibold text-gray-700">
-									Water Supply
-								</FormLabel>
-								<FormControl>
-									<Input
-										placeholder="Enter Water Supply (e.g. Municipal, Borewell)"
-										{...field}
-										className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-				</div>
-			)}
+				{/* Flooring Type & Water Supply (residential only) */}
+				{isResidential && (
+					<>
+						<FormField
+							control={form.control}
+							name="features.flooringType"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-sm font-semibold text-gray-700">
+										Flooring Type
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Enter Flooring Type (e.g. Marble, Tile, Wood)"
+											{...field}
+											className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="features.waterSupply"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-sm font-semibold text-gray-700">
+										Water Supply
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="Enter Water Supply (e.g. Municipal, Borewell)"
+											{...field}
+											className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</>
+				)}
+			</div>
 
 			{/* Boolean Features - Grid of Pills (all types except plot) */}
 			{!isPlot && (

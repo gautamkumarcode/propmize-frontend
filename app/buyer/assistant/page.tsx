@@ -21,9 +21,11 @@ import {
 	Settings,
 	X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function AssistantPage() {
+	const router = useRouter();
 	const { user } = useAuth();
 	const [chatMode, setChatMode] = useState<
 		"property-search" | "general-inquiry" | "recommendation"
@@ -146,6 +148,12 @@ export default function AssistantPage() {
 	const handleClearChat = async () => {
 		// Create a new chat to effectively clear the current one
 		await handleNewChat();
+	};
+
+	const handlePropertyClick = (propertyId: string) => {
+		console.log("Property clicked:", propertyId);
+		// Navigate to property details
+		router.push(`/property/${propertyId}`);
 	};
 
 	if (isInitializing) {
@@ -302,10 +310,7 @@ export default function AssistantPage() {
 					key={chatId} // Force re-render when chatId changes
 					initialChatId={chatId || undefined}
 					onNewChat={handleNewChat}
-					onPropertyClick={(propertyId) => {
-						console.log("Property clicked:", propertyId);
-						// Navigate to property details
-					}}
+					onPropertyClick={handlePropertyClick}
 					onActionClick={(action) => {
 						console.log("Action clicked:", action);
 						// Handle various actions like save, contact, etc.

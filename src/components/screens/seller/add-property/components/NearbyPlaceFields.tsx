@@ -1,19 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-	FormField,
-	FormLabel,
-	FormMessage,
-} from "@/components/ui/form";
+import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import { UseFormReturn, useFieldArray } from "react-hook-form";
 import { PropertyFormData } from "../validation/propertySchema";
 
@@ -28,7 +19,6 @@ export default function NearbyPlaceFields({
 	form,
 	place,
 	distanceUnits,
-	isEditMode,
 }: NearbyPlaceFieldsProps) {
 	const { fields, append, remove } = useFieldArray<
 		PropertyFormData,
@@ -37,6 +27,11 @@ export default function NearbyPlaceFields({
 		control: form.control,
 		name: `nearbyPlaces.${place}`,
 	});
+
+	const [adding, setAdding] = useState(false);
+	const [newName, setNewName] = useState("");
+	const [newDistance, setNewDistance] = useState("");
+	const [newUnit, setNewUnit] = useState(distanceUnits[0]);
 
 	const placeLabels = {
 		schools: "Schools",
@@ -52,150 +47,123 @@ export default function NearbyPlaceFields({
 		transport: "🚌",
 	};
 
+	const handleAdd = () => {
+		if (!newName || !newDistance) return;
+		append({
+			name: newName,
+			distance: newDistance,
+			unit: newUnit as "meter" | "km",
+		});
+		setNewName("");
+		setNewDistance("");
+		setNewUnit(distanceUnits[0]);
+		setAdding(false);
+	};
+
 	return (
-		<div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-			<div className="flex items-center justify-between mb-6">
+		<div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
+			{/* Header */}
+			<div className="flex items-center justify-between mb-4">
 				<div className="flex items-center gap-3">
-					<span className="text-2xl">{placeIcons[place]}</span>
+					<span className="text-lg">{placeIcons[place]}</span>
 					<FormLabel className="text-lg font-semibold text-gray-800">
 						{placeLabels[place]}
 					</FormLabel>
 				</div>
-				<Button
-					type="button"
-					size="sm"
-					variant="outline"
-					className="font-medium border-primary text-primary hover:bg-primary hover:text-white transition-colors"
-					onClick={() =>
-						append({
-							name: "",
-							distance: "",
-							unit: distanceUnits[0] as "meter" | "km",
-						})
-					}>
-					+ Add {place.slice(0, -1)}
-				</Button>
+				{!adding && (
+					<Button
+						type="button"
+						size="sm"
+						variant="outline"
+						className="flex items-center gap-1 text-primary border-primary hover:bg-primary hover:text-white"
+						onClick={() => setAdding(true)}>
+						<Plus className="w-4 h-4" />
+						Add {placeLabels[place].slice(0, -1)}
+					</Button>
+				)}
 			</div>
 
-			<div className="space-y-4">
+			{/* Chipset */}
+			<div className="flex flex-wrap gap-2 mb-4">
 				{fields.length === 0 && (
-					<div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-						<div className="text-gray-500 text-sm mb-2">
-							No {placeLabels[place].toLowerCase()} added yet
-						</div>
-						<div className="text-xs text-gray-400">
-							Click the button above to add one
-						</div>
-					</div>
+					<span className="text-sm text-gray-500">
+						No {placeLabels[place].toLowerCase()} added yet
+					</span>
 				)}
 
 				{fields.map((field, idx) => (
 					<div
 						key={field.id}
-						className="flex flex-col sm:flex-row gap-3 items-start sm:items-center p-4  group">
-						{/* Name Field */}
-						<FormField
-							control={form.control}
-							name={`nearbyPlaces.${place}.${idx}.name`}
-							render={({ field }) => (
-								<div className="flex-1 min-w-0">
-									<Input
-										placeholder={`${placeLabels[place].slice(0, -1)} name`}
-										className="w-full text-sm bg-white border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
-										{...field}
-									/>
-									<FormMessage className="text-xs mt-1" />
-								</div>
-							)}
-						/>
-
-						{/* Distance and Unit Fields */}
-						<div className="flex w-full sm:w-auto">
-							{/* Distance Input */}
-							<FormField
-								control={form.control}
-								name={`nearbyPlaces.${place}.${idx}.distance`}
-								render={({ field }) => (
-									<div className="flex-1">
-										<Input
-											type="number"
-											placeholder="Distance"
-											min={0}
-											step={0.1}
-											className="rounded-r-none border-r-0 text-sm bg-white border-gray-300 focus:z-10 hide-number-arrows"
-											value={
-												field.value !== undefined && field.value !== null
-													? String(field.value)
-													: ""
-											}
-											onChange={(e) =>
-												field.onChange(e.target.valueAsNumber || 0)
-											}
-										/>
-										<FormMessage className="text-xs mt-1" />
-									</div>
-								)}
-							/>
-
-							{/* Unit Dropdown */}
-							<FormField
-								control={form.control}
-								name={`nearbyPlaces.${place}.${idx}.unit`}
-								render={({ field }) => (
-									<div className="w-24">
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="outline"
-													className="w-full h-12 px-3 text-sm rounded-l-none border-gray-300 bg-white hover:bg-gray-50 focus:z-10">
-													<span className="truncate">
-														{field.value || "km"}
-													</span>
-													<svg
-														width="14"
-														height="14"
-														viewBox="0 0 16 16"
-														fill="none"
-														className="ml-1 flex-shrink-0">
-														<path
-															d="M4 6L8 10L12 6"
-															stroke="currentColor"
-															strokeWidth="1.5"
-															strokeLinecap="round"
-															strokeLinejoin="round"
-														/>
-													</svg>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end" className="w-24">
-												{distanceUnits.map((unit) => (
-													<DropdownMenuItem
-														key={unit}
-														onSelect={() => field.onChange(unit)}
-														className="text-sm">
-														{unit}
-													</DropdownMenuItem>
-												))}
-											</DropdownMenuContent>
-										</DropdownMenu>
-										<FormMessage className="text-xs mt-1" />
-									</div>
-								)}
-							/>
-						</div>
-
-						{/* Remove Button */}
+						className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium shadow-sm">
+						<span>
+							{form.getValues(`nearbyPlaces.${place}.${idx}.name`)} •{" "}
+							{form.getValues(`nearbyPlaces.${place}.${idx}.distance`)}{" "}
+							{form.getValues(`nearbyPlaces.${place}.${idx}.unit`)}
+						</span>
 						<Button
 							type="button"
-							size="icon"
+							size="sm"
 							variant="ghost"
-							className="h-12 w-12 text-red-400 hover:text-destructive hover:bg-destructive/10 transition-colors flex-shrink-0 border border-red-400"
+							className="h-6 px-2 text-xs text-red-600 hover:bg-red-100 rounded-full"
 							onClick={() => remove(idx)}>
-							<X className="h-4 w-4" />
+							Remove
 						</Button>
 					</div>
 				))}
 			</div>
+
+			{/* Add New Chip */}
+			{/* Add New Chip */}
+			{adding && (
+				<div className="flex flex-wrap gap-3 items-center">
+					{/* Name Input */}
+					<Input
+						placeholder="Name"
+						className="flex-1 min-w-[20rem] text-sm lg:w-[25rem]"
+						value={newName}
+						onChange={(e) => setNewName(e.target.value)}
+					/>
+
+					{/* Distance Input */}
+					<div className="flex items-center">
+						<Input
+							placeholder="Distance"
+							type="number"
+							className="w-[7rem] text-sm hide-number-arrows rounded-l-lg rounded-r-none border-r-none"
+							value={newDistance}
+							onChange={(e) => setNewDistance(e.target.value)}
+						/>
+
+						{/* Unit Select */}
+						<select
+							className="border rounded-r-lg px-2 py-2 text-sm h-12 rounded-l-none bg-white text-gray-700 "
+							value={newUnit}
+							onChange={(e) => setNewUnit(e.target.value)}>
+							{distanceUnits.map((unit) => (
+								<option key={unit} value={unit}>
+									{unit}
+								</option>
+							))}
+						</select>
+					</div>
+
+					{/* Action Buttons */}
+					<Button
+						type="button"
+						size="sm"
+						onClick={handleAdd}
+						className="bg-primary text-white w-[80px] hover:bg-primary/90 h-12">
+						Add
+					</Button>
+					<Button
+						type="button"
+						size="sm"
+						variant="ghost"
+						onClick={() => setAdding(false)}>
+						Cancel
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }

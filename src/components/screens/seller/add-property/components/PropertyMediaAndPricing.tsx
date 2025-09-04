@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import React, { useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { PropertyFormData } from "../validation/propertySchema";
+import NearbyPlaceFields from "./NearbyPlaceFields";
 
 interface PropertyMediaAndPricingProps {
 	form: UseFormReturn<PropertyFormData>;
@@ -17,6 +18,9 @@ interface PropertyMediaAndPricingProps {
 
 type PricingFieldNames = "basePrice" | "maintenanceCharges" | "securityDeposit";
 type PricingValueFieldKey = `pricing.${PricingFieldNames}`;
+
+const places = ["schools", "hospitals", "malls", "transport"];
+const distanceUnits = ["meter", "km"];
 
 export default function PropertyMediaAndPricing({
 	form,
@@ -28,9 +32,9 @@ export default function PropertyMediaAndPricing({
 	const isForSale = listingType === "sale";
 
 	const priceFields = [
-		{ name: "basePrice", label: "Monthly Rent", min: 0 },
-		{ name: "maintenanceCharges", label: "Maintenance Charges", min: 0 },
-		{ name: "securityDeposit", label: "Security Deposit", min: 0 },
+		{ name: "basePrice", label: "Monthly Rent" },
+		{ name: "maintenanceCharges", label: "Maintenance Charges" },
+		{ name: "securityDeposit", label: "Security Deposit" },
 	];
 	// Define pricing fields based on listing type
 
@@ -75,10 +79,10 @@ export default function PropertyMediaAndPricing({
 						</FormLabel>
 						<FormControl>
 							<div
-								className={`relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 transition-colors ${
+								className={`relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 transition-colors   ${
 									dragActive
-										? "border-primary bg-primary/10"
-										: "border-muted bg-background"
+										? "border-gray-800 bg-primary/10"
+										: "border-gray-400 bg-background"
 								}`}
 								onDrop={handleDrop}
 								onDragOver={(e) => {
@@ -101,9 +105,14 @@ export default function PropertyMediaAndPricing({
 										d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 12l4-4a2 2 0 012.828 0l2.828 2.828a2 2 0 002.828 0L20 8m-4 4v4m0 0h-4m4 0h4"
 									/>
 								</svg>
-								<span className="text-sm text-muted-foreground mb-2">
-									Drag & drop images here, or click to select
-								</span>
+
+								<div className="text-xs text-muted-foreground mt-2 flex flex-col items-center justify-center">
+									<span className="">
+										Drag & drop images here, or click to select
+									</span>
+									You can upload up to 10 images. Supported formats: JPG, PNG,
+									WEBP.
+								</div>
 								<input
 									ref={inputRef}
 									type="file"
@@ -149,9 +158,7 @@ export default function PropertyMediaAndPricing({
 								</div>
 							))}
 						</div>
-						<div className="text-xs text-muted-foreground mt-2">
-							You can upload up to 10 images. Supported formats: JPG, PNG, WEBP.
-						</div>
+
 						<FormMessage />
 					</FormItem>
 				)}
@@ -202,8 +209,7 @@ export default function PropertyMediaAndPricing({
 												type="number"
 												{...field}
 												onChange={(e) => {
-													const value = e.target.valueAsNumber;
-													field.onChange(value);
+													field.onChange(e);
 												}}
 												className="border-none rounded-none h-[40px] px-3 focus:ring-0 focus:border-none hide-number-arrows"
 											/>
@@ -217,7 +223,7 @@ export default function PropertyMediaAndPricing({
 				))}
 
 			{/* Price Negotiable Field */}
-			<div className="flex items-center gap-8">
+			{/* <div className="flex items-center gap-8">
 				<FormField
 					control={form.control}
 					name="pricing.priceNegotiable"
@@ -235,8 +241,8 @@ export default function PropertyMediaAndPricing({
 						</FormItem>
 					)}
 				/>
-			</div>
-
+			</div> */}
+			{/* 
 			{propertyType !== "plot" && (
 				<FormField
 					control={form.control}
@@ -257,7 +263,123 @@ export default function PropertyMediaAndPricing({
 						</FormItem>
 					)}
 				/>
+			)} */}
+
+			<FormField
+				control={form.control}
+				name="contact.name"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel className="text-sm font-semibold text-gray-700">
+							Contact Name <span style={{ color: "red" }}>*</span>
+						</FormLabel>
+						<FormControl>
+							<Input
+								placeholder="Owner/Agent Name"
+								{...field}
+								className="h-[40px] px-3 py-2 text-xs"
+							/>
+						</FormControl>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+			<FormField
+				control={form.control}
+				name="contact.phone"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel className="text-sm font-semibold text-gray-700">
+							Contact Phone <span style={{ color: "red" }}>*</span>
+						</FormLabel>
+						<FormControl>
+							<Input
+								placeholder="Phone Number"
+								{...field}
+								className="h-[40px] px-3 py-2 text-xs"
+							/>
+						</FormControl>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+			<FormField
+				control={form.control}
+				name="contact.whatsapp"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel className="text-sm font-semibold text-gray-700">
+							Contact WhatsApp
+						</FormLabel>
+						<FormControl>
+							<Input
+								placeholder="WhatsApp Number (optional)"
+								{...field}
+								className="h-[40px] px-3 py-2 text-xs"
+							/>
+						</FormControl>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+			<FormField
+				control={form.control}
+				name="contact.type"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel className="text-sm font-semibold text-gray-700">
+							Contact Type <span style={{ color: "red" }}>*</span>
+						</FormLabel>
+						<select
+							{...field}
+							className="border rounded-lg h-[40px] px-3 py-2 w-full text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+							<option value="owner">Owner</option>
+							<option value="agent">Agent</option>
+							<option value="builder">Builder</option>
+						</select>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
+
+			{propertyType !== "plot" && (
+				<>
+					<h3 className="text-md font-semibold text-gray-800 mb-4 mt-6">
+						Nearby Places
+					</h3>
+					{places.map((place) => (
+						<NearbyPlaceFields
+							key={place}
+							form={form}
+							place={place as "schools" | "hospitals" | "malls" | "transport"}
+							distanceUnits={distanceUnits}
+						/>
+					))}
+				</>
 			)}
+
+			<h3 className="text-md font-semibold text-gray-800 mb-4 mt-6">
+				Additional Notes
+			</h3>
+			<FormField
+				control={form.control}
+				name="notes"
+				render={({ field }) => (
+					<FormItem>
+						<FormLabel className="text-sm font-semibold text-gray-700">
+							Notes
+						</FormLabel>
+						<FormControl>
+							<Input
+								placeholder="Additional notes"
+								{...field}
+								className="h-[40px] px-3 py-2 text-xs"
+							/>
+						</FormControl>
+						<FormMessage />
+					</FormItem>
+				)}
+			/>
 		</div>
 	);
 }
