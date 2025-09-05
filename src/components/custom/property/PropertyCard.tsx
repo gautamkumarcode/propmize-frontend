@@ -251,7 +251,7 @@ export default function PropertyCard({
 						<div className="absolute bottom-4 left-4">
 							<Badge className="bg-white/95 backdrop-blur-sm text-gray-900 text-lg font-bold px-4 py-2 shadow-xl border-0 rounded-xl">
 								{formatPrice(
-									property.price || property?.pricing?.basePrice?.value || 0,
+									property.price || Number(property?.pricing?.basePrice) || 0,
 									property.status
 								)}{" "}
 							</Badge>

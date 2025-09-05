@@ -265,8 +265,7 @@ const MyProperty = () => {
 
 								<div className="flex justify-between items-center mb-4">
 									<div className="text-lg font-bold text-blue-600">
-										{property.pricing?.basePrice?.value}{" "}
-										{property.pricing?.basePrice?.currency}
+										{property.pricing?.basePrice}{" "}
 										{property.pricing?.priceNegotiable && (
 											<span className="text-sm font-normal text-gray-500 ml-1">
 												(Negotiable)
