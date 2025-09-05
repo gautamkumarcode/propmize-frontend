@@ -103,14 +103,14 @@ export const routes: Record<string, Route> = {
 		name: "My Property",
 		description: "Manage your property listings",
 		layout: "seller",
-		protected: false,
+		protected: true,
 	},
 	properties: {
 		path: "/property",
-		name: "Properties",
-		description: "Manage your property listings",
-		layout: "buyer",
-		protected: true,
+		name: "Explore All Properties",
+		description: "Explore all property listings",
+		layout: "public",
+		protected: false,
 	},
 
 	// Seller routes
@@ -123,8 +123,15 @@ export const routes: Record<string, Route> = {
 	},
 	addProperty: {
 		path: "/seller/add-property",
-		name: "Add Property",
-		description: "Add a new property listing",
+		name: "Sell / Rent Property",
+		description: "Create a new property listing",
+		layout: "seller",
+		protected: true,
+	},
+	addPropertyOnWhatsapp: {
+		path: "#",
+		name: "Sell / Rent Property on WhatsApp",
+		description: "Create a new property listing via WhatsApp",
 		layout: "seller",
 		protected: true,
 	},
@@ -202,8 +209,6 @@ export const getPublicRoutes = (): Route[] => {
 
 // Navigation items for different layouts
 export const buyerNavItems: NavigationItem[] = [
-	{ route: routes.buyerAssistant, icon: "Home" },
-
 	// { route: routes.buyerProfile, icon: "User" },
 	{
 		route: {
@@ -215,6 +220,8 @@ export const buyerNavItems: NavigationItem[] = [
 		icon: "RotateCcw",
 		isHighlighted: true,
 	},
+	{ route: routes.buyerAssistant, icon: "Home" },
+
 	{ route: routes.saved, icon: "Heart" },
 	{ route: routes.recent, icon: "Eye" },
 	{ route: routes.contacted, icon: "Phone" },
@@ -225,7 +232,6 @@ export const buyerNavItems: NavigationItem[] = [
 
 export const sellerNavItems: NavigationItem[] = [
 	// { route: routes.sellerProfile, icon: "User" },
-	{ route: routes.myProperty, icon: "Building" },
 	{
 		route: {
 			path: "/buyer/assistant",
@@ -236,13 +242,14 @@ export const sellerNavItems: NavigationItem[] = [
 		icon: "RotateCcw",
 		isHighlighted: true,
 	},
-
+	{ route: routes.myProperty, icon: "Building" },
+	{ route: routes.addProperty, icon: "Plus" },
+	// { route: routes.addPropertyOnWhatsapp, icon: "Plus" },
 	{ route: routes.sellerPlans, icon: "Crown" },
 	{ route: routes.sellerGuide, icon: "BookOpen" },
 	{ route: routes.sellerSupport, icon: "HelpCircle" },
 	{ route: routes.sellerAnalytics, icon: "BarChart3" },
 	{ route: routes.sellerLeads, icon: "MessageSquare" },
-	{ route: routes.addProperty, icon: "Plus", isHighlighted: true },
 	{ route: routes.sellerPremium, icon: "Diamond" },
 ];
 

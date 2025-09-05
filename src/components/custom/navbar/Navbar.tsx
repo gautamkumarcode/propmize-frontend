@@ -12,7 +12,7 @@ import { iconMap } from "@/lib/routing/iconMap";
 import { buyerNavItems, sellerNavItems } from "@/lib/routing/routes";
 import { useAuthStore } from "@/store/app-store";
 import { AxiosError } from "axios";
-import { Bell, LogIn, LogOut, User } from "lucide-react";
+import { Bell, LogIn, LogOut, Text, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -134,19 +134,6 @@ export default function Navbar({
 		}
 	};
 
-	const isModeSwitchItem = async (itemPath: string) => {
-		try {
-			const response = await apiClient.put(`/api/users/${user?._id}/role`, {
-				role: itemPath === "/seller" ? "seller" : "buyer",
-			});
-
-			console.log(response);
-		} catch (error) {
-			console.error("Error fetching user data:", error);
-		}
-		return itemPath === "/seller" || itemPath === "/buyer/assistant";
-	};
-
 	return (
 		<>
 			<nav className="bg-white border-b border-gray-200 lg:px-6 py-4 px-0 md:px-4">
@@ -201,12 +188,16 @@ export default function Navbar({
 							<button
 								onClick={() => setShowNavDropdown(!showNavDropdown)}
 								className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg">
-								<User size={20} />
+								{showNavDropdown ? (
+									<X size={24} className="transition-all" />
+								) : (
+									<Text className="rotate-y-180" size={24} />
+								)}
 							</button>
 
 							{/* Navigation Dropdown - positioned to the left of menu button */}
 							{showNavDropdown && (
-								<div className="absolute md:w-[25rem] w-[95vw] top-full right-0 mt-1  bg-white border border-gray-200 rounded-lg shadow-lg z-50 h-[70vh] overflow-y-scroll">
+								<div className="absolute md:w-[25rem] w-[60vw] top-full -right-3 bottom-0 mt-1  bg-white border border-gray-200 rounded-lg shadow-lg z-[999] h-[92vh] overflow-y-scroll">
 									<div className="py-2">
 										<div className="px-4 py-2 border-b border-gray-200">
 											{" "}
