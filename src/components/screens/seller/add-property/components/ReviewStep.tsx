@@ -247,7 +247,7 @@ export default function ReviewStep({ form, isEditMode }: StepProps) {
 									<img
 										src={mappedFiles ? mappedFiles[idx] : ""}
 										alt={file.name}
-										className="h-24 w-full object-cover rounded-lg border shadow-md transition-transform group-hover:scale-105"
+										className="h-48 w-full object-contain rounded-lg border shadow-md transition-transform group-hover:scale-105"
 									/>
 									{/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg" /> */}
 									{/* <span className="absolute bottom-2 left-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded truncate">

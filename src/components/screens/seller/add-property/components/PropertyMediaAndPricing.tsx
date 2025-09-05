@@ -126,12 +126,12 @@ export default function PropertyMediaAndPricing({
 							</div>
 						</FormControl>
 						<div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-							{selectedImages.map((file, index) => (
+							{form.watch("images")?.map((file, index) => (
 								<div key={file.name + index} className="relative group">
 									<img
 										src={URL.createObjectURL(file)}
 										alt={file.name}
-										className="h-32 w-full object-cover rounded-lg border shadow-sm"
+										className="h-48 w-full object-contain rounded-lg border shadow-sm"
 									/>
 									<button
 										type="button"

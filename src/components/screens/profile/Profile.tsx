@@ -301,18 +301,18 @@ export default function Profile() {
 										<div className="flex flex-col items-center -mt-16">
 											<div className="relative">
 												<Avatar className="w-24 h-24 border-4 border-white shadow-lg">
-													{formData.avatar &&
-													typeof formData.avatar === "string" ? (
+													{formData.avatar ? (
 														<AvatarImage
-															src={`http://localhost:5001/${formData.avatar}`}
+															src={
+																formData.avatar instanceof File
+																	? URL.createObjectURL(formData.avatar as File)
+																	: formData.avatar
+															}
 															alt="Profile"
 															className="object-contain w-full h-full"
 														/>
 													) : profile?.avatar ? (
-														<AvatarImage
-															src={`http://localhost:5001/${profile.avatar}`}
-															alt="Profile"
-														/>
+														<AvatarImage src={profile.avatar} alt="Profile" />
 													) : null}
 													<AvatarFallback className="bg-blue-100 text-blue-800 text-2xl">
 														<UserIcon className="w-8 h-8" />

@@ -191,9 +191,9 @@ const PropertyDetails = () => {
 					{images.length > 0 ? (
 						<Image
 							fill
-							src={imageError ? "/placeholder-property.jpg" : images[0]}
+							src={imageError ? "/placeholder-property.jpg" : imageUrl}
 							alt={property.title}
-							className="object-cover transition-transform duration-300 hover:scale-105"
+							className="object-contain transition-transform duration-300 hover:scale-105"
 							onError={() => setImageError(true)}
 							priority
 						/>

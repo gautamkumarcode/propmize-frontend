@@ -125,6 +125,7 @@ const MyProperty = () => {
 					{properties.map((property: PropertyResponse) => (
 						<div
 							key={property._id}
+							onClick={() => router.push(`/property/${property._id}`)}
 							className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
 							{/* ...existing property card code... */}
 							<div className="relative h-[20rem]">

@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
 			"propmize-backend.onrender.com",
 			"localhost",
 			"localhost:5001",
+			"res.cloudinary.com",
 			// add other domains if needed
 		],
 	},

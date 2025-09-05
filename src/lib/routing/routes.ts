@@ -221,6 +221,7 @@ export const buyerNavItems: NavigationItem[] = [
 		isHighlighted: true,
 	},
 	{ route: routes.buyerAssistant, icon: "Home" },
+	{ route: routes.properties, icon: "Building" },
 
 	{ route: routes.saved, icon: "Heart" },
 	{ route: routes.recent, icon: "Eye" },
@@ -242,8 +243,9 @@ export const sellerNavItems: NavigationItem[] = [
 		icon: "RotateCcw",
 		isHighlighted: true,
 	},
-	{ route: routes.myProperty, icon: "Building" },
 	{ route: routes.addProperty, icon: "Plus" },
+	{ route: routes.myProperty, icon: "Building" },
+	{ route: routes.properties, icon: "Building" },
 	// { route: routes.addPropertyOnWhatsapp, icon: "Plus" },
 	{ route: routes.sellerPlans, icon: "Crown" },
 	{ route: routes.sellerGuide, icon: "BookOpen" },
