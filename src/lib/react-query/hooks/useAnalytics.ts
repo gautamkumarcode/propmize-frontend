@@ -10,3 +10,14 @@ export const useSellerDashboard = () => {
 		select: (data) => data.data,
 	});
 };
+
+
+// get All property analytics for seller
+export const useSellerAllPropertyAnalytics = (selectedPeriod:string) => {
+	return useQuery({
+		queryKey: QueryKeys.sellerPropertyAnalytics,
+		queryFn: () => AnalyticsService.getSellerPropertyAnalytics(selectedPeriod),
+		select: (data) => data.data,
+	});
+};	
+

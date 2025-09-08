@@ -206,10 +206,12 @@ export default function Navbar({
 												<div className="flex items-center space-x-3 py-2">
 													{/* Avatar: fallback to initials if no avatar */}
 													{user.avatar ? (
-														<img
+														<Image
 															src={user.avatar}
 															alt={user.name}
-															className="w-10 h-10 rounded-full object-cover border border-gray-200"
+															className="w-10 h-10 rounded-full object-contain border border-gray-200"
+															width={40}
+															height={40}
 														/>
 													) : (
 														<div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg border border-gray-200">

@@ -1,3 +1,4 @@
+import { SellerPropertyAnalytics } from "@/types/property";
 import apiClient from "../api";
 import { ApiResponse, Lead } from "../types/api";
 
@@ -117,6 +118,18 @@ export class AnalyticsService {
 			}
 		);
 
+		return response.data;
+	}
+
+	/**
+	 * Get detailed analytics for all properties of a seller
+	 */
+	static async getSellerPropertyAnalytics(
+		selectedPeriod: string
+	): Promise<ApiResponse<SellerPropertyAnalytics>> {
+		const response = await apiClient.get(
+			`/analytics/seller/properties?period=${selectedPeriod}`
+		);
 		return response.data;
 	}
 }

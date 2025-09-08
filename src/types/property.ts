@@ -179,3 +179,85 @@ export type Property = {
 	};
 	notes?: string;
 };
+
+
+
+export interface SellerPropertyAnalytics {
+	overallStats: OverallStat[];
+	propertyAnalytics: PropertyAnalytic[];
+	periodData: WeeklyDatum[];
+	marketInsights: MarketInsight[];
+	summary: Summary;
+}
+
+export interface MarketInsight {
+	title: string;
+	value: string;
+	insight: string;
+	recommendation: string;
+}
+
+export interface OverallStat {
+	label: string;
+	value: string;
+	change: string;
+	trend: string;
+	icon: string;
+}
+
+export interface PropertyAnalytic {
+	id: string;
+	title: string;
+	views: number;
+	inquiries: number;
+	favorites: number;
+	calls: number;
+	likes: number;
+	conversionRate: number;
+	converted: number;
+	daysListed: number;
+	status: Status;
+	propertyType: PropertyType;
+	listingType: ListingType;
+	location: Location;
+	price: PriceClass | number;
+}
+
+export enum ListingType {
+	Rent = "rent",
+	Sale = "sale",
+}
+
+export enum Location {
+	GhazipurUttarPradesh = "Ghazipur, Uttar Pradesh",
+	VaranasiUttarPradesh = "Varanasi, Uttar Pradesh",
+}
+
+export interface PriceClass {
+	value: number;
+	unit: string;
+}
+
+export enum PropertyType {
+	Apartment = "apartment",
+	Commercial = "commercial",
+	Plot = "plot",
+}
+
+export enum Status {
+	Active = "active",
+	Pending = "pending",
+}
+
+export interface Summary {
+	totalProperties: number;
+	activeProperties: number;
+	totalValue: string;
+	averagePrice: null;
+}
+
+export interface WeeklyDatum {
+	day: string;
+	views: number;
+	inquiries: number;
+}

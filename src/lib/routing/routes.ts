@@ -124,7 +124,7 @@ export const routes: Record<string, Route> = {
 	addProperty: {
 		path: "/seller/add-property",
 		name: "Sell / Rent Property",
-		description: "Create a new property listing",
+		description: "List your property & reach genuine buyers/tenants",
 		layout: "seller",
 		protected: true,
 	},
@@ -246,13 +246,14 @@ export const sellerNavItems: NavigationItem[] = [
 	{ route: routes.addProperty, icon: "Plus" },
 	{ route: routes.myProperty, icon: "Building" },
 	{ route: routes.properties, icon: "Building" },
+	{ route: routes.sellerAnalytics, icon: "BarChart3" },
+	{ route: routes.sellerLeads, icon: "MessageSquare" },
 	// { route: routes.addPropertyOnWhatsapp, icon: "Plus" },
 	{ route: routes.sellerPlans, icon: "Crown" },
 	{ route: routes.sellerGuide, icon: "BookOpen" },
 	{ route: routes.sellerSupport, icon: "HelpCircle" },
-	{ route: routes.sellerAnalytics, icon: "BarChart3" },
-	{ route: routes.sellerLeads, icon: "MessageSquare" },
-	{ route: routes.sellerPremium, icon: "Diamond" },
+
+	// { route: routes.sellerPremium, icon: "Diamond" },
 ];
 
 export const sellerBottomNavItems: NavigationItem[] = [

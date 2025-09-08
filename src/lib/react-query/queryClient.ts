@@ -157,4 +157,5 @@ export const QueryKeys = {
 	faqs: ["support", "faqs"] as const,
 	faqCategories: ["support", "faqs", "categories"] as const,
 	supportStats: ["support", "stats"] as const,
+	sellerPropertyAnalytics: ["analytics", "seller-properties"] as const,
 } as const;
