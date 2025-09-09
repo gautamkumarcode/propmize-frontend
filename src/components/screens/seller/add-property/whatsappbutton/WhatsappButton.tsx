@@ -58,14 +58,14 @@ Please guide me through the listing process.`;
 	return (
 		<Button
 			variant={"outline"}
-			className="flex justify-self-end absolute lg:-top-4 right-0 z-[9] text-green-600 border-green-600 hover:bg-green-600 hover:text-white top-[6.5rem]"
+			className="flex justify-self-end absolute lg:-top-3 right-1 z-[9] text-green-600 border-green-600 hover:bg-green-600 hover:text-white top-[6.5rem]"
 			onClick={handleWhatsAppClick}
 			disabled={isLoading}>
 			{isLoading ? (
 				"Opening WhatsApp..."
 			) : (
 				<>
-					Add Property on
+					List via WhatsApp
 					<svg
 						className="text-green-500 hover:text-white"
 						width="20"

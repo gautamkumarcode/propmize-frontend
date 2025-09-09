@@ -40,6 +40,7 @@ export default function AIChatWindow({
 }: AIChatWindowProps) {
 	const [message, setMessage] = useState("");
 
+
 	const [isNewChat, setIsNewChat] = useState(false);
 
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -80,6 +81,10 @@ export default function AIChatWindow({
 			console.error("Error starting new chat:", error);
 		}
 	};
+
+	// useEffect(() => {
+	// 	handleStartNewChat();
+	// }, [isAuthenticated && !user]); // Restart chat when user logs in/out
 
 	const handleSendMessage = async () => {
 		if (!message.trim()) return;

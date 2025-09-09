@@ -107,8 +107,8 @@ export const routes: Record<string, Route> = {
 	},
 	properties: {
 		path: "/property",
-		name: "Explore All Properties",
-		description: "Explore all property listings",
+		name: "All listings",
+		description: "Explore property listed  in my city ",
 		layout: "public",
 		protected: false,
 	},
@@ -270,5 +270,5 @@ export const buyerBottomNavItems: NavigationItem[] = [
 	// Use a unique route for chat/messages, or remove duplicate
 	{ route: routes.buyerAssistant, icon: "MessageSquare", isHighlighted: true },
 	{ route: routes.newProjects, icon: "Building" },
-	{ route: routes.buyerProfile, icon: "User" },
+	{ route: routes.properties, icon: "Building" },
 ];

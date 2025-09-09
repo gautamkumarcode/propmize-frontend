@@ -1,20 +1,17 @@
 "use client";
 
+import PropertyCard from "@/components/custom/property/PropertyCard";
+import PropertyCardLoader from "@/components/custom/property/PropertyCardLoader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRecentlyViewedProperties } from "@/lib/react-query/hooks/useProperties";
 import { PropertyResponse } from "@/types";
-import { Bath, Bed, Eye, MapPin, Phone, Square, Trash2 } from "lucide-react";
+import { Eye } from "lucide-react";
 
 export default function Recent() {
 	const { data: recentPropertiesData, isLoading } =
 		useRecentlyViewedProperties();
 	const recentProperties: PropertyResponse[] = recentPropertiesData?.data || [];
-
-	// Example clearAllHistory handler (implement API if needed)
-	const clearAllHistory = () => {
-		// TODO: Call API to clear history, then refetch
-	};
 
 	return (
 		<div className="min-h-screen bg-gray-50 ">
@@ -32,70 +29,23 @@ export default function Recent() {
 									{recentProperties.length} properties viewed
 								</p>
 							</div>
-							<Button
+							{/* <Button
 								variant="outline"
 								onClick={clearAllHistory}
 								className="text-red-600 hover:text-red-700 hover:border-red-300">
 								<Trash2 className="w-4 h-4 mr-2" />
 								Clear History
-							</Button>
+							</Button> */}
 						</div>
 					</div>
 
 					{/* Properties Grid */}
 					{isLoading ? (
-						<div className="text-center py-12">Loading...</div>
+						<PropertyCardLoader />
 					) : recentProperties.length > 0 ? (
 						<div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 							{recentProperties.map((property: PropertyResponse) => (
-								<Card key={property._id} className="overflow-hidden">
-									<div className="relative">
-										<img
-											src={property.images?.[0] || "/api/placeholder/300/200"}
-											alt={property.title}
-											className="w-full h-48 object-cover"
-										/>
-										<div className="absolute bottom-3 left-3 bg-white px-3 py-1 rounded-full text-sm font-semibold">
-											₹{property.price}
-										</div>
-									</div>
-									<div className="p-4">
-										<h3 className="text-lg font-semibold text-gray-900 mb-2">
-											{property.title}
-										</h3>
-										<p className="text-gray-600 flex items-center mb-3">
-											<MapPin className="w-4 h-4 mr-1" />
-											{property.address?.city}, {property.address?.area}
-										</p>
-										<div className="flex items-center justify-between mb-4">
-											<div className="flex items-center space-x-4 text-sm text-gray-600">
-												<span className="flex items-center">
-													<Bed className="w-4 h-4 mr-1" />
-													{property.bedrooms} Beds
-												</span>
-												<span className="flex items-center">
-													<Bath className="w-4 h-4 mr-1" />
-													{property.bathrooms} Baths
-												</span>
-												<span className="flex items-center">
-													<Square className="w-4 h-4 mr-1" />
-													{property.area?.value} {property.area?.unit}
-												</span>
-											</div>
-										</div>
-
-										<div className="flex items-center justify-between">
-											<p className="text-xs text-gray-500">
-												{/* If API provides viewedDate, format it here */}
-												{/* Example: Viewed on 22/08/2025 */}
-											</p>
-											<Button size="sm">
-												<Phone className="w-4 h-4 mr-1" />
-												Contact
-											</Button>
-										</div>
-									</div>
-								</Card>
+								<PropertyCard key={property._id} property={property} />
 							))}
 						</div>
 					) : (

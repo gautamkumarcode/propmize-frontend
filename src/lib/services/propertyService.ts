@@ -265,4 +265,14 @@ export class PropertyService {
 			data: response.data.data || [],
 		};
 	}
+
+	static async getNewlyAddedProperties(): Promise<
+		ApiResponse<PropertyResponse[]>
+	> {
+		const response = await apiClient.get("/properties/newly-added");
+		return {
+			...response.data,
+			data: response.data.data || [],
+		};
+	}
 }

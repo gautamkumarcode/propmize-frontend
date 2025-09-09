@@ -1,13 +1,7 @@
-
-
-import AppLayout from "@/components/custom/layout/AppLayout";
-import { Toaster } from "@/components/ui/Toaster";
-import type { Metadata } from "next";
+import { Metadata } from "next/dist/lib/metadata/types/metadata-interface";
 import { Geist, Geist_Mono } from "next/font/google";
-import NextTopLoader from "nextjs-toploader";
-import { Providers } from "../src/lib/providers/Providers";
+import React from "react";
 import "./globals.css";
-
 const geistSans = Geist({
 	variable: "--font-geist-sans",
 	subsets: ["latin"],
@@ -27,11 +21,7 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({
-	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+export default function Layout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
 			<head>
@@ -42,23 +32,7 @@ export default function RootLayout({
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<NextTopLoader
-					color="#2563eb"
-					initialPosition={0.08}
-					crawlSpeed={200}
-					height={3}
-					crawl={true}
-					easing="ease"
-					speed={200}
-					showSpinner={false}
-					// disable circle loader
-
-					zIndex={1600}
-				/>
-				<Toaster />
-				<Providers>
-					<AppLayout>{children}</AppLayout>
-				</Providers>
+				{children}
 			</body>
 		</html>
 	);

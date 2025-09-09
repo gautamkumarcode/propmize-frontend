@@ -158,4 +158,5 @@ export const QueryKeys = {
 	faqCategories: ["support", "faqs", "categories"] as const,
 	supportStats: ["support", "stats"] as const,
 	sellerPropertyAnalytics: ["analytics", "seller-properties"] as const,
+	newlyAddedProperties: ["properties", "newly-added"] as const,
 } as const;

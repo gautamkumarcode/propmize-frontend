@@ -1,3 +1,5 @@
+"use client";
+
 import { PropertyFormData } from "@/components/screens/seller/add-property/validation/propertySchema";
 import {
 	useInfiniteQuery,
@@ -411,5 +413,14 @@ export function useRecentlyViewedProperties() {
 	return useQuery({
 		queryKey: QueryKeys.recentlyViewedProperties,
 		queryFn: PropertyService.getRecentlyViewedProperties,
+	});
+}
+
+export function useNewlyAddedProperties() {
+	return useQuery({
+		queryKey: QueryKeys.newlyAddedProperties,
+		queryFn: PropertyService.getNewlyAddedProperties,
+		select: (data) => data.data,
+		staleTime: 10 * 60 * 1000, // 10 minutes
 	});
 }

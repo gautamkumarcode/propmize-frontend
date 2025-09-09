@@ -117,6 +117,12 @@ export interface PropertyResponse {
 		}
 	];
 	currency: "INR" | "USD" | "EUR";
+	// UI-specific and new-projects fields
+	offers?: string[];
+	totalUnits?: number;
+	availableUnits?: number;
+	launchDate?: string;
+	possessionDate?: string;
 }
 export interface PropertyImage {
 	id: string;

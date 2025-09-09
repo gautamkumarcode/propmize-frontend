@@ -1,6 +1,5 @@
 // Firebase Push Notifications Service
 // This service will work when Firebase is installed and configured
-
 import { FirebaseApp } from "firebase/app";
 import type { MessagePayload, Messaging } from "firebase/messaging";
 
