@@ -196,7 +196,7 @@ export default function Profile() {
 
 	if (!isAuthenticated) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+			<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center pt-10">
 				<div className="text-center p-8 bg-white rounded-xl shadow-lg">
 					<Shield className="w-12 h-12 text-blue-500 mx-auto mb-4" />
 					<h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -242,7 +242,7 @@ export default function Profile() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 ">
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-4 ">
 			<div className="max-w-6xl mx-auto px-2 sm:px-2 lg:px-8">
 				{/* Header Section */}
 				<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">

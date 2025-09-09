@@ -30,7 +30,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 	}, []);
 
 	return (
-		<div className="min-h-screen bg-gray-50 pb-20">
+		<div className="min-h-screen bg-gray-50">
 			{mounted && (
 				<Header
 					mode={userMode || "buyer"} // Default to buyer if not set
@@ -47,7 +47,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 			)}
 
 			{/* Main Content */}
-			<main className=" px-4 py-6">{children}</main>
+			<main className="px-4">{children}</main>
 
 			{/* Auth Modal */}
 			<AuthModal

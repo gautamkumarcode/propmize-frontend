@@ -22,7 +22,9 @@ import {
 	Phone,
 	Send,
 } from "lucide-react";
+import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
+import logo from "../../../../public/logo.png";
 
 interface AIChatWindowProps {
 	initialChatId?: string;
@@ -39,7 +41,6 @@ export default function AIChatWindow({
 	onNewChat,
 }: AIChatWindowProps) {
 	const [message, setMessage] = useState("");
-
 
 	const [isNewChat, setIsNewChat] = useState(false);
 
@@ -150,10 +151,10 @@ export default function AIChatWindow({
 									{msg.properties.map((property, idx) => (
 										<Card
 											key={property._id || idx}
-											className="cursor-pointer hover:shadow-lg transition-all border border-gray-100 rounded-xl overflow-hidden">
+											className="cursor-pointer hover:shadow-lg transition-all border border-gray-100 rounded-xl overflow-hidden max-w-2xl">
 											<CardContent className="p-0">
 												{/* Image Section */}
-												<div className="relative h-36 md:h-40 w-full">
+												<div className="relative h-36 md:h-52 w-full">
 													<img
 														src={
 															property?.images && property.images[0]
@@ -330,9 +331,7 @@ export default function AIChatWindow({
 				<div className="flex flex-col items-center">
 					<Loader2 className="w-6 h-6 md:w-8 md:h-8 animate-spin text-blue-500 mb-2" />
 					<span className="text-sm text-gray-600 text-center">
-						{initialChatId
-							? "Loading chat session..."
-							: "Starting AI assistant..."}
+						{initialChatId ? "Loading chat session..." : "Starting Propmize..."}
 					</span>
 				</div>
 			</div>
@@ -403,8 +402,14 @@ export default function AIChatWindow({
 					{/* Typing indicator */}
 					{isTyping && (
 						<div className="flex gap-2 md:gap-3 mb-4 px-2 md:px-0">
-							<div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-								<Bot className="w-3 h-3 md:w-4 md:h-4 text-white" />
+							<div className="w-6 h-6 md:w-8 md:h-8  rounded-full flex items-center justify-center">
+								<Image
+									src={logo}
+									alt="AI"
+									width={20}
+									height={20}
+									className="object-contain"
+								/>
 							</div>
 							<Card className="bg-gray-50 max-w-[85%] md:max-w-[80%]">
 								<CardContent className="p-3">
@@ -415,7 +420,7 @@ export default function AIChatWindow({
 											<div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
 										</div>
 										<span className="text-xs text-gray-500">
-											AI assistant is thinking...
+											Propmize is thinking...
 										</span>
 									</div>
 								</CardContent>

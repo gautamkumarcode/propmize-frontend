@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { PropertyFormData } from "../validation/propertySchema";
 
@@ -28,6 +29,10 @@ interface StepProps {
 export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 	const propertyType = form.watch("propertyType");
 	const listingType = form.watch("listingType");
+
+	// State for extra area fields
+	const [showBuiltUp, setShowBuiltUp] = useState<boolean>(false);
+	const [showSuperBuiltUp, setShowSuperBuiltUp] = useState<boolean>(false);
 
 	const propertyTypes = [
 		{ value: "apartment", label: "Apartment" },
@@ -235,6 +240,164 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 						/>
 					)}
 				/>
+
+				{/* Add Area Details Buttons */}
+				<div className="flex flex-col gap-2 mt-2 md:col-span-3">
+					{!showBuiltUp && (
+						<button
+							type="button"
+							className="text-blue-600 text-sm font-medium hover:underline text-left"
+							onClick={() => setShowBuiltUp(true)}>
+							+ Add Built-up Area
+						</button>
+					)}
+					{!showSuperBuiltUp && (
+						<button
+							type="button"
+							className="text-blue-600 text-sm font-medium hover:underline text-left"
+							onClick={() => setShowSuperBuiltUp(true)}>
+							+ Add Super Built-up Area
+						</button>
+					)}
+				</div>
+
+				{/* Built-up Area Field */}
+				{showBuiltUp && (
+					<div className="flex gap-2 items-center mt-2 md:col-span-3">
+						<FormField
+							control={form.control}
+							name="builtUpArea.value"
+							render={({ field }) => (
+								<FormItem className="flex-1">
+									<FormLabel className="text-sm font-semibold text-gray-700">
+										Built-up Area
+									</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="e.g., 1500" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="builtUpArea.unit"
+							render={({ field }) => (
+								<FormItem className="w-[120px]">
+									<FormLabel className="text-sm font-semibold text-gray-700">
+										Unit
+									</FormLabel>
+									<FormControl>
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="outline"
+													className="w-full flex justify-between h-[40px] px-3 py-2 text-sm">
+													<span>
+														{areaUnits.find((au) => au.value === field.value)
+															?.label || "Unit"}
+													</span>
+													<ChevronDown className="w-4 h-4 text-muted-foreground" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent className="w-full min-w-[120px]">
+												{areaUnits.map((au) => (
+													<DropdownMenuItem
+														key={au.value}
+														onSelect={() => field.onChange(au.value)}>
+														{au.label}
+													</DropdownMenuItem>
+												))}
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="ml-2 text-red-500 hover:text-red-700"
+							aria-label="Remove Built-up Area"
+							onClick={() => {
+								setShowBuiltUp(false);
+								form.setValue("builtUpArea.value", "");
+							}}>
+							<span className="sr-only">Remove</span>×
+						</Button>
+					</div>
+				)}
+
+				{/* Super Built-up Area Field */}
+				{showSuperBuiltUp && (
+					<div className="flex gap-2 items-center mt-2 md:col-span-3">
+						<FormField
+							control={form.control}
+							name="superBuiltUpArea.value"
+							render={({ field }) => (
+								<FormItem className="flex-1">
+									<FormLabel className="text-sm font-semibold text-gray-700">
+										Super Built-up Area
+									</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="e.g., 1800" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="superBuiltUpArea.unit"
+							render={({ field }) => (
+								<FormItem className="w-[120px]">
+									<FormLabel className="text-sm font-semibold text-gray-700">
+										Unit
+									</FormLabel>
+									<FormControl>
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button
+													variant="outline"
+													className="w-full flex justify-between h-[40px] px-3 py-2 text-sm">
+													<span>
+														{areaUnits.find((au) => au.value === field.value)
+															?.label || "Unit"}
+													</span>
+													<ChevronDown className="w-4 h-4 text-muted-foreground" />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent className="w-full min-w-[120px]">
+												{areaUnits.map((au) => (
+													<DropdownMenuItem
+														key={au.value}
+														onSelect={() => field.onChange(au.value)}>
+														{au.label}
+													</DropdownMenuItem>
+												))}
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="ml-2 text-red-500 hover:text-red-700"
+							aria-label="Remove Super Built-up Area"
+							onClick={() => {
+								setShowSuperBuiltUp(false);
+								form.setValue("superBuiltUpArea.value", "");
+							}}>
+							<span className="sr-only">Remove</span>×
+						</Button>
+					</div>
+				)}
 				<FormField
 					control={form.control}
 					name="age"

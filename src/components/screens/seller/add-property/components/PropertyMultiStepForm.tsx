@@ -33,6 +33,8 @@ export const getPropertyDefaultValues = (): PropertyFormData => ({
 	age: "",
 	images: [],
 	amenities: [],
+	builtUpArea: { value: "", unit: "sqft" },
+	superBuiltUpArea: { value: "", unit: "sqft" },
 	address: {
 		street: "",
 		area: "",

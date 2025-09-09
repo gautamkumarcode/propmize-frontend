@@ -89,7 +89,7 @@ export default function SellerDashboard() {
 	];
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6 pt-4 px-4 ">
 			{/* Header */}
 			<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
 				<h1 className="text-2xl font-bold mb-2">Welcome back!</h1>

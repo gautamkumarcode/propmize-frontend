@@ -3,26 +3,14 @@
 import AIChatWindow from "@/components/custom/chat/AIChatWindow";
 import ChatHistoryModal from "@/components/custom/chat/ChatHistoryModal";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/providers/AuthProvider";
 import { aiChatService } from "@/services/aiChatService";
-import {
-	Bot,
-	History,
-	Info,
-	MoreVertical,
-	Plus,
-	Settings,
-	X,
-} from "lucide-react";
+import { ChevronRight, History, Info, Plus, Settings, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+
+import logo from "../../../../public/logo.png";
 
 export default function AssistantPage() {
 	const router = useRouter();
@@ -31,6 +19,7 @@ export default function AssistantPage() {
 		"property-search" | "general-inquiry" | "recommendation"
 	>("property-search");
 	const [showModeSelector, setShowModeSelector] = useState(false);
+	const [showSidebar, setShowSidebar] = useState(false);
 	const [chatId, setChatId] = useState<string | null>(null);
 	const [isInitializing, setIsInitializing] = useState(true);
 	const [showChatHistory, setShowChatHistory] = useState(false);
@@ -158,22 +147,29 @@ export default function AssistantPage() {
 
 	if (isInitializing) {
 		return (
-			<div className="fixed inset-x-0 top-16 bottom-20 md:bottom-6 bg-white flex items-center justify-center mx-auto max-w-7xl">
+			<div className=" bg-white flex items-center justify-center mx-auto max-w-7xl">
 				<div className="text-center">
 					<div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-						<Bot className="w-8 h-8 text-blue-600 animate-pulse" />
+						<Image src={logo} alt="Propmize Logo" width={40} height={40} />
 					</div>
-					<p className="text-gray-600">Initializing AI Assistant...</p>
+					<p className="text-gray-600">Initializing Propmize...</p>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="fixed inset-x-0 top-16 bottom-20 md:bottom-6 bg-white flex flex-col mx-auto max-w-7xl">
+		<div className=" inset-x-0  bg-white flex flex-col mx-auto max-w-7xl h-[85vh] lg:h-[90vh] overflow-scroll relative">
 			{/* Header */}
-			<div className="border-b px-4 py-3 md:px-6 md:py-4 bg-gray-50 flex-shrink-0">
-				<div className="flex items-center justify-between">
+			<div className="border-b  bg-gray-200 flex-shrink-0 flex justify-end absolute z-30 left-0 rounded-br-2xl">
+				{/* Sidebar open button */}
+
+				{/* You can use any icon, here is Settings for example */}
+				<ChevronRight
+					className="w-8 h-8 text-xl text-gray-600"
+					onClick={() => setShowSidebar(true)}
+				/>
+				{/* <div className="flex items-center justify-between">
 					<div className="flex items-center space-x-3 min-w-0">
 						<div className="lg:w-9 lg:h-9 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 w-7 h-7">
 							<Bot className="lg:w-5 lg:h-5 w-4 h-4 text-blue-600" />
@@ -194,73 +190,73 @@ export default function AssistantPage() {
 					</div>
 
 					{/* New Chat and Mode selector buttons */}
+				{/* 
+				<div className="flex gap-2 justify-center items-center">
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={handleNewChat}
+						className="text-gray-600 hover:text-blue-600 rounded-full"
+						aria-label="New Chat">
+						<Plus className="w-5 h-5" />
+					</Button>
 
-					<div className="flex gap-2 justify-center items-center">
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={handleNewChat}
-							className="text-gray-600 hover:text-blue-600 rounded-full"
-							aria-label="New Chat">
-							<Plus className="w-5 h-5" />
-						</Button>
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={handleViewChatHistory}
+						className="text-gray-600 hover:text-blue-600 rounded-full"
+						aria-label="Chat History">
+						<History className="w-5 h-5" />
+					</Button>
 
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={handleViewChatHistory}
-							className="text-gray-600 hover:text-blue-600 rounded-full"
-							aria-label="Chat History">
-							<History className="w-5 h-5" />
-						</Button>
-
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="ghost"
-									size="icon"
-									className="text-gray-600 hover:text-blue-600 rounded-full flex-shrink-0"
-									aria-label="Chat Options">
-									<MoreVertical className="w-6 h-6" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-48">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="text-gray-600 hover:text-blue-600 rounded-full flex-shrink-0"
+								aria-label="Chat Options">
+								<MoreVertical className="w-6 h-6" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-48">
+							<DropdownMenuItem
+								onClick={handleNewChat}
+								className="cursor-pointer">
+								<Plus className="w-4 h-4 mr-2" />
+								New Chat
+							</DropdownMenuItem>
+							{user && (
 								<DropdownMenuItem
-									onClick={handleNewChat}
+									onClick={() => setShowChatHistory(true)}
 									className="cursor-pointer">
-									<Plus className="w-4 h-4 mr-2" />
-									New Chat
+									<History className="w-4 h-4 mr-2" />
+									Chat History
 								</DropdownMenuItem>
-								{user && (
-									<DropdownMenuItem
-										onClick={() => setShowChatHistory(true)}
-										className="cursor-pointer">
-										<History className="w-4 h-4 mr-2" />
-										Chat History
-									</DropdownMenuItem>
-								)}
-								<DropdownMenuSeparator />
-								<DropdownMenuItem
-									onClick={handleClearChat}
-									className="cursor-pointer">
-									<X className="w-4 h-4 mr-2" />
-									Clear Chat
-								</DropdownMenuItem>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem className="cursor-pointer">
-									<Info className="w-4 h-4 mr-2" />
-									Help & Support
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={() => setShowModeSelector(!showModeSelector)}
-									className="cursor-pointer">
-									<Settings className="w-4 h-4 mr-2" />
-									Settings
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
-				</div>
+							)}
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								onClick={handleClearChat}
+								className="cursor-pointer">
+								<X className="w-4 h-4 mr-2" />
+								Clear Chat
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem className="cursor-pointer">
+								<Info className="w-4 h-4 mr-2" />
+								Help & Support
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => setShowModeSelector(!showModeSelector)}
+								className="cursor-pointer">
+								<Settings className="w-4 h-4 mr-2" />
+								Settings
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div> */}
+				{/* </div> */}
 
 				{/* Mobile user status */}
 				{!user && (
@@ -316,6 +312,73 @@ export default function AssistantPage() {
 						// Handle various actions like save, contact, etc.
 					}}
 				/>
+				{/* Sidebar overlay */}
+				{showSidebar && (
+					<div className="fixed inset-0 z-40">
+						<div className="fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-50 flex flex-col">
+							<div className="flex items-center justify-between p-4 border-b">
+								<div className="flex items-center gap-2">
+									<Image
+										src={logo}
+										alt="Propmize Logo"
+										width={30}
+										height={30}
+									/>
+									<p className="text-blue-600 font-semibold">Propmize</p>
+								</div>
+								<Button
+									variant="ghost"
+									size="icon"
+									onClick={() => setShowSidebar(false)}
+									aria-label="Close Sidebar">
+									<X className="w-5 h-5" />
+								</Button>
+							</div>
+							<div className="p-4 flex-1 overflow-y-auto">
+								<ul className="space-y-2">
+									<li>
+										<button
+											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
+											onClick={handleNewChat}>
+											<Plus className="w-4 h-4" /> New Chat
+										</button>
+									</li>
+									{user && (
+										<li>
+											<button
+												className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
+												onClick={() => setShowChatHistory(true)}>
+												<History className="w-4 h-4" /> Chat History
+											</button>
+										</li>
+									)}
+									<li>
+										<button
+											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
+											onClick={handleClearChat}>
+											<X className="w-4 h-4" /> Clear Chat
+										</button>
+									</li>
+									<li>
+										<button
+											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
+											// Add your help/support handler here
+										>
+											<Info className="w-4 h-4" /> Help & Support
+										</button>
+									</li>
+									<li>
+										<button
+											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
+											onClick={() => setShowModeSelector(!showModeSelector)}>
+											<Settings className="w-4 h-4" /> Settings
+										</button>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Chat History Modal */}

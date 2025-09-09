@@ -145,6 +145,24 @@ export const propertySchema = z.object({
 		.optional(),
 
 	notes: z.string().optional(),
+	builtUpArea: z
+		.object({
+			value: z
+				.string()
+
+				.optional(),
+			unit: z.enum(["sqft", "sqm", "acre", "hectare"]),
+		})
+		.optional(),
+	superBuiltUpArea: z
+		.object({
+			value: z
+				.string()
+
+				.optional(),
+			unit: z.enum(["sqft", "sqm", "acre", "hectare"]),
+		})
+		.optional(),
 });
 
 export type PropertyFormData = z.infer<typeof propertySchema>;
