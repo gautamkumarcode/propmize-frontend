@@ -251,9 +251,10 @@ export class AIChatService {
 		return guestId;
 	}
 
-	// Clear guest session (when user signs up)
+	// Clear guest session and chat (when user signs up/logs in)
 	clearGuestSession(): void {
 		localStorage.removeItem("propmize_guest_id");
+		localStorage.removeItem("ai_current_chat");
 		this.guestId = null;
 	}
 

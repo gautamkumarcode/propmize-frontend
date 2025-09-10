@@ -26,13 +26,28 @@ export default function AssistantPage() {
 
 	// Initialize chat when component mounts
 	const initializeChat = useCallback(async () => {
+		if (user) {
+			// Logged-in user: check for existing chat history
+			try {
+				const history = await aiChatService.getUserAIChats(1, 1, "active");
+				if (history.success && history.data.chats.length > 0) {
+					setChatId(history.data.chats[0]._id);
+					localStorage.setItem("ai_current_chat", history.data.chats[0]._id);
+					setIsInitializing(false);
+					return;
+				}
+			} catch (error) {
+				console.error("Error fetching chat history:", error);
+			}
+		}
+
+		// Guest or no chat history: fallback to localStorage or create new chat
 		const storedChatId = localStorage.getItem("ai_current_chat");
 		if (storedChatId) {
 			setChatId(storedChatId);
 			setIsInitializing(false);
 			return;
 		}
-		// If chatId exists (from localStorage), do not create a new chat
 		if (chatId) {
 			setIsInitializing(false);
 			return;
@@ -41,9 +56,7 @@ export default function AssistantPage() {
 			const response = await aiChatService.startAIChat(chatMode, {
 				showModeSpecificContent: false,
 				...(user && {
-					userPreferences: {
-						// Add any user preferences if available
-					},
+					userPreferences: {},
 				}),
 			});
 			if (response.success && response.data) {

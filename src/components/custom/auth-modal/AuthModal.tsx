@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { triggerToast } from "@/components/ui/Toaster";
 
 import apiClient from "@/lib/api";
+import { aiChatService } from "@/services/aiChatService";
 import { useAuthStore } from "@/store/app-store";
 import type { CredentialResponse } from "@react-oauth/google";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
@@ -55,6 +56,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 	redirectTo,
 }) => {
 	const queryClient = useQueryClient();
+
 	const { login, setUserMode } = useAuthStore();
 	const router = useRouter();
 	const [step, setStep] = useState<OtpStep>({
@@ -240,6 +242,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 				description: `Welcome, ${user.name || user.phone}!`,
 				variant: "success",
 			});
+			await aiChatService.clearGuestSession(); // Clear guest session and chat on login/signup
 			if (redirectTo) {
 				if (redirectTo.startsWith("/seller")) setUserMode("seller");
 				else if (redirectTo.startsWith("/buyer")) setUserMode("buyer");
@@ -264,7 +267,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
 	};
 
 	const handleSuccess = async (response: CredentialResponse) => {
-		console.log(response);
 		if (!response.credential) {
 			triggerToast({
 				title: "Login failed",
@@ -280,6 +282,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 			const { user, tokens } = res.data.data;
 			login(user, tokens.accessToken, tokens.refreshToken);
 			queryClient.invalidateQueries({ queryKey: ["user"] });
+			await aiChatService.clearGuestSession();
 			triggerToast({
 				title: "Login successful",
 				description: `Welcome, ${user.name || user.phone}!`,

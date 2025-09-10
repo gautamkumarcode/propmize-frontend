@@ -83,6 +83,12 @@ export default function Navbar({
 			onSuccess: () => {
 				setUser(null);
 				setAuthenticated(false);
+				// Clear guest chat and guest ID so a fresh guest chat is created after logout
+				if (typeof window !== "undefined") {
+					import("@/services/aiChatService").then(({ aiChatService }) => {
+						aiChatService.clearGuestSession();
+					});
+				}
 				toast({
 					title: "Logged out",
 					description: "You have been successfully logged out.",
@@ -94,6 +100,11 @@ export default function Navbar({
 				// Force logout even if API call fails
 				setUser(null);
 				setAuthenticated(false);
+				if (typeof window !== "undefined") {
+					import("@/services/aiChatService").then(({ aiChatService }) => {
+						aiChatService.clearGuestSession();
+					});
+				}
 			},
 		});
 	};
