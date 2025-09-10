@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/providers/AuthProvider";
 import { useCreateLead } from "@/lib/react-query/hooks/useLeads";
 import { cn } from "@/lib/utils";
 import { PropertyResponse } from "@/types";
+import { AxiosError } from "axios";
 import {
 	Bath,
 	Bed,
@@ -132,12 +133,12 @@ export default function PropertyCard({
 						description: "Your inquiry has been sent to the seller.",
 					});
 				},
-				onError: (error) => {
-					console.error("Error creating lead:", error);
+				onError: (error: unknown) => {
+					const axiosError = error as AxiosError;
 					toast({
 						title: "Failed to Send Inquiry",
-						description:
-							"There was an error sending your inquiry. Please try again.",
+						description: (axiosError?.response?.data as { error?: string })
+							?.error,
 						variant: "destructive",
 					});
 				},

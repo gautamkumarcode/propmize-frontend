@@ -1,6 +1,5 @@
 "use client";
 
-			
 import LogoImage from "@/assests/logo1.png";
 import NotificationDropdown from "@/components/custom/notifications/NotificationDropdown";
 import { toast } from "@/hooks/use-toast";
@@ -112,6 +111,7 @@ export default function Navbar({
 
 				if (response.data.success) {
 					setUserMode(targetMode);
+					if (user) setUser({ ...user, role: targetMode });
 					router.push(redirectTo);
 					setShowNavDropdown(false);
 					toast({
@@ -345,7 +345,7 @@ export default function Navbar({
 												);
 											})}
 										{/* Divider */}
-										<div className="border-t border-gray-200 my-2"></div>;
+										<div className="border-t border-gray-200 my-2"></div>
 										{/* Profile Option */}
 										{/* {isAuthenticated && (
 												<button

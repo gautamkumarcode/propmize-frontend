@@ -43,6 +43,7 @@ export default function Profile() {
 	const { user, isAuthenticated, userMode } = useAuthStore();
 	const { data: profileData, isLoading, error } = useProfile();
 	const updateProfileMutation = useUpdateProfile();
+	const { setUser } = useAuthStore();
 
 	const profile: User | undefined | null = profileData || user;
 	// const Layout = userMode === "seller" ? SellerLayout : BuyerLayout;
@@ -83,17 +84,26 @@ export default function Profile() {
 					country: profile.address?.country || "India",
 				},
 				avatar: profile.avatar || undefined,
-				preferences: profile.preferences ? {
-					propertyTypes: profile.preferences.propertyTypes || [],
-					priceRange: profile.preferences.priceRange || { min: 0, max: 10000000 },
-					locations: profile.preferences.locations || [],
-					notifications: profile.preferences.notifications || { email: true, sms: true, push: true },
-				} : {
-					propertyTypes: [],
-					priceRange: { min: 0, max: 10000000 },
-					locations: [],
-					notifications: { email: true, sms: true, push: true },
-				},
+				preferences: profile.preferences
+					? {
+							propertyTypes: profile.preferences.propertyTypes || [],
+							priceRange: profile.preferences.priceRange || {
+								min: 0,
+								max: 10000000,
+							},
+							locations: profile.preferences.locations || [],
+							notifications: profile.preferences.notifications || {
+								email: true,
+								sms: true,
+								push: true,
+							},
+					  }
+					: {
+							propertyTypes: [],
+							priceRange: { min: 0, max: 10000000 },
+							locations: [],
+							notifications: { email: true, sms: true, push: true },
+					  },
 			});
 		}
 	}, [profile]);
@@ -139,8 +149,12 @@ export default function Profile() {
 		if (formData.preferences) {
 			Object.keys(formData.preferences).forEach((key) => {
 				if (
-					JSON.stringify(formData.preferences[key as keyof typeof formData.preferences]) !==
-					JSON.stringify(profile?.preferences?.[key as keyof typeof profile.preferences])
+					JSON.stringify(
+						formData.preferences[key as keyof typeof formData.preferences]
+					) !==
+					JSON.stringify(
+						profile?.preferences?.[key as keyof typeof profile.preferences]
+					)
 				) {
 					changedData[`preferences.${key}`] =
 						formData.preferences[key as keyof typeof formData.preferences];
@@ -174,8 +188,9 @@ export default function Profile() {
 		}
 
 		updateProfileMutation.mutate(fd, {
-			onSuccess: () => {
+			onSuccess: (data) => {
 				setIsEditing(false);
+				if (data?.data) setUser(data.data); // Update store with new user data
 				toast({
 					title: "Profile updated successfully",
 					description: "Your changes have been saved.",
@@ -185,9 +200,7 @@ export default function Profile() {
 				toast({
 					title: "Update failed",
 					description:
-						error instanceof Error
-							? error.message
-							: "Failed to update profile",
+						error instanceof Error ? error.message : "Failed to update profile",
 					variant: "destructive",
 				});
 			},

@@ -71,10 +71,9 @@ const MyProperty = () => {
 
 	const properties = myPropertyData || [];
 
-	console.log("My Properties:", properties);
 
 	return (
-		<div className="container mx-auto px-4 py-8">
+		<div className="container mx-auto px-4 py-8 pb-20">
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
 					My Properties

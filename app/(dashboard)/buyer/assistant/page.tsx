@@ -166,7 +166,7 @@ export default function AssistantPage() {
 
 				{/* You can use any icon, here is Settings for example */}
 				<ChevronRight
-					className="w-8 h-8 text-xl text-gray-600"
+					className="w-8 h-8 text-xl text-gray-900"
 					onClick={() => setShowSidebar(true)}
 				/>
 				{/* <div className="flex items-center justify-between">

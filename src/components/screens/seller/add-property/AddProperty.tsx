@@ -94,7 +94,7 @@ export default function AddProperty() {
 									<div
 										key={step}
 										className={`w-2 h-2 rounded-full ${
-											step === 1 ? "bg-blue-600" : "bg-gray-300"
+											step <= currentStep ? "bg-blue-600" : "bg-gray-300"
 										}`}></div>
 								))}
 							</div>

@@ -14,6 +14,8 @@ import { triggerToast } from "@/components/ui/Toaster";
 
 import apiClient from "@/lib/api";
 import { useAuthStore } from "@/store/app-store";
+import type { CredentialResponse } from "@react-oauth/google";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { ChevronDown, X } from "lucide-react";
@@ -261,21 +263,66 @@ const AuthModal: React.FC<AuthModalProps> = ({
 		setLoading(false);
 	};
 
+	const handleSuccess = async (response: CredentialResponse) => {
+		console.log(response);
+		if (!response.credential) {
+			triggerToast({
+				title: "Login failed",
+				description: "No credential received from Google.",
+				variant: "destructive",
+			});
+			return;
+		}
+		try {
+			const res = await apiClient.post("/auth/google-login", {
+				token: response.credential,
+			});
+			const { user, tokens } = res.data.data;
+			login(user, tokens.accessToken, tokens.refreshToken);
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+			triggerToast({
+				title: "Login successful",
+				description: `Welcome, ${user.name || user.phone}!`,
+				variant: "success",
+			});
+			handlePostAuthRedirect();
+		} catch (error) {
+			console.error("Google login failed:", error);
+			triggerToast({
+				title: "Login failed",
+				description: "Google login failed. Please try again.",
+				variant: "destructive",
+			});
+		}
+	};
 	if (!isOpen) return null;
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 bg-opacity-50">
 			<div className="relative w-full max-w-md mx-4">
 				<Card className="w-full">
-					<CardHeader className="relative">
+					<CardHeader className="relative mb-4">
 						<button
 							onClick={onClose}
 							className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-100">
 							<X className="h-5 w-5" />
 						</button>
-						<CardTitle className="text-center">Login</CardTitle>
+						<CardTitle className="text-center">Sign In</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-4">
+						<GoogleOAuthProvider
+							clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+							<GoogleLogin
+								onSuccess={handleSuccess}
+								onError={() => console.log("Login Failed")}
+							/>
+						</GoogleOAuthProvider>
+
+						<div className="flex items-center gap-3 pt-2">
+							<hr className="flex-grow border-gray-300" />
+							<span className="text-gray-500">or</span>
+							<hr className="flex-grow border-gray-300" />
+						</div>
 						{!step.isOtpSent ? (
 							<form onSubmit={handleSendOtp} className="space-y-4">
 								<div className="space-y-2">

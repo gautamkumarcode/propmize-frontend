@@ -213,11 +213,8 @@ export const useUpdateProfile = () => {
 
 	return useMutation({
 		mutationFn: (profileData: FormData) => {
-			console.log("Profile data received:", profileData);
-
 			// Debug: Log FormData contents if it's FormData
 			if (profileData instanceof FormData) {
-				console.log("FormData contents:");
 				for (const [key, value] of profileData.entries()) {
 					console.log(key, value);
 				}
@@ -228,7 +225,9 @@ export const useUpdateProfile = () => {
 		onSuccess: (data: ApiResponse<User>) => {
 			queryClient.setQueryData(QueryKeys.profile, data.data);
 			queryClient.invalidateQueries({ queryKey: QueryKeys.profile });
+			queryClient.invalidateQueries({ queryKey: ["user"] });
 		},
+
 		onError: (error: unknown) => {
 			const errorMessage =
 				isHttpError(error) && error.response?.data?.message

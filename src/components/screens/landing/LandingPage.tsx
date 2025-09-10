@@ -42,17 +42,17 @@ export default function LandingPage() {
 				if (response.data.success) {
 					setUser({ ...user, role: mode });
 					setUserMode(mode);
-					if (mode === "seller") {
-						router.push("/seller");
-					} else {
-						router.push("/buyer/assistant");
-					}
 				}
 			} catch (error) {
 				console.log("API error:", error);
 			}
 		} else if (mode) {
 			setUserMode(mode);
+		}
+		if (mode === "seller") {
+			router.push("/seller");
+		} else {
+			router.push("/buyer/assistant");
 		}
 		setIsLoading(false);
 	};
@@ -77,14 +77,19 @@ export default function LandingPage() {
 	];
 
 	return (
-		<div className="min-h-screen flex flex-col ">
+		<div className="min-h-screen flex flex-col px-4">
 			<Image
 				src={logo}
 				alt="Propmize Logo"
 				width={150}
 				height={50}
-				className="mx-auto my-8"
+				className="mx-auto my-4"
 			/>
+			{isLoading && (
+				<p>
+					<Loader2 className=" absolute top-1/2 left-1/2 w-10 h-10 animate-spin text-white z-50" />
+				</p>
+			)}
 			{/* Main content */}
 			<div className="flex-1 flex flex-col items-center justify-center px-4 py-8 bg-gradient-to-b from-blue-500 to-blue-300 rounded-t-4xl">
 				{/* Greeting Section */}
@@ -105,17 +110,20 @@ export default function LandingPage() {
 				</div>
 
 				{/* Service Cards */}
-				<div className="grid gap-6 md:grid-cols-2 w-full max-w-3xl mb-16 relative">
+				<div className="grid gap-6 md:grid-cols-2 w-full max-w-4xl mb-16 relative">
 					{services.map((service) => (
 						<Card
 							key={service.id}
-							className={`cursor-pointer transition-all duration-300 rounded-2xl bg-white/90 backdrop-blur-md hover:shadow-2xl hover:scale-[1.03] ${
-								selectedService === service.id
-									? "ring-4 ring-offset-2 ring-blue-400"
-									: ""
-							}`}
+							className={`relative cursor-pointer transition-all duration-300 rounded-2xl  backdrop-blur-md hover:shadow-2xl hover:scale-[1.03] overflow-hidden
+		${selectedService === service.id ? "ring-0" : ""}`}
 							onClick={() => handleServiceSelection(service.id, service.mode)}>
-							<CardContent className="p-6 flex items-center justify-between">
+							{/* Animated Border Layer */}
+							<div className="absolute inset-0 rounded-2xl p-[2px] bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 animate-border">
+								<div className="h-full w-full rounded-2xl  backdrop-blur-md"></div>
+							</div>
+
+							{/* Card Content */}
+							<CardContent className="relative p-6 flex items-center justify-between z-10">
 								<div className="flex items-center space-x-4">
 									<div className={`p-4 rounded-xl ${service.color}`}>
 										<service.icon className="h-6 w-6 text-blue-600" />
@@ -127,16 +135,10 @@ export default function LandingPage() {
 										<p className="text-gray-600 text-sm">{service.subtitle}</p>
 									</div>
 								</div>
-								<ArrowRight className="h-6 w-6 text-gray-400 animate-bounce" />
+								<ArrowRight className="h-8 w-8 text-white animate-bounce" />
 							</CardContent>
 						</Card>
 					))}
-
-					{isLoading && (
-						<p>
-							<Loader2 className="w-4 h-4 animate-spin text-blue-800   " />
-						</p>
-					)}
 				</div>
 			</div>
 
@@ -182,7 +184,7 @@ export default function LandingPage() {
 						].map((feature, index) => (
 							<Card
 								key={index}
-								className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+								className="bg-white border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] animate-border">
 								<CardHeader className="text-center pb-4">
 									<div
 										className={`mx-auto mb-4 p-4 ${feature.bgColor} rounded-full w-16 h-16 flex items-center justify-center`}>

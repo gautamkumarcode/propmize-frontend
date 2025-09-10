@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
 			"localhost",
 			"localhost:5001",
 			"res.cloudinary.com",
+			"lh3.googleusercontent.com",
 			// add other domains if needed
 		],
 	},
