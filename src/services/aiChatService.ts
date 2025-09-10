@@ -241,21 +241,14 @@ export class AIChatService {
 
 	// Generate or retrieve guest ID for non-authenticated users
 	private getGuestId(): string {
-		if (this.guestId) return this.guestId;
-
-		// Check localStorage for existing guest ID
-		const savedGuestId = localStorage.getItem("propmize_guest_id");
-		if (savedGuestId) {
-			this.guestId = savedGuestId;
-			return this.guestId;
+		let guestId = localStorage.getItem("propmize_guest_id");
+		if (!guestId) {
+			const timestamp = Date.now();
+			const random = Math.random().toString(36).substring(2);
+			guestId = `guest_${timestamp}_${random}`;
+			localStorage.setItem("propmize_guest_id", guestId);
 		}
-
-		// Generate new guest ID
-		const timestamp = Date.now();
-		const random = Math.random().toString(36).substring(2);
-		this.guestId = `guest_${timestamp}_${random}`;
-		localStorage.setItem("propmize_guest_id", this.guestId);
-		return this.guestId;
+		return guestId;
 	}
 
 	// Clear guest session (when user signs up)
@@ -283,11 +276,13 @@ export class AIChatService {
 		const requestKey = `startChat:${conversationType}:${JSON.stringify(
 			context
 		)}`;
+		const guestId = this.isGuestUser() ? this.getGuestId() : undefined;
 		return debouncedRequest(requestKey, async () => {
 			try {
 				const response = await apiClient.post(`${this.baseUrl}/chat`, {
 					conversationType,
 					context,
+					...(guestId && { guestId }),
 				});
 				return response.data;
 			} catch (error) {
@@ -304,6 +299,7 @@ export class AIChatService {
 		context?: AIChatContext
 	): Promise<SendMessageResponse> {
 		const requestKey = `sendMessage:${chatId}:${message.substring(0, 50)}`;
+		const guestId = this.isGuestUser() ? this.getGuestId() : undefined;
 		return debouncedRequest(requestKey, async () => {
 			try {
 				const response = await apiClient.post(
@@ -311,6 +307,7 @@ export class AIChatService {
 					{
 						content: message,
 						context,
+						...(guestId && { guestId }),
 					}
 				);
 				return response.data;
