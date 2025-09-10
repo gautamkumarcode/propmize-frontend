@@ -172,7 +172,7 @@ export default function AssistantPage() {
 	}
 
 	return (
-		<div className=" inset-x-0  bg-white flex flex-col mx-auto max-w-7xl h-[85vh] lg:h-[90vh] overflow-scroll relative">
+		<div className=" inset-x-0  bg-white flex flex-col mx-auto max-w-7xl h-[80vh] lg:h-[90vh] overflow-scroll relative">
 			{/* Header */}
 			<div className="border-b  bg-gray-200 flex-shrink-0 flex justify-end absolute z-30 left-0 rounded-br-2xl">
 				{/* Sidebar open button */}

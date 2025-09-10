@@ -47,7 +47,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 			)}
 
 			{/* Main Content */}
-			<main className="px-4">{children}</main>
+			<main className="">{children}</main>
 
 			{/* Auth Modal */}
 			<AuthModal
