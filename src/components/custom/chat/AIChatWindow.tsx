@@ -14,6 +14,7 @@ import { AIAction } from "@/types";
 import {
 	Bot,
 	Calendar,
+	ChevronDown,
 	Heart,
 	Home,
 	Info,
@@ -35,16 +36,16 @@ interface AIChatWindowProps {
 
 export default function AIChatWindow({
 	initialChatId,
-
 	onPropertyClick,
 	onActionClick,
 	onNewChat,
 }: AIChatWindowProps) {
 	const [message, setMessage] = useState("");
-
 	const [isNewChat, setIsNewChat] = useState(false);
-
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const messagesContainerRef = useRef<HTMLDivElement>(null);
+	const [isAtBottom, setIsAtBottom] = useState(true);
+	const [lastMessageCount, setLastMessageCount] = useState(0);
 
 	const {
 		chatId,
@@ -54,7 +55,6 @@ export default function AIChatWindow({
 		isSendingMessage,
 		startNewChat,
 		sendMessage,
-
 		setChatId: setAIChatId,
 	} = useAIChatState(initialChatId);
 
@@ -68,10 +68,38 @@ export default function AIChatWindow({
 		}
 	}, [initialChatId, chatId, isLoading, setAIChatId]);
 
-	// Auto scroll to bottom
+	// Handle scroll position and auto-scroll logic
 	useEffect(() => {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages, isTyping]);
+		const container = messagesContainerRef.current;
+		if (!container) return;
+
+		// Check if user is at the bottom
+		const checkScrollPosition = () => {
+			if (!container) return;
+			const threshold = 100; // pixels from bottom
+			const isNearBottom =
+				container.scrollHeight - container.scrollTop - container.clientHeight <=
+				threshold;
+			setIsAtBottom(isNearBottom);
+		};
+
+		container.addEventListener("scroll", checkScrollPosition);
+
+		// Auto-scroll only if:
+		// 1. User is already at the bottom, OR
+		// 2. New messages arrived (not just typing indicator)
+		const shouldScroll = isAtBottom || messages.length > lastMessageCount;
+
+		if (shouldScroll) {
+			messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+		}
+
+		setLastMessageCount(messages.length);
+
+		return () => {
+			container.removeEventListener("scroll", checkScrollPosition);
+		};
+	}, [messages, isTyping, isAtBottom, lastMessageCount]);
 
 	const handleStartNewChat = async () => {
 		try {
@@ -82,10 +110,6 @@ export default function AIChatWindow({
 			console.error("Error starting new chat:", error);
 		}
 	};
-
-	// useEffect(() => {
-	// 	handleStartNewChat();
-	// }, [isAuthenticated && !user]); // Restart chat when user logs in/out
 
 	const handleSendMessage = async () => {
 		if (!message.trim()) return;
@@ -116,6 +140,11 @@ export default function AIChatWindow({
 		if (onActionClick) {
 			onActionClick({ ...action, propertyId });
 		}
+	};
+
+	const scrollToBottom = () => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+		setIsAtBottom(true);
 	};
 
 	const renderMessage = (msg: AIMessage, index: number) => {
@@ -313,14 +342,6 @@ export default function AIChatWindow({
 						})()}
 					</div>
 				</div>
-
-				{/* {isUser && (
-					<div className="flex-shrink-0">
-						<div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
-							<User className="w-3 h-3 md:w-4 md:h-4 text-white" />
-						</div>
-					</div>
-				)} */}
 			</div>
 		);
 	};
@@ -339,9 +360,18 @@ export default function AIChatWindow({
 	}
 
 	return (
-		<div className="flex-1 flex flex-col h-full">
+		<div className="flex-1 flex flex-col h-full relative">
+			{/* Scroll to bottom button */}
+			{!isAtBottom && (
+				<Button
+					onClick={scrollToBottom}
+					className="absolute bottom-25 right-4 z-10 rounded-full w-10 h-10 p-0 shadow-lg bg-blue-100 animate-bounce border-gray-300">
+					<ChevronDown className="w-8 h-8 text-xl text-gray-900" />
+				</Button>
+			)}
+
 			{/* Messages */}
-			<div className=" overflow-y-scroll flex-1">
+			<div className="overflow-y-auto flex-1" ref={messagesContainerRef}>
 				<div className="p-2 md:p-4 space-y-0">
 					{/* New chat state */}
 					{isNewChat && !isLoading && (

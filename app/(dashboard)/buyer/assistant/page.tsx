@@ -160,7 +160,7 @@ export default function AssistantPage() {
 
 	if (isInitializing) {
 		return (
-			<div className=" bg-white flex items-center justify-center mx-auto max-w-7xl">
+			<div className=" bg-white flex items-center justify-center mx-auto max-w-7xl h-screen ">
 				<div className="text-center">
 					<div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
 						<Image src={logo} alt="Propmize Logo" width={40} height={40} />
@@ -272,13 +272,13 @@ export default function AssistantPage() {
 				{/* </div> */}
 
 				{/* Mobile user status */}
-				{!user && (
+				{/* {!user && (
 					<div className="mt-2 md:hidden">
 						<span className="text-xs text-blue-600">
 							Guest Mode - Sign up for personalized experience
 						</span>
 					</div>
-				)}
+				)} */}
 
 				{/* Mode selector dropdown */}
 				{showModeSelector && (
