@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { NotificationTpes } from "@/types";
 import {
 	Bell,
 	Check,
@@ -10,44 +11,20 @@ import {
 	Trash2,
 	X,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-
-export interface Notification {
-	id: string;
-	title: string;
-	message: string;
-	type:
-		| "info"
-		| "success"
-		| "warning"
-		| "error"
-		| "property"
-		| "message"
-		| "system";
-	timestamp: Date;
-	read: boolean;
-	actionUrl?: string;
-	userId?: string;
-	metadata?: {
-		propertyId?: string;
-		propertyTitle?: string;
-		senderName?: string;
-		amount?: number;
-	};
-}
+import { useEffect, useRef } from "react";
 
 interface NotificationDropdownProps {
 	isOpen: boolean;
 	onClose: () => void;
-	notifications: Notification[];
+	notifications: NotificationTpes[];
 	onMarkAsRead: (id: string) => void;
 	onMarkAllAsRead: () => void;
 	onDeleteNotification: (id: string) => void;
-	onNotificationClick: (notification: Notification) => void;
+	onNotificationClick: (notification: NotificationTpes) => void;
 }
 
-const NotificationIcon = ({ type }: { type: Notification["type"] }) => {
+const NotificationIcon = ({ type }: { type: NotificationTpes["type"] }) => {
 	const iconProps = { size: 16, className: "text-white" };
 
 	switch (type) {
@@ -68,7 +45,7 @@ const NotificationIcon = ({ type }: { type: Notification["type"] }) => {
 	}
 };
 
-const getNotificationStyles = (type: Notification["type"]) => {
+const getNotificationStyles = (type: NotificationTpes["type"]) => {
 	switch (type) {
 		case "property":
 			return "bg-blue-500";
@@ -90,7 +67,7 @@ const getNotificationStyles = (type: Notification["type"]) => {
 const formatTimeAgo = (date: Date) => {
 	const now = new Date();
 	const diffInMinutes = Math.floor(
-		(now.getTime() - date.getTime()) / (1000 * 60)
+		(now.getTime() - new Date(date).getTime()) / (1000 * 60)
 	);
 
 	if (diffInMinutes < 1) return "Just now";
@@ -142,7 +119,9 @@ export default function NotificationDropdown({
 
 	const unreadCount = notifications.filter((n) => !n.read).length;
 	const sortedNotifications = [...notifications].sort(
-		(a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+		(a, b) =>
+			new Date(b.createdAt ?? 0).getTime() -
+			new Date(a.createdAt ?? 0).getTime()
 	);
 
 	return (
@@ -193,7 +172,7 @@ export default function NotificationDropdown({
 				) : (
 					sortedNotifications.map((notification) => (
 						<div
-							key={notification.id}
+							key={notification._id}
 							className={`flex items-start space-x-3 p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
 								!notification.read ? "bg-blue-50" : ""
 							}`}
@@ -250,7 +229,7 @@ export default function NotificationDropdown({
 											<Button
 												onClick={(e) => {
 													e.stopPropagation();
-													onMarkAsRead(notification.id);
+													onMarkAsRead(notification._id);
 												}}
 												variant="ghost"
 												size="sm"
@@ -261,7 +240,7 @@ export default function NotificationDropdown({
 										<Button
 											onClick={(e) => {
 												e.stopPropagation();
-												onDeleteNotification(notification.id);
+												onDeleteNotification(notification._id);
 											}}
 											variant="ghost"
 											size="sm"
@@ -273,7 +252,7 @@ export default function NotificationDropdown({
 
 								<div className="flex items-center justify-between mt-2">
 									<span className="text-xs text-gray-400">
-										{formatTimeAgo(notification.timestamp)}
+										{formatTimeAgo(notification.createdAt ?? new Date())}
 									</span>
 									{!notification.read && (
 										<div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -294,7 +273,7 @@ export default function NotificationDropdown({
 						className="w-full text-sm text-gray-600 hover:text-gray-800"
 						onClick={() => {
 							onClose();
-							router.push('/notifications');
+							router.push("/notifications");
 						}}>
 						View All Notifications
 					</Button>

@@ -1,52 +1,86 @@
 import { useSocket } from "@/lib/socket/socketContext";
-import { NotificationService } from "@/services/notificationService";
 import { useAuthStore } from "@/store/app-store";
-import { useEffect, useState } from "react";
+import { NotificationTpes } from "@/types";
+import { useEffect, useMemo, useState } from "react";
 
-/**
- * Listens for real-time notifications from backend via Socket.IO
- * and triggers NotificationService to show them in the UI.
- * @returns An object containing the listening status
- */
-export const useSocketNotifications = () => {
-	const { socket } = useSocket();
-	const { isAuthenticated } = useAuthStore();
+type NotificationSocketHandlers = {
+	onAdd?: (notification: NotificationTpes) => void;
+	onRead?: (id: string) => void;
+	onDelete?: (id: string) => void;
+};
+
+export const useSocketNotifications = (
+	handlers: NotificationSocketHandlers = {}
+) => {
+	const { socket, joinRoom } = useSocket();
+	const { user, isAuthenticated } = useAuthStore();
 	const [isListening, setIsListening] = useState(false);
 
+	// Memoize handlers to prevent unnecessary re-renders
+	const stableHandlers = useMemo(
+		() => handlers,
+		[handlers.onAdd, handlers.onRead, handlers.onDelete]
+	);
+
 	useEffect(() => {
-		// Only set up listeners if we have a socket connection and user is authenticated
-		if (!socket || !isAuthenticated) {
+		if (!socket || !isAuthenticated || !user?._id) {
 			setIsListening(false);
 			return;
 		}
 
-		const handleNotification = (data: {
-			userId: string;
-			title: string;
-			message: string;
-			type: string;
-			actionUrl: string;
-		}) => {
-			NotificationService.notify({
-				...data,
-				type: data.type as
-					| "success"
-					| "error"
-					| "warning"
-					| "property"
-					| "message"
-					| undefined,
-			});
+		// Join the user's room for notifications only after socket connects
+
+		// Setup event listeners
+		const setupListeners = () => {
+			if (stableHandlers.onAdd) {
+				socket.on("notification", stableHandlers.onAdd);
+			}
+			if (stableHandlers.onRead) {
+				socket.on("notification:read", stableHandlers.onRead);
+			}
+			if (stableHandlers.onDelete) {
+				socket.on("notification:delete", stableHandlers.onDelete);
+			}
 		};
 
-		socket.on("notification", handleNotification);
-		setIsListening(true);
+		// If socket is already connected, join room and setup listeners immediately
+		if (socket.connected) {
+			socket.emit("join", user._id);
+			setupListeners();
+			setIsListening(true);
+		}
+
+		// Setup listeners and join room when socket connects
+		socket.on("connect", () => {
+			socket.emit("join", user._id);
+			setupListeners();
+			setIsListening(true);
+		});
+
+		socket.on("disconnect", () => {
+			setIsListening(false);
+		});
 
 		return () => {
-			socket.off("notification", handleNotification);
+			if (!socket) return;
+			// Remove all listeners
+			if (stableHandlers.onAdd) {
+				socket.off("notification", stableHandlers.onAdd);
+			}
+			if (stableHandlers.onRead) {
+				socket.off("notification:read", stableHandlers.onRead);
+			}
+			if (stableHandlers.onDelete) {
+				socket.off("notification:delete", stableHandlers.onDelete);
+			}
+
+			// Remove connection listeners
+			socket.off("connect");
+			socket.off("disconnect");
+
 			setIsListening(false);
 		};
-	}, [socket, isAuthenticated]); // Add isAuthenticated to dependency array
+	}, [socket, isAuthenticated, user?._id, stableHandlers, joinRoom]);
 
 	return { isListening, socket };
 };

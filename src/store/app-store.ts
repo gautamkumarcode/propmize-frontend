@@ -1,6 +1,6 @@
 "use client";
 
-import { AppState, ChatSession, Notification, User } from "@/types";
+import { AppState, ChatSession, NotificationTpes, User } from "@/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -11,7 +11,7 @@ interface AppStore extends AppState {
 	setAuthenticated: (isAuthenticated: boolean) => void;
 
 	// Notification actions
-	addNotification: (notification: Notification) => void;
+	addNotification: (notification: NotificationTpes) => void;
 	markNotificationAsRead: (notificationId: string) => void;
 	clearNotifications: () => void;
 
@@ -34,7 +34,10 @@ export const useAppStore = create<AppStore>()(
 		(set, get) => ({
 			// Initial state
 			user: null,
-			userMode: typeof window !== "undefined" ? (localStorage.getItem("userMode") as "buyer" | "seller" || "buyer") : "buyer",
+			userMode:
+				typeof window !== "undefined"
+					? (localStorage.getItem("userMode") as "buyer" | "seller") || "buyer"
+					: "buyer",
 			isAuthenticated: false,
 			notifications: [],
 			chatSessions: [],
@@ -53,14 +56,14 @@ export const useAppStore = create<AppStore>()(
 			setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
 
 			// Notification actions
-			addNotification: (notification) =>
+			addNotification: (notification: NotificationTpes) =>
 				set((state) => ({
 					notifications: [notification, ...state.notifications],
 				})),
 			markNotificationAsRead: (notificationId) =>
 				set((state) => ({
 					notifications: state.notifications.map((notif) =>
-						notif.id === notificationId ? { ...notif, isRead: true } : notif
+						notif._id === notificationId ? { ...notif, isRead: true } : notif
 					),
 				})),
 			clearNotifications: () => set({ notifications: [] }),

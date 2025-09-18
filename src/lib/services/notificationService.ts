@@ -1,18 +1,9 @@
+import { NotificationTpes } from "@/types";
 import apiClient from "../api";
 import { ApiResponse } from "../types/api";
 
 // Notification types
-export interface Notification {
-	id: string;
-	userId: string;
-	type: "lead" | "property" | "payment" | "system" | "promotion";
-	title: string;
-	message: string;
-	data?: Record<string, unknown>;
-	isRead: boolean;
-	createdAt: Date;
-	updatedAt: Date;
-}
+export type Notification = NotificationTpes;
 
 export interface NotificationPreferences {
 	email: {
@@ -46,7 +37,7 @@ export class NotificationService {
 			page?: number;
 			limit?: number;
 		} = {}
-	): Promise<ApiResponse<Notification[]>> {
+	): Promise<ApiResponse<NotificationTpes[]>> {
 		const params = new URLSearchParams();
 
 		Object.entries(filters).forEach(([key, value]) => {

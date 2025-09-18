@@ -1,6 +1,5 @@
 "use client";
 
-import type { Notification } from "@/components/custom/notifications/NotificationDropdown";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -12,6 +11,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useAuth } from "@/lib";
+import { NotificationTpes } from "@/types";
 import {
 	Bell,
 	Check,
@@ -24,7 +24,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const NotificationIcon = ({ type }: { type: Notification["type"] }) => {
+const NotificationIcon = ({ type }: { type: NotificationTpes["type"] }) => {
 	const iconProps = { size: 20, className: "text-white" };
 
 	switch (type) {
@@ -45,7 +45,7 @@ const NotificationIcon = ({ type }: { type: Notification["type"] }) => {
 	}
 };
 
-const getNotificationStyles = (type: Notification["type"]) => {
+const getNotificationStyles = (type: NotificationTpes["type"]) => {
 	switch (type) {
 		case "property":
 			return "bg-blue-500";
@@ -97,7 +97,9 @@ export default function NotificationsPage() {
 	}
 
 	const sortedNotifications = [...notifications].sort(
-		(a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+		(a, b) =>
+			new Date(b.createdAt ?? new Date()).getTime() -
+			new Date(a.createdAt ?? new Date()).getTime()
 	);
 
 	const filteredNotifications =
@@ -161,7 +163,7 @@ export default function NotificationsPage() {
 		</div>
 	);
 
-	function renderNotificationList(notifications: Notification[]) {
+	function renderNotificationList(notifications: NotificationTpes[]) {
 		if (notifications.length === 0) {
 			return (
 				<div className="flex flex-col items-center justify-center py-16 text-gray-500">
@@ -178,7 +180,7 @@ export default function NotificationsPage() {
 			<div className="divide-y divide-gray-100">
 				{notifications.map((notification) => (
 					<div
-						key={notification.id}
+						key={notification._id}
 						className={`flex items-start p-4 hover:bg-gray-50 transition-colors ${
 							!notification.read ? "bg-blue-50" : ""
 						}`}>
@@ -230,7 +232,9 @@ export default function NotificationsPage() {
 									)}
 
 									<div className="mt-2 text-xs text-gray-400">
-										{new Date(notification.timestamp).toLocaleString("en-US", {
+										{new Date(
+											notification.createdAt ?? Date.now()
+										).toLocaleString("en-US", {
 											year: "numeric",
 											month: "2-digit",
 											day: "2-digit",
@@ -247,7 +251,7 @@ export default function NotificationsPage() {
 										<Button
 											onClick={(e) => {
 												e.stopPropagation();
-												markAsRead(notification.id);
+												markAsRead(notification._id);
 											}}
 											variant="ghost"
 											size="sm"
@@ -258,13 +262,14 @@ export default function NotificationsPage() {
 									<Button
 										onClick={(e) => {
 											e.stopPropagation();
-											deleteNotification(notification.id);
+											deleteNotification(notification._id);
 										}}
 										variant="ghost"
 										size="sm"
 										className="p-1 text-gray-400 hover:text-red-600">
 										<Trash2 size={16} />
 									</Button>
+									;
 								</div>
 							</div>
 						</div>

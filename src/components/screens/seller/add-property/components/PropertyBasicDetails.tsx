@@ -178,7 +178,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 								placeholder="Describe the property..."
 								{...field}
 								rows={5}
-								className="min-h-[100px] px-3 py-2 text-sm"
+								className="min-h-[100px] px-3 py-2 text-sm border border-gray-300 focus-within:border-gray-300 focus-within:ring-0"
 							/>
 						</FormControl>
 						<FormMessage />

@@ -7,11 +7,15 @@ import { safeLocalStorage } from "../utils/storage";
 interface SocketContextType {
 	socket: Socket | null;
 	isConnected: boolean;
+	joinRoom: (userId: string) => void;
+	leaveRoom: (userId: string) => void;
 }
 
 const SocketContext = createContext<SocketContextType>({
 	socket: null,
 	isConnected: false,
+	joinRoom: () => {},
+	leaveRoom: () => {},
 });
 
 export const useSocket = () => {
@@ -30,6 +34,22 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [isConnected, setIsConnected] = useState(false);
 
+	// Function to join a user's room
+	const joinRoom = (userId: string) => {
+		if (socket && isConnected) {
+			socket.emit("join", userId);
+			console.log(`Joined room for user: ${userId}`);
+		}
+	};
+
+	// Function to leave a user's room
+	const leaveRoom = (userId: string) => {
+		if (socket && isConnected) {
+			socket.emit("leave", userId);
+			console.log(`Left room for user: ${userId}`);
+		}
+	};
+
 	useEffect(() => {
 		const token = safeLocalStorage.getItem("accessToken");
 
@@ -45,12 +65,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 			);
 
 			newSocket.on("connect", () => {
-				console.log("Socket connected:", newSocket.id);
 				setIsConnected(true);
 			});
 
 			newSocket.on("disconnect", () => {
-				console.log("Socket disconnected");
 				setIsConnected(false);
 			});
 
@@ -70,7 +88,8 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 	}, []);
 
 	return (
-		<SocketContext.Provider value={{ socket, isConnected }}>
+		<SocketContext.Provider
+			value={{ socket, isConnected, joinRoom, leaveRoom }}>
 			{children}
 		</SocketContext.Provider>
 	);

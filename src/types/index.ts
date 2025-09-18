@@ -1,6 +1,7 @@
 // User and Authentication Types
 export interface User {
 	_id: string;
+	id?: string; // For compatibility
 	name: string;
 	email: string;
 	phone?: string;
@@ -174,15 +175,27 @@ export interface ChatSession {
 }
 
 // Notification Types
-export interface Notification {
-	id: string;
+export interface NotificationTpes {
+	_id: string;
 	userId: string;
-	type: "inquiry" | "property_update" | "payment" | "system";
+	type:
+		| "info"
+		| "success"
+		| "warning"
+		| "error"
+		| "property"
+		| "message"
+		| "system"
+		| "inquiry"
+		| "property_update"
+		| "payment";
 	title: string;
 	message: string;
-	isRead: boolean;
+	read: boolean;
+	actionUrl?: string;
 	metadata?: NotificationMetadata;
-	createdAt: Date;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
 // Premium Plan Types
@@ -302,7 +315,7 @@ export interface AppState {
 	user: User | null;
 	userMode: "buyer" | "seller";
 	isAuthenticated: boolean;
-	notifications: Notification[];
+	notifications: NotificationTpes[];
 	chatSessions: ChatSession[];
 	currentChatId: string | null;
 	savedProperties: string[];
@@ -348,6 +361,10 @@ export interface NotificationMetadata {
 	propertyId?: string;
 	leadId?: string;
 	paymentId?: string;
+	propertyTitle?: string;
+	senderName?: string;
+	amount?: number;
+	dueDate?: string;
 	actionUrl?: string;
 	additionalData?: Record<string, string | number | boolean>;
 }
