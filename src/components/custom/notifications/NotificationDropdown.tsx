@@ -66,9 +66,9 @@ const getNotificationStyles = (type: NotificationTpes["type"]) => {
 
 const formatTimeAgo = (date: Date) => {
 	const now = new Date();
-	const diffInMinutes = Math.floor(
-		(now.getTime() - new Date(date).getTime()) / (1000 * 60)
-	);
+	const d = new Date(date);
+	if (isNaN(d.getTime())) return "";
+	const diffInMinutes = Math.floor((now.getTime() - d.getTime()) / (1000 * 60));
 
 	if (diffInMinutes < 1) return "Just now";
 	if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
@@ -79,7 +79,7 @@ const formatTimeAgo = (date: Date) => {
 	const diffInDays = Math.floor(diffInHours / 24);
 	if (diffInDays < 7) return `${diffInDays}d ago`;
 
-	return date.toLocaleDateString();
+	return d.toLocaleDateString();
 };
 
 export default function NotificationDropdown({
