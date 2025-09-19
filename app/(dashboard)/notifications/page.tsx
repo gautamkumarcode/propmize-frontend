@@ -269,7 +269,6 @@ export default function NotificationsPage() {
 										className="p-1 text-gray-400 hover:text-red-600">
 										<Trash2 size={16} />
 									</Button>
-									;
 								</div>
 							</div>
 						</div>

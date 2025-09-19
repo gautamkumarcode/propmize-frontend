@@ -65,11 +65,13 @@ export const useNotifications = () => {
 				}
 			}
 		};
-		fetchNotifications();
+		if (user?._id) {
+			fetchNotifications();
+		}
 		return () => {
 			isMounted = false;
 		};
-	}, [user?.id, userMode]);
+	}, [user?._id, userMode]);
 
 	// Request browser notification permission on mount
 	useEffect(() => {
@@ -118,11 +120,14 @@ export const useNotifications = () => {
 	// Handle notification click
 	const handleNotificationClick = useCallback(
 		async (notification: NotificationTpes) => {
+			console.log(notification);
 			try {
 				if (!notification.read) {
 					await markAsRead(notification._id);
 				}
-				const actionUrl = notification.metadata?.actionUrl;
+				const actionUrl =
+					notification?.actionUrl || notification.metadata?.actionUrl;
+				console.log(actionUrl);
 				if (typeof actionUrl === "string" && actionUrl.length > 0) {
 					router.push(actionUrl);
 				}
@@ -130,7 +135,7 @@ export const useNotifications = () => {
 				console.error("Failed to handle notification click:", error);
 			}
 		},
-		[markAsRead, router]
+		[]
 	);
 
 	// Add notification manually (for local/manual notifications)

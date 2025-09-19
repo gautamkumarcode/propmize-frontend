@@ -172,6 +172,7 @@ export default function Navbar({
 						{/* Notifications */}
 						<div className="relative" ref={notificationRef}>
 							<button
+								disabled={!isAuthenticated}
 								onClick={() => setShowNotifications(!showNotifications)}
 								className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full">
 								<Bell size={20} />
