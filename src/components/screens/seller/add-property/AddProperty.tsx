@@ -36,7 +36,7 @@ export default function AddProperty() {
 	};
 
 	return (
-		<div className="min-h-screen relative pt-4 pb-20 ">
+		<div className="min-h-screen relative pt-4 pb-20 px-4 ">
 			<WhatsAppButton />
 
 			<div className="max-w-5xl mx-auto  sm:px-2 lg:px-8">
