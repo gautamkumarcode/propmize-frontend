@@ -14,7 +14,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { PropertyFilters } from "@/lib/types/api";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface PropertySearchProps {
 	onFilterChange: (filters: PropertyFilters, query?: string) => void;
@@ -38,30 +38,50 @@ export default function PropertySearch({
 		bedrooms: undefined,
 		bathrooms: undefined,
 		city: undefined,
+		search: undefined,
 	});
-	const [priceRange, setPriceRange] = useState([0, 10000000]); // Default price range in INR
+	const [priceRange, setPriceRange] = useState([0, 10000000]);
+
+	// Memoized callback to prevent infinite re-renders
+	const handleFilterUpdate = useCallback(
+		(updatedFilters: PropertyFilters, query: string) => {
+			onFilterChange(updatedFilters, query);
+		},
+		[onFilterChange]
+	);
+
+	// Update filters when searchQuery changes externally
+	useEffect(() => {
+		setFilters((prev) => ({
+			...prev,
+			search: searchQuery || undefined,
+		}));
+	}, [searchQuery]);
 
 	// Debounced search using useEffect
 	useEffect(() => {
 		const handler = setTimeout(() => {
-			onFilterChange(filters, searchQuery);
-		}, 500); // 500ms debounce
+			const filtersWithSearch = {
+				...filters,
+				search: searchQuery || undefined,
+			};
+			handleFilterUpdate(filtersWithSearch, searchQuery);
+		}, 1000); // 1000ms debounce
 		return () => {
 			clearTimeout(handler);
 		};
-	}, [searchQuery, filters]);
+	}, [searchQuery, filters, handleFilterUpdate]);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSearchQuery(e.target.value);
+		const value = e.target.value;
+		setSearchQuery(value);
 	};
 
 	// Handle filter changes
 	const handleFilterChange = (key: keyof PropertyFilters, value: unknown) => {
 		setFilters((prev) => {
-			// Convert 'any' value to undefined to clear the filter
 			const processedValue = value === "any" ? undefined : value;
-			const newFilters = { ...prev, [key]: processedValue };
-			return newFilters;
+			return { ...prev, [key]: processedValue };
 		});
 	};
 
@@ -70,19 +90,23 @@ export default function PropertySearch({
 		setPriceRange(values);
 		setFilters((prev) => ({
 			...prev,
-			minPrice: values[0],
-			maxPrice: values[1],
+			minPrice: values[0] === 0 ? undefined : values[0],
+			maxPrice: values[1] === 10000000 ? undefined : values[1],
 		}));
 	};
 
-	// Apply filters
+	// Apply filters immediately
 	const applyFilters = () => {
-		onFilterChange(filters, searchQuery);
+		const filtersWithSearch = {
+			...filters,
+			search: searchQuery || undefined,
+		};
+		handleFilterUpdate(filtersWithSearch, searchQuery);
 	};
 
 	// Reset filters
 	const resetFilters = () => {
-		setFilters({
+		const resetFiltersState = {
 			type: undefined,
 			status: undefined,
 			minPrice: undefined,
@@ -90,10 +114,12 @@ export default function PropertySearch({
 			bedrooms: undefined,
 			bathrooms: undefined,
 			city: undefined,
-		});
+			search: undefined,
+		};
+		setFilters(resetFiltersState);
 		setSearchQuery("");
 		setPriceRange([0, 10000000]);
-		onFilterChange({});
+		handleFilterUpdate(resetFiltersState, "");
 	};
 
 	// Format price for display
@@ -107,6 +133,14 @@ export default function PropertySearch({
 		} else {
 			return `₹${price}`;
 		}
+	};
+
+	// Get active filters for display (exclude search from badges)
+	const getActiveFilters = () => {
+		const { search, ...otherFilters } = filters;
+		return Object.entries(otherFilters).filter(
+			([key, value]) => value !== undefined
+		);
 	};
 
 	return (
@@ -271,42 +305,49 @@ export default function PropertySearch({
 
 					{/* Active Filters */}
 					<div className="mt-6 flex flex-wrap gap-2">
-						{Object.entries(filters).map(
-							([key, value]) =>
-								value !== undefined && (
-									<Badge
-										key={key}
-										variant="secondary"
-										className="px-3 py-1.5 flex items-center gap-1.5">
-										<span>
-											{key === "minPrice"
-												? `Min: ${formatPrice(value as number)}`
-												: key === "maxPrice"
-												? `Max: ${formatPrice(value as number)}`
-												: key === "type"
-												? `Type: ${value}`
-												: key === "status"
-												? `For: ${value}`
-												: key === "bedrooms"
-												? `${value}+ Beds`
-												: key === "bathrooms"
-												? `${value}+ Baths`
-												: key === "city"
-												? `City: ${value}`
-												: `${key}: ${value}`}
-										</span>
-										<X
-											className="h-3.5 w-3.5 cursor-pointer"
-											onClick={() =>
-												handleFilterChange(
-													key as keyof PropertyFilters,
-													undefined
-												)
-											}
-										/>
-									</Badge>
-								)
+						{/* Show search query as a badge if it exists */}
+						{searchQuery && (
+							<Badge
+								variant="secondary"
+								className="px-3 py-1.5 flex items-center gap-1.5">
+								<span>Search: {searchQuery}</span>
+								<X
+									className="h-3.5 w-3.5 cursor-pointer"
+									onClick={() => setSearchQuery("")}
+								/>
+							</Badge>
 						)}
+						{/* Show other active filters */}
+						{getActiveFilters().map(([key, value]) => (
+							<Badge
+								key={key}
+								variant="secondary"
+								className="px-3 py-1.5 flex items-center gap-1.5">
+								<span>
+									{key === "minPrice"
+										? `Min: ${formatPrice(value as number)}`
+										: key === "maxPrice"
+										? `Max: ${formatPrice(value as number)}`
+										: key === "type"
+										? `Type: ${value}`
+										: key === "status"
+										? `For: ${value}`
+										: key === "bedrooms"
+										? `${value}+ Beds`
+										: key === "bathrooms"
+										? `${value}+ Baths`
+										: key === "city"
+										? `City: ${value}`
+										: `${key}: ${value}`}
+								</span>
+								<X
+									className="h-3.5 w-3.5 cursor-pointer"
+									onClick={() =>
+										handleFilterChange(key as keyof PropertyFilters, undefined)
+									}
+								/>
+							</Badge>
+						))}
 					</div>
 				</div>
 			)}

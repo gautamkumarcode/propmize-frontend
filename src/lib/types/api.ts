@@ -75,6 +75,7 @@ export interface PropertyFilters {
 	city?: string;
 	state?: string;
 	bedrooms?: number;
+	search?: string;
 	bathrooms?: number;
 	area?: {
 		min?: number;
