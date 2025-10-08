@@ -10,10 +10,7 @@ import { cn } from "@/lib/utils";
 import { PropertyResponse } from "@/types";
 import { AxiosError } from "axios";
 import {
-	Bath,
-	Bed,
 	Calendar,
-	Car,
 	Crown,
 	Eye,
 	Heart,
@@ -21,7 +18,6 @@ import {
 	MessageCircle,
 	Phone,
 	Shield,
-	Square,
 	Star,
 } from "lucide-react";
 import Image from "next/image";
@@ -98,6 +94,16 @@ export default function PropertyCard({
 	const handleSaveToggle = (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
+		if (!user) {
+			// Ideally, trigger auth modal here
+			toast({
+				title: "Authentication Required",
+				description: "Please sign in to save properties.",
+				variant: "destructive",
+			});
+			return;
+		}
+
 		toggleLikeMutation.mutate(property._id);
 	};
 
@@ -154,33 +160,6 @@ export default function PropertyCard({
 	const handleImageLoad = () => {
 		setImageLoading(false);
 	};
-
-	const propertySpecs = [
-		{
-			icon: Bed,
-			value: `${property.bedrooms} `,
-			key: "bedrooms",
-		},
-		{
-			icon: Bath,
-			value: `${property.bathrooms} `,
-			key: "bathrooms",
-		},
-		{
-			icon: Square,
-			value: formatArea(property.area.value, property.area.unit),
-			key: "area",
-		},
-		...(property.parking
-			? [
-					{
-						icon: Car,
-						value: `${property.parking} `,
-						key: "parking",
-					},
-			  ]
-			: []),
-	];
 
 	const statusColors = {
 		active: "bg-green-100 text-green-800",

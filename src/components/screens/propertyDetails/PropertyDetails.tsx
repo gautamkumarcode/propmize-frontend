@@ -12,6 +12,7 @@ import {
 	Calendar,
 	Car,
 	CarIcon,
+	CheckCircle,
 	ChevronLeft,
 	ChevronRight,
 	Clock,
@@ -62,6 +63,15 @@ const PropertyDetails = () => {
 	const handleSaveToggle = (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
+
+		if (!user) {
+			triggerToast({
+				title: "Login Required",
+				description: "You need to be logged in to save properties.",
+				variant: "destructive",
+			});
+			return;
+		}
 		if (property) {
 			toggleLikeMutation.mutate(property._id);
 		}
@@ -137,509 +147,678 @@ const PropertyDetails = () => {
 		return icons[type] || <MapPin className="h-4 w-4 md:h-5 md:w-5" />;
 	};
 
-	console.log(property);
-
 	return (
-		<div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 pb-20">
-			{/* Header Section */}
-			<div className="mb-6 md:mb-8">
-				<h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4 leading-tight">
-					{property.title.charAt(0).toUpperCase() + property.title.slice(1)}
-				</h1>
-				<div className="flex items-center gap-2 mb-4 md:mb-6">
-					<MapPin className="h-4 w-4 md:h-5 md:w-5 text-blue-500 flex-shrink-0" />
-					<span className="text-sm md:text-base text-gray-600 leading-relaxed">
-						{property.address.street}, {property.address.area},{" "}
-						{property.address.city}, {property.address.state} -{" "}
-						{property.address.zipCode}
-					</span>
-				</div>
-				<div className="flex flex-wrap gap-2 mb-4 md:mb-6">
-					<Badge
-						variant={
-							["sale", "rent"].includes(property.status)
-								? "default"
-								: "secondary"
-						}
-						className="text-xs md:text-sm">
-						{property.status.toUpperCase()}
-					</Badge>
-					{property.featured && (
-						<Badge className="bg-purple-100 text-purple-800 text-xs md:text-sm">
-							<Crown className="h-3 w-3 md:h-4 md:w-4 mr-1" /> FEATURED
-						</Badge>
-					)}
-					{property.isPremium && (
-						<Badge className="bg-amber-100 text-amber-800 text-xs md:text-sm">
-							<TrendingUp className="h-3 w-3 md:h-4 md:w-4 mr-1" /> PREMIUM
-						</Badge>
-					)}
-					<Badge variant="outline" className="text-xs md:text-sm capitalize">
-						{property.propertyType}
-					</Badge>
-					<Badge variant="outline" className="text-xs md:text-sm capitalize">
-						{property.listingType}
-					</Badge>
-				</div>
-			</div>
+		<div className="min-h-screen bg-background">
+			{/* Hero Header Section */}
+			<div className="relative border-b border-border">
+				<div className="absolute inset-0 bg-grid-pattern opacity-20"></div>
+				<div className="relative max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
+					{/* Main Content Row */}
+					<div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 lg:gap-8">
+						{/* Left Section - Title and Address */}
+						<div className="flex-1 animate-fadeInUp min-w-0">
+							<h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 md:mb-6 leading-tight break-words">
+								{property.title.charAt(0).toUpperCase() +
+									property.title.slice(1)}
+							</h1>
 
-			{/* Image Gallery */}
-			<div className="relative mb-8 md:mb-12 rounded-2xl overflow-hidden">
-				<div className="relative h-64 md:h-80 lg:h-96 bg-gradient-to-br from-gray-100 to-gray-200">
-					{images.length > 0 ? (
-						<Image
-							fill
-							src={imageError ? "/placeholder-property.jpg" : imageUrl}
-							alt={property.title}
-							className="object-contain transition-transform duration-300 hover:scale-105"
-							onError={() => setImageError(true)}
-							priority
-						/>
-					) : (
-						<div className="w-full h-full flex items-center justify-center bg-gray-200">
-							<Home className="h-12 w-12 md:h-16 md:w-16 text-gray-400" />
-						</div>
-					)}
-
-					{/* Navigation Arrows */}
-					{images.length > 1 && (
-						<>
-							<button
-								onClick={prevImage}
-								className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-all duration-200">
-								<ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
-							</button>
-							<button
-								onClick={nextImage}
-								className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-lg hover:bg-white transition-all duration-200">
-								<ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-							</button>
-						</>
-					)}
-
-					{/* Image Counter */}
-					{images.length > 1 && (
-						<div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-xs md:text-sm">
-							{currentImageIndex + 1} / {images.length}
-						</div>
-					)}
-
-					{/* Action Buttons */}
-					<div className="absolute top-4 right-4 flex gap-2">
-						<Button
-							size="icon"
-							variant="secondary"
-							className="rounded-full bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white hover:scale-110 transition-all duration-200"
-							onClick={handleSaveToggle}>
-							<Heart
-								className={`h-4 w-4 md:h-5 md:w-5 ${
-									isLikedByUser ? "fill-red-500 text-red-500" : ""
-								}`}
-							/>
-						</Button>
-						<Button
-							size="icon"
-							variant="secondary"
-							className="rounded-full bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white hover:scale-110 transition-all duration-200">
-							<Share2 className="h-4 w-4 md:h-5 md:w-5" />
-						</Button>
-					</div>
-				</div>
-
-				{/* Thumbnails */}
-				{images.length > 1 && (
-					<div className="flex gap-2 mt-4 overflow-x-auto py-2">
-						{images.map((img, idx) => (
-							<div
-								key={idx}
-								className={`relative h-16 w-16 md:h-20 md:w-20 min-w-[4rem] md:min-w-[5rem] rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
-									currentImageIndex === idx
-										? "ring-3 ring-blue-500 ring-offset-2"
-										: "opacity-70 hover:opacity-100"
-								}`}
-								onClick={() => setCurrentImageIndex(idx)}>
-								<Image
-									fill
-									src={img}
-									alt={`${property.title} ${idx + 1}`}
-									className="object-cover"
-								/>
-							</div>
-						))}
-					</div>
-				)}
-			</div>
-
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-				{/* Main Content */}
-				<div className="lg:col-span-2 space-y-6 md:space-y-8">
-					{/* Price Section */}
-					<div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-2xl border border-blue-200">
-						<div className="flex flex-wrap items-center justify-between gap-4 md:gap-6">
-							<div>
-								<span className="text-2xl md:text-3xl lg:text-4xl font-bold text-green-700">
-									{property.listingType === "sale"
-										? `₹${formatPrice(property.price)}`
-										: `₹${property.pricing?.basePrice}`}{" "}
+							{/* Address Badge */}
+							<div className="flex items-center gap-3 mb-6 md:mb-8 p-4 bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 w-full max-w-2xl">
+								<div className="flex-shrink-0 p-2 bg-primary/10 rounded-full">
+									<MapPin className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+								</div>
+								<span className="text-base md:text-lg text-muted-foreground leading-relaxed break-words">
+									{property.address.street}, {property.address.area},{" "}
+									{property.address.city}, {property.address.state} -{" "}
+									{property.address.zipCode}
 								</span>
-								{property.listingType !== "sale" && (
-									<span className="ml-2 text-base md:text-lg text-gray-600">
-										/
-										{property.listingType === "rent" ? "month" : "lease period"}
-									</span>
-								)}
-								{/* {property.pricing?.priceNegotiable && (
-									<div className="text-sm md:text-base text-blue-600 mt-2 font-medium">
-										💬 Price Negotiable
-									</div>
-								)} */}
 							</div>
 						</div>
 
-						{property.pricing && (
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-6 border-t border-blue-200">
-								{property.pricing.maintenanceCharges && (
-									<div className="text-center p-3 bg-white rounded-lg border border-blue-100">
-										<div className="text-xs md:text-sm text-gray-600 font-medium">
-											Maintenance
-										</div>
-										<div className="font-semibold text-base md:text-lg">
-											₹
-											{formatPrice(Number(property.pricing.maintenanceCharges))}
-											<span className="text-xs text-gray-500">/month</span>
-										</div>
-									</div>
+						{/* Right Section - Badges */}
+						<div className="flex flex-col gap-4 lg:items-end lg:max-w-md">
+							{/* Status and Feature Badges */}
+							<div className="flex flex-wrap gap-2 md:gap-3 justify-start lg:justify-end">
+								<Badge
+									variant={
+										["sale", "rent"].includes(property.status)
+											? "default"
+											: "secondary"
+									}
+									className="text-sm md:text-base px-3 py-2 md:px-4 md:py-2 bg-primary text-primary-foreground hover:bg-primary/90 flex-shrink-0">
+									{property.status.toUpperCase()}
+								</Badge>
+
+								{property.featured && (
+									<Badge className="bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm md:text-base px-3 py-2 md:px-4 md:py-2 hover:from-purple-600 hover:to-purple-700 flex-shrink-0">
+										<Crown className="h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
+										FEATURED
+									</Badge>
 								)}
-								{property.pricing.securityDeposit && (
-									<div className="text-center p-3 bg-white rounded-lg border border-blue-100">
-										<div className="text-xs md:text-sm text-gray-600 font-medium">
-											Security Deposit
-										</div>
-										<div className="font-semibold text-base md:text-lg">
-											₹{formatPrice(Number(property.pricing.securityDeposit))}
-										</div>
-									</div>
+
+								{property.isPremium && (
+									<Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm md:text-base px-3 py-2 md:px-4 md:py-2 hover:from-amber-600 hover:to-amber-700 flex-shrink-0">
+										<TrendingUp className="h-4 w-4 md:h-5 md:w-5 mr-1 md:mr-2" />
+										PREMIUM
+									</Badge>
 								)}
-								{property.pricing.brokeragePercentage && (
-									<div className="text-center p-3 bg-white rounded-lg border border-blue-100">
-										<div className="text-xs md:text-sm text-gray-600 font-medium">
-											Brokerage
-										</div>
-										<div className="font-semibold text-base md:text-lg">
-											{property.pricing.brokeragePercentage}%
-										</div>
-									</div>
-								)}
+							</div>
+
+							{/* Type Badges */}
+							<div className="flex flex-wrap gap-2 md:gap-3 justify-start lg:justify-end">
+								<Badge
+									variant="outline"
+									className="text-sm md:text-base px-3 py-2 md:px-4 md:py-2 capitalize border-border bg-card/50 flex-shrink-0">
+									{property.propertyType}
+								</Badge>
+								<Badge
+									variant="outline"
+									className="text-sm md:text-base px-3 py-2 md:px-4 md:py-2 capitalize border-border bg-card/50 flex-shrink-0">
+									{property.listingType}
+								</Badge>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 pb-20">
+				{/* Image Gallery */}
+				<div className="relative mb-8 md:mb-12 rounded-3xl overflow-hidden shadow-2xl animate-fadeInUp">
+					<div className="relative h-72 md:h-96 lg:h-[32rem] bg-gradient-to-br from-muted/50 to-muted">
+						{images.length > 0 ? (
+							<Image
+								fill
+								src={imageError ? "/placeholder-property.jpg" : imageUrl}
+								alt={property.title}
+								className="object-cover transition-all duration-500 hover:scale-105"
+								onError={() => setImageError(true)}
+								priority
+							/>
+						) : (
+							<div className="w-full h-full flex items-center justify-center bg-muted">
+								<div className="text-center">
+									<Home className="h-16 w-16 md:h-20 md:w-20 text-muted-foreground mx-auto mb-4" />
+									<p className="text-muted-foreground">No images available</p>
+								</div>
 							</div>
 						)}
+
+						{/* Gradient Overlay */}
+						<div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+
+						{/* Navigation Arrows */}
+						{images.length > 1 && (
+							<>
+								<button
+									onClick={prevImage}
+									className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-card/90 backdrop-blur-md p-3 rounded-full shadow-xl hover:bg-card hover:scale-110 transition-all duration-300 border border-border/50">
+									<ChevronLeft className="h-6 w-6 md:h-7 md:w-7 text-foreground" />
+								</button>
+								<button
+									onClick={nextImage}
+									className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-card/90 backdrop-blur-md p-3 rounded-full shadow-xl hover:bg-card hover:scale-110 transition-all duration-300 border border-border/50">
+									<ChevronRight className="h-6 w-6 md:h-7 md:w-7 text-foreground" />
+								</button>
+							</>
+						)}
+
+						{/* Image Counter */}
+						{images.length > 1 && (
+							<div className="absolute bottom-6 right-6 bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm md:text-base font-medium">
+								{currentImageIndex + 1} / {images.length}
+							</div>
+						)}
+
+						{/* Action Buttons */}
+						<div className="absolute top-6 right-6 flex gap-3">
+							<Button
+								size="icon"
+								variant="secondary"
+								className="rounded-full bg-card/90 backdrop-blur-md text-foreground hover:bg-card hover:scale-110 transition-all duration-300 border border-border/50 shadow-lg"
+								onClick={handleSaveToggle}>
+								<Heart
+									className={`h-5 w-5 md:h-6 md:w-6 transition-colors duration-300 ${
+										isLikedByUser ? "fill-red-500 text-red-500" : ""
+									}`}
+								/>
+							</Button>
+							<Button
+								size="icon"
+								variant="secondary"
+								className="rounded-full bg-card/90 backdrop-blur-md text-foreground hover:bg-card hover:scale-110 transition-all duration-300 border border-border/50 shadow-lg">
+								<Share2 className="h-5 w-5 md:h-6 md:w-6" />
+							</Button>
+						</div>
 					</div>
 
-					{/* Property Overview */}
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-						<h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
-							Property Overview
-						</h2>
-						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-							{[
-								{ icon: Bed, label: "Bedrooms", value: property.bedrooms || 0 },
-								{
-									icon: Bath,
-									label: "Bathrooms",
-									value: property.bathrooms || 0,
-								},
-								{
-									icon: Square,
-									label: "Area",
-									value: `${property.area.value} ${property.area.unit}`,
-								},
-								{ icon: Car, label: "Parking", value: property.parking || 0 },
-								...(property.balconies
-									? [
-											{
-												icon: TreePine,
-												label: "Balconies",
-												value: property.balconies,
-											},
-									  ]
-									: []),
-								...(property.floor
-									? [
-											{
-												icon: Building,
-												label: "Floor",
-												value: `${property.floor}${
-													property.totalFloors
-														? ` of ${property.totalFloors}`
-														: ""
-												}`,
-											},
-									  ]
-									: []),
-								{
-									icon: Calendar,
-									label: "Age",
-									value: `${property.age} years`,
-								},
-								{ icon: Home, label: "Furnishing", value: property.furnished },
-							].map((item, index) => (
+					{/* Thumbnails */}
+					{images.length > 1 && (
+						<div className="flex gap-3 mt-6 overflow-x-auto py-2 px-1">
+							{images.map((img, idx) => (
 								<div
-									key={index}
-									className="flex flex-col items-center p-3 md:p-4 bg-gray-50 rounded-xl border border-gray-100">
-									<item.icon className="h-5 w-5 md:h-6 md:w-6 text-blue-500 mb-2" />
-									<span className="text-xs md:text-sm text-gray-600 font-medium mb-1">
-										{item.label}
-									</span>
-									<span className="font-semibold text-sm md:text-base text-gray-900">
-										{item.value}
-									</span>
+									key={idx}
+									className={`relative h-20 w-20 md:h-24 md:w-24 min-w-[5rem] md:min-w-[6rem] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
+										currentImageIndex === idx
+											? "ring-3 ring-primary ring-offset-2 ring-offset-background scale-105"
+											: "opacity-70 hover:opacity-100 hover:scale-105"
+									}`}
+									onClick={() => setCurrentImageIndex(idx)}>
+									<Image
+										fill
+										src={img}
+										alt={`${property.title} ${idx + 1}`}
+										className="object-cover"
+									/>
+									{currentImageIndex === idx && (
+										<div className="absolute inset-0 bg-primary/20 border-2 border-primary rounded-2xl"></div>
+									)}
 								</div>
 							))}
 						</div>
-					</div>
+					)}
+				</div>
 
-					{/* Description */}
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-						<h2 className="text-xl md:text-2xl font-semibold mb-4 text-gray-900">
-							Description
-						</h2>
-						<p className="text-gray-700 leading-relaxed text-base md:text-lg">
-							{property.description}
-						</p>
-					</div>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+					{/* Main Content */}
+					<div className="lg:col-span-2 space-y-8 md:space-y-10">
+						{/* Price Section */}
+						<div className="relative bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 p-8 rounded-3xl border border-border/50 backdrop-blur-sm animate-fadeInUp overflow-hidden">
+							{/* Background Pattern */}
+							<div className="absolute inset-0 bg-dot-pattern opacity-10"></div>
 
-					{/* Amenities */}
-					{property.amenities && property.amenities.length > 0 && (
-						<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-							<h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
-								Amenities
-							</h2>
-							<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-								{property.amenities.map((amenity, idx) => (
+							<div className="relative z-10">
+								<div className="flex flex-wrap items-center justify-between gap-6 mb-6">
+									<div>
+										<div className="flex items-baseline gap-2 mb-2">
+											<span className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary">
+												{property.listingType === "sale"
+													? `₹${formatPrice(property.price)}`
+													: `₹${property.pricing?.basePrice}`}
+											</span>
+											{property.listingType !== "sale" && (
+												<span className="text-lg md:text-xl text-muted-foreground font-medium">
+													/
+													{property.listingType === "rent"
+														? "month"
+														: "lease period"}
+												</span>
+											)}
+										</div>
+										{property.pricing?.priceNegotiable && (
+											<div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/20 text-secondary rounded-full text-sm font-medium">
+												💬 Price Negotiable
+											</div>
+										)}
+									</div>
+								</div>
+
+								{property.pricing && (
+									<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-6 border-t border-border/30">
+										{property.pricing.maintenanceCharges && (
+											<div className="text-center p-4 bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 hover:shadow-lg transition-all duration-300">
+												<div className="text-sm text-muted-foreground font-medium mb-1">
+													Maintenance
+												</div>
+												<div className="font-bold text-lg text-foreground">
+													₹
+													{formatPrice(
+														Number(property.pricing.maintenanceCharges)
+													)}
+													<span className="text-xs text-muted-foreground ml-1">
+														/month
+													</span>
+												</div>
+											</div>
+										)}
+										{property.pricing.securityDeposit && (
+											<div className="text-center p-4 bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 hover:shadow-lg transition-all duration-300">
+												<div className="text-sm text-muted-foreground font-medium mb-1">
+													Security Deposit
+												</div>
+												<div className="font-bold text-lg text-foreground">
+													₹
+													{formatPrice(
+														Number(property.pricing.securityDeposit)
+													)}
+												</div>
+											</div>
+										)}
+										{property.pricing.brokeragePercentage && (
+											<div className="text-center p-4 bg-card/80 backdrop-blur-sm rounded-2xl border border-border/50 hover:shadow-lg transition-all duration-300">
+												<div className="text-sm text-muted-foreground font-medium mb-1">
+													Brokerage
+												</div>
+												<div className="font-bold text-lg text-foreground">
+													{property.pricing.brokeragePercentage}%
+												</div>
+											</div>
+										)}
+									</div>
+								)}
+							</div>
+						</div>
+
+						{/* Property Overview */}
+						<div className="bg-card/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-border/50 animate-fadeInUp">
+							<div className="flex items-center gap-3 mb-8">
+								<div className="p-2 bg-primary/10 rounded-xl">
+									<Home className="h-6 w-6 text-primary" />
+								</div>
+								<h2 className="text-2xl md:text-3xl font-bold text-foreground">
+									Property Overview
+								</h2>
+							</div>
+							<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+								{[
+									{
+										icon: Bed,
+										label: "Bedrooms",
+										value: property.bedrooms || 0,
+										color: "text-blue-500",
+										bg: "bg-blue-50",
+									},
+									{
+										icon: Bath,
+										label: "Bathrooms",
+										value: property.bathrooms || 0,
+										color: "text-cyan-500",
+										bg: "bg-cyan-50",
+									},
+									{
+										icon: Square,
+										label: "Area",
+										value: `${property.area.value} ${property.area.unit}`,
+										color: "text-green-500",
+										bg: "bg-green-50",
+									},
+									{
+										icon: Car,
+										label: "Parking",
+										value: property.parking || 0,
+										color: "text-purple-500",
+										bg: "bg-purple-50",
+									},
+									...(property.balconies
+										? [
+												{
+													icon: TreePine,
+													label: "Balconies",
+													value: property.balconies,
+													color: "text-emerald-500",
+													bg: "bg-emerald-50",
+												},
+										  ]
+										: []),
+									...(property.floor
+										? [
+												{
+													icon: Building,
+													label: "Floor",
+													value: `${property.floor}${
+														property.totalFloors
+															? ` of ${property.totalFloors}`
+															: ""
+													}`,
+													color: "text-orange-500",
+													bg: "bg-orange-50",
+												},
+										  ]
+										: []),
+									{
+										icon: Calendar,
+										label: "Age",
+										value: `${property.age} years`,
+										color: "text-red-500",
+										bg: "bg-red-50",
+									},
+									{
+										icon: Home,
+										label: "Furnishing",
+										value: property.furnished,
+										color: "text-indigo-500",
+										bg: "bg-indigo-50",
+									},
+								].map((item, index) => (
 									<div
-										key={idx}
-										className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-										{renderAmenityIcon(amenity)}
-										<span className="text-sm md:text-base text-gray-700 capitalize">
-											{amenity}
+										key={index}
+										className="group flex flex-col items-center p-4 md:p-6 bg-muted/30 rounded-2xl border border-border/30 hover:shadow-lg hover:scale-105 transition-all duration-300 hover:bg-card/50">
+										<div
+											className={`p-3 ${item.bg} rounded-2xl mb-3 group-hover:scale-110 transition-transform duration-300`}>
+											<item.icon
+												className={`h-6 w-6 md:h-7 md:w-7 ${item.color}`}
+											/>
+										</div>
+										<span className="text-sm text-muted-foreground font-medium mb-2 text-center">
+											{item.label}
+										</span>
+										<span className="font-bold text-base md:text-lg text-foreground text-center">
+											{item.value}
 										</span>
 									</div>
 								))}
 							</div>
 						</div>
-					)}
 
-					{/* Additional Features */}
-					{property.features && (
-						<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-							<h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
-								Features
-							</h2>
-							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-								{Object.entries(property.features).map(([key, value]) => {
-									if (value === null || value === undefined || value === "")
-										return null;
-
-									const label = key
-										.replace(/([A-Z])/g, " $1")
-										.replace(/^./, (str) => str.toUpperCase());
-									const displayValue =
-										typeof value === "boolean" ? (value ? "Yes" : "No") : value;
-
-									return (
-										<div
-											key={key}
-											className="flex gap-4 bg-gray-50 p-4 rounded-lg border border-gray-100">
-											<h3 className="text-sm font-medium text-gray-600 mb-1">
-												{label}
-											</h3>
-											<p className="font-semibold text-gray-900 text-base capitalize">
-												{displayValue}
-											</p>
-										</div>
-									);
-								})}
+						{/* Description */}
+						<div className="bg-card/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-border/50 animate-fadeInUp">
+							<div className="flex items-center gap-3 mb-6">
+								<div className="p-2 bg-secondary/10 rounded-xl">
+									<Building className="h-6 w-6 text-secondary" />
+								</div>
+								<h2 className="text-2xl md:text-3xl font-bold text-foreground">
+									Description
+								</h2>
+							</div>
+							<div className="prose prose-lg max-w-none">
+								<p className="text-muted-foreground leading-relaxed text-base md:text-lg">
+									{property.description}
+								</p>
 							</div>
 						</div>
-					)}
 
-					{/* Location & Nearby Places */}
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-						<h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
-							Location Details
-						</h2>
-
-						<div className="mb-6 p-4 md:p-6 bg-blue-50 rounded-xl border border-blue-100">
-							<div className="flex items-start gap-3">
-								<MapPin className="h-5 w-5 md:h-6 md:w-6 text-blue-500 mt-1 flex-shrink-0" />
-								<div>
-									<p className="text-base md:text-lg text-gray-800 font-medium mb-2">
-										{property.address.area}, {property.address.city}
-									</p>
-									<p className="text-sm md:text-base text-gray-600">
-										{property.address.street}, {property.address.state} -{" "}
-										{property.address.zipCode}
-									</p>
-									{property.address.landmark && (
-										<p className="text-sm md:text-base text-gray-600 mt-2">
-											<span className="font-medium">Landmark:</span>{" "}
-											{property.address.landmark}
-										</p>
-									)}
+						{/* Amenities */}
+						{property.amenities && property.amenities.length > 0 && (
+							<div className="bg-card/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-border/50 animate-fadeInUp">
+								<div className="flex items-center gap-3 mb-8">
+									<div className="p-2 bg-accent/10 rounded-xl">
+										<Star className="h-6 w-6 text-accent" />
+									</div>
+									<h2 className="text-2xl md:text-3xl font-bold text-foreground">
+										Amenities
+									</h2>
+								</div>
+								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+									{property.amenities.map((amenity, idx) => (
+										<div
+											key={idx}
+											className="group flex items-center gap-4 p-4 bg-muted/30 rounded-2xl border border-border/30 hover:shadow-lg hover:scale-105 transition-all duration-300 hover:bg-card/50">
+											<div className="p-2 bg-primary/10 rounded-xl group-hover:scale-110 transition-transform duration-300">
+												{renderAmenityIcon(amenity)}
+											</div>
+											<span className="text-base md:text-lg text-foreground capitalize font-medium">
+												{amenity}
+											</span>
+										</div>
+									))}
 								</div>
 							</div>
-						</div>
+						)}
 
-						{property.nearbyPlaces &&
-							Object.entries(property.nearbyPlaces).some(
-								([_, places]) => Array.isArray(places) && places.length > 0
-							) && (
-								<>
-									<h3 className="text-lg md:text-xl font-semibold mb-4 text-gray-900">
-										Nearby Places
-									</h3>
-									<div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-										{Object.entries(property.nearbyPlaces).map(
-											([type, places]) => {
-												if (!Array.isArray(places) || places.length === 0)
-													return null;
+						{/* Additional Features */}
+						{property.features && (
+							<div className="bg-card/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-border/50 animate-fadeInUp">
+								<div className="flex items-center gap-3 mb-8">
+									<div className="p-2 bg-primary/10 rounded-xl">
+										<Shield className="h-6 w-6 text-primary" />
+									</div>
+									<h2 className="text-2xl md:text-3xl font-bold text-foreground">
+										Additional Features
+									</h2>
+								</div>
+								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+									{Object.entries(property.features).map(([key, value]) => {
+										if (value === null || value === undefined || value === "")
+											return null;
 
-												return (
-													<div
-														key={type}
-														className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-														<div className="flex items-center gap-2 mb-3">
-															{renderNearbyIcon(type)}
-															<h4 className="font-semibold text-gray-800 capitalize">
-																{type}
-															</h4>
-														</div>
-														<ul className="space-y-2">
-															{places.slice(0, 3).map((place, idx) => (
-																<li
-																	key={idx}
-																	className="flex justify-between items-center text-sm md:text-base">
-																	<span className="text-gray-700">
-																		{place.name}
-																	</span>
-																	<span className="text-gray-500 font-medium">
-																		{place.distance} {place.unit || "km"}
-																	</span>
-																</li>
-															))}
-														</ul>
+										const label = key
+											.replace(/([A-Z])/g, " $1")
+											.replace(/^./, (str) => str.toUpperCase());
+										const displayValue =
+											typeof value === "boolean"
+												? value
+													? "Yes"
+													: "No"
+												: value;
+
+										return (
+											<div
+												key={key}
+												className="group p-5 bg-muted/30 rounded-2xl border border-border/30 hover:shadow-lg hover:scale-105 transition-all duration-300 hover:bg-card/50">
+												<div className="flex items-center justify-between">
+													<div>
+														<h3 className="text-sm font-medium text-muted-foreground mb-1">
+															{label}
+														</h3>
+														<p className="font-bold text-lg text-foreground capitalize">
+															{displayValue}
+														</p>
 													</div>
-												);
-											}
+													<div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+														<CheckCircle className="h-5 w-5 text-secondary" />
+													</div>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							</div>
+						)}
+
+						{/* Location & Nearby Places */}
+						<div className="bg-card/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-border/50 animate-fadeInUp">
+							<div className="flex items-center gap-3 mb-8">
+								<div className="p-2 bg-accent/10 rounded-xl">
+									<MapPin className="h-6 w-6 text-accent" />
+								</div>
+								<h2 className="text-2xl md:text-3xl font-bold text-foreground">
+									Location & Connectivity
+								</h2>
+							</div>
+
+							{/* Address Card */}
+							<div className="mb-8 p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl border border-primary/20">
+								<div className="flex items-start gap-4">
+									<div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+										<MapPin className="h-6 w-6 text-primary" />
+									</div>
+									<div className="flex-1">
+										<h3 className="text-xl font-bold text-foreground mb-2">
+											{property.address.area}, {property.address.city}
+										</h3>
+										<p className="text-muted-foreground mb-2">
+											{property.address.street}, {property.address.state} -{" "}
+											{property.address.zipCode}
+										</p>
+										{property.address.landmark && (
+											<div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
+												<span className="w-2 h-2 bg-primary rounded-full"></span>
+												<span className="text-sm font-medium text-primary">
+													Near {property.address.landmark}
+												</span>
+											</div>
 										)}
 									</div>
-								</>
-							)}
-					</div>
+								</div>
+							</div>
 
-					{/* Property History */}
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-						<h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
-							Property History
-						</h2>
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-							<div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-								<h3 className="text-sm font-medium text-gray-600 mb-2">
-									Listed On
-								</h3>
-								<p className="font-semibold text-gray-900 text-base">
-									{new Date(property.createdAt).toLocaleDateString()}
-								</p>
-							</div>
-							<div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-								<h3 className="text-sm font-medium text-gray-600 mb-2">
-									Views
-								</h3>
-								<p className="font-semibold text-gray-900 text-base flex items-center gap-2">
-									<Eye className="h-4 w-4" /> {property.views || 0}
-								</p>
-							</div>
-							{property.expiresAt && (
+							{/* Nearby Places */}
+							{property.nearbyPlaces &&
+								Object.entries(property.nearbyPlaces).some(
+									([_, places]) => Array.isArray(places) && places.length > 0
+								) && (
+									<>
+										<h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+											<div className="w-2 h-2 bg-secondary rounded-full"></div>
+											Nearby Amenities
+										</h3>
+										<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+											{Object.entries(property.nearbyPlaces).map(
+												([type, places]) => {
+													if (!Array.isArray(places) || places.length === 0)
+														return null;
+
+													return (
+														<div
+															key={type}
+															className="group p-6 bg-muted/30 rounded-2xl border border-border/30 hover:shadow-lg hover:scale-105 transition-all duration-300 hover:bg-card/50">
+															<div className="flex items-center gap-3 mb-4">
+																<div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+																	{renderNearbyIcon(type)}
+																</div>
+																<h4 className="font-bold text-lg text-foreground capitalize">
+																	{type}
+																</h4>
+															</div>
+															<div className="space-y-3">
+																{places.slice(0, 3).map((place, idx) => (
+																	<div
+																		key={idx}
+																		className="flex justify-between items-center p-3 bg-card/50 rounded-xl">
+																		<span className="text-foreground font-medium">
+																			{place.name}
+																		</span>
+																		<span className="text-sm text-muted-foreground font-semibold px-2 py-1 bg-muted/50 rounded-lg">
+																			{place.distance} {place.unit || "km"}
+																		</span>
+																	</div>
+																))}
+															</div>
+														</div>
+													);
+												}
+											)}
+										</div>
+									</>
+								)}
+						</div>
+
+						{/* Property History */}
+						<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+							<h2 className="text-xl md:text-2xl font-semibold mb-6 text-gray-900">
+								Property History
+							</h2>
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
 								<div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
 									<h3 className="text-sm font-medium text-gray-600 mb-2">
-										Expires On
+										Listed On
 									</h3>
 									<p className="font-semibold text-gray-900 text-base">
-										{new Date(property.expiresAt).toLocaleDateString()}
+										{new Date(property.createdAt).toLocaleDateString()}
 									</p>
 								</div>
-							)}
-							{property.likedBy && (
 								<div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
 									<h3 className="text-sm font-medium text-gray-600 mb-2">
-										Likes
+										Views
 									</h3>
 									<p className="font-semibold text-gray-900 text-base flex items-center gap-2">
-										<Heart className="h-4 w-4" /> {property.likedBy.length}
+										<Eye className="h-4 w-4" /> {property.views || 0}
 									</p>
 								</div>
-							)}
+								{property.expiresAt && (
+									<div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+										<h3 className="text-sm font-medium text-gray-600 mb-2">
+											Expires On
+										</h3>
+										<p className="font-semibold text-gray-900 text-base">
+											{new Date(property.expiresAt).toLocaleDateString()}
+										</p>
+									</div>
+								)}
+								{property.likedBy && (
+									<div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+										<h3 className="text-sm font-medium text-gray-600 mb-2">
+											Likes
+										</h3>
+										<p className="font-semibold text-gray-900 text-base flex items-center gap-2">
+											<Heart className="h-4 w-4" /> {property.likedBy.length}
+										</p>
+									</div>
+								)}
+							</div>
 						</div>
 					</div>
-				</div>
 
-				{/* Sidebar */}
-				<div className="lg:col-span-1 space-y-6 md:space-y-8">
-					{/* Contact Info Card */}
-					<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-6">
-						<h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-gray-900">
-							<Contact className="h-5 w-5 md:h-6 md:w-6 text-blue-500" />
-							Contact Information
-						</h2>
-
-						<div className="space-y-4 md:space-y-6">
-							<div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-								<h3 className="text-sm font-medium text-gray-600 mb-1">
-									Contact Person
-								</h3>
-								<p className="font-semibold text-lg text-gray-900">
-									{property.contact?.name}
-								</p>
-								<p className="text-sm text-blue-600 font-medium capitalize">
-									{property.contact?.type}
+					{/* Sidebar */}
+					<div className="lg:col-span-1 space-y-8">
+						{/* Contact Info Card */}
+						<div className="bg-card/90 backdrop-blur-sm p-6 rounded-3xl shadow-xl border border-border/50 sticky top-6 animate-fadeInUp">
+							<div className="text-center mb-6">
+								<div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4">
+									<Contact className="h-8 w-8 text-primary" />
+								</div>
+								<h2 className="text-xl font-bold text-foreground mb-2">
+									Contact Information
+								</h2>
+								<p className="text-sm text-muted-foreground">
+									Get in touch with the property owner
 								</p>
 							</div>
 
-							<div className="bg-green-50 p-4 rounded-xl border border-green-100">
-								<h3 className="text-sm font-medium text-gray-600 mb-1">
-									Phone Number
+							{/* Contact Person */}
+							<div className="bg-muted/30 p-5 rounded-2xl mb-6 text-center">
+								<div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+									<span className="text-xl font-bold text-primary">
+										{property.contact?.name?.charAt(0)?.toUpperCase() || "?"}
+									</span>
+								</div>
+								<h3 className="font-bold text-lg text-foreground mb-1">
+									{property.contact?.name || "Contact Person"}
 								</h3>
-								{user ? (
-									<p className="font-semibold text-lg text-gray-900 flex items-center gap-2">
-										<Phone className="h-4 w-4 text-green-500" />
-										{property.contact?.phone}
-									</p>
-								) : (
-									<p className="font-semibold text-lg text-gray-900">
-										<em className="text-sm text-gray-500">Login to view</em>
-									</p>
+								<span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full capitalize">
+									{property.contact?.type || "Agent"}
+								</span>
+							</div>
+
+							{/* Contact Methods */}
+							<div className="space-y-4 mb-6">
+								{/* Phone */}
+								<div className="flex items-center justify-between p-4 bg-muted/20 rounded-xl border border-border/30">
+									<div className="flex items-center gap-3">
+										<div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+											<Phone className="h-5 w-5 text-blue-500" />
+										</div>
+										<div>
+											<p className="text-sm text-muted-foreground">Phone</p>
+											{user ? (
+												<p className="font-semibold text-foreground">
+													{property.contact?.phone || "Not available"}
+												</p>
+											) : (
+												<p className="text-sm text-muted-foreground italic">
+													Login to view
+												</p>
+											)}
+										</div>
+									</div>
+								</div>
+
+								{/* WhatsApp */}
+								{property.contact?.whatsapp && (
+									<div className="flex items-center justify-between p-4 bg-muted/20 rounded-xl border border-border/30">
+										<div className="flex items-center gap-3">
+											<div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+												<svg
+													className="h-5 w-5 text-green-500"
+													fill="currentColor"
+													viewBox="0 0 24 24">
+													<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+												</svg>
+											</div>
+											<div>
+												<p className="text-sm text-muted-foreground">
+													WhatsApp
+												</p>
+												{user ? (
+													<p className="font-semibold text-foreground">
+														{property.contact.whatsapp}
+													</p>
+												) : (
+													<p className="text-sm text-muted-foreground italic">
+														Login to view
+													</p>
+												)}
+											</div>
+										</div>
+									</div>
 								)}
 							</div>
 
-							{property.contact?.whatsapp && (
-								<div className="bg-green-50 p-4 rounded-xl border border-green-100">
-									<h3 className="text-sm font-medium text-gray-600 mb-1">
-										WhatsApp
-									</h3>
-									{user ? (
-										<p className="font-semibold text-lg text-green-600">
-											{property.contact.whatsapp}
-										</p>
-									) : (
-										<p className="font-semibold text-lg text-gray-900">
-											<em className="text-sm text-gray-500">Login to view</em>
-										</p>
-									)}
-								</div>
-							)}
-
-							<div className="flex flex-col gap-3">
+							{/* Action Buttons */}
+						{
+							user && 	<div className="space-y-3">
 								<Button
-									className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-base"
+									className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
 									onClick={() => {
 										if (user && property.contact?.phone) {
 											const phone = property.contact.phone.replace(
@@ -656,48 +835,39 @@ const PropertyDetails = () => {
 											});
 										}
 									}}>
-									<Phone className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+									<Phone className="h-5 w-5 mr-2" />
 									Call Now
 								</Button>
 
-								<Button
-									className="w-full bg-green-500 hover:bg-green-600 py-3 text-base flex items-center justify-center"
-									onClick={() => {
-										if (user && property.contact?.whatsapp) {
-											const phone = property.contact.whatsapp.replace(
-												/[^0-9]/g,
-												""
-											);
-											window.open(`https://wa.me/${phone}`, "_blank");
-										} else {
-											triggerToast({
-												title: "Login Required",
-												description: "Please login to contact via WhatsApp.",
-												variant: "destructive",
-											});
-										}
-									}}>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										strokeWidth={1.5}
-										stroke="currentColor"
-										className="h-4 w-4 md:h-5 md:w-5 mr-2">
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M16.862 14.487c-.263-.131-1.553-.767-1.793-.855-.24-.088-.415-.131-.59.132-.175.263-.677.855-.83 1.03-.152.175-.307.197-.57.066-.263-.131-1.111-.409-2.117-1.304-.782-.696-1.31-1.556-1.464-1.819-.152-.263-.016-.405.115-.536.118-.117.263-.307.395-.461.132-.153.175-.263.263-.439.088-.175.044-.329-.022-.461-.066-.132-.59-1.425-.808-1.95-.213-.513-.43-.443-.59-.452l-.5-.01c-.175 0-.461.066-.703.329-.242.263-.927.906-.927 2.209 0 1.302.948 2.56 1.08 2.735.131.175 1.87 2.993 4.53 4.078.634.273 1.127.436 1.513.558.636.203 1.215.174 1.672.106.51-.075 1.553-.635 1.773-1.248.22-.613.22-1.138.154-1.248-.066-.11-.24-.175-.503-.307z"
-										/>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9c0 1.57.41 3.05 1.13 4.33L3 21l4.77-1.13A8.963 8.963 0 0012 21c4.97 0 9-4.03 9-9z"
-										/>
-									</svg>
-									WhatsApp
-								</Button>
+								{property.contact?.whatsapp && (
+									<Button
+										className="w-full bg-green-500 hover:bg-green-600 text-white py-3 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+										onClick={() => {
+											if (user && property.contact?.whatsapp) {
+												const phone = property.contact.whatsapp.replace(
+													/[^0-9]/g,
+													""
+												);
+												window.open(`https://wa.me/${phone}`, "_blank");
+											} else {
+												triggerToast({
+													title: "Login Required",
+													description: "Please login to contact via WhatsApp.",
+													variant: "destructive",
+												});
+											}
+										}}>
+										<svg
+											className="h-5 w-5 mr-2"
+											fill="currentColor"
+											viewBox="0 0 24 24">
+											<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+										</svg>
+										WhatsApp
+									</Button>
+								)}
 							</div>
+						}
 						</div>
 					</div>
 
