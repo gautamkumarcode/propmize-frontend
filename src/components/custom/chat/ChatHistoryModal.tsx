@@ -158,7 +158,48 @@ export default function ChatHistoryModal({
 		);
 	}
 
-	console.log(isOpen);
+	// ...existing code...
+
+	const handleChatDelete = async (chatId: string) => {
+		if (!user) return;
+		if (confirm("Are you sure you want to delete this chat?")) {
+			try {
+				await aiChatService.deleteAIChat(chatId);
+
+				// Remove the chat from the local state first
+				const updatedChats = chats.filter((chat) => chat._id !== chatId);
+				setChats(updatedChats);
+
+				// If this was the last chat, create a new one
+				if (updatedChats.length === 0) {
+					try {
+						const newChatResponse = await aiChatService.startAIChat();
+						if (newChatResponse.success) {
+							// Add the new chat to the list
+							setChats([newChatResponse.data]);
+							// Automatically select the new chat and close modal
+							onSelectChat(newChatResponse.data._id);
+							onClose();
+							console.log(
+								"New chat created and selected:",
+								newChatResponse.data._id
+							);
+						}
+					} catch (error) {
+						console.error("Error creating new chat:", error);
+						alert("Failed to create new chat");
+					}
+				}
+
+				console.log("Chat deleted successfully");
+			} catch (error) {
+				console.error("Error deleting chat:", error);
+				alert("Failed to delete chat");
+			}
+		}
+	};
+
+	// ...existing code...
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
 			<div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col border border-gray-200">
@@ -256,6 +297,13 @@ export default function ChatHistoryModal({
 									<p className="text-sm text-gray-600 line-clamp-2">
 										{getMessagePreview(chat.messages)}
 									</p>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => handleChatDelete(chat._id)}
+										className="mt-2">
+										Delete
+									</Button>
 								</div>
 							))}
 							{isLoading && chats.length > 0 && (

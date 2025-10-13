@@ -516,6 +516,27 @@ export class AIChatService {
 			throw error;
 		}
 	}
+	async deleteAIChat(chatId: string): Promise<{ success: boolean }> {
+		try {
+			const response = await apiClient.delete(`${this.baseUrl}/chat/${chatId}`);
+			return response.data;
+		} catch (error) {
+			console.error("Error deleting AI chat:", error);
+			throw error;
+		}
+	}
+	async deleteAllUserAIChats(): Promise<{
+		success: boolean;
+		deletedCount: number;
+	}> {
+		try {
+			const response = await apiClient.delete(`${this.baseUrl}/chat/all`);
+			return response.data;
+		} catch (error) {
+			console.error("Error deleting all user AI chats:", error);
+			throw error;
+		}
+	}
 }
 
 // Create singleton instance for use throughout the app

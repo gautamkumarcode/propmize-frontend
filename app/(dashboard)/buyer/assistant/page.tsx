@@ -5,7 +5,7 @@ import ChatHistoryModal from "@/components/custom/chat/ChatHistoryModal";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/providers/AuthProvider";
 import { aiChatService } from "@/services/aiChatService";
-import { ChevronRight, History, Info, Plus, Settings, X } from "lucide-react";
+import { ChevronRight, History, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -129,15 +129,6 @@ export default function AssistantPage() {
 		} catch (error) {
 			console.error("Error creating new chat:", error);
 		}
-	};
-
-	const handleViewChatHistory = () => {
-		if (!user) {
-			// Show a message that user needs to be logged in
-			console.log("User must be logged in to view chat history");
-			return;
-		}
-		setShowChatHistory(true);
 	};
 
 	const handleSelectChat = async (selectedChatId: string) => {
@@ -325,9 +316,15 @@ export default function AssistantPage() {
 						// Handle various actions like save, contact, etc.
 					}}
 				/>
-				{/* Sidebar overlay */}
 				{showSidebar && (
 					<div className="fixed inset-0 z-40">
+						{/* Backdrop - clicking this will close the sidebar */}
+						<div
+							className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+							onClick={() => setShowSidebar(false)}
+						/>
+
+						{/* Sidebar */}
 						<div className="fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-50 flex flex-col">
 							<div className="flex items-center justify-between p-4 border-b">
 								<div className="flex items-center gap-2">
@@ -352,7 +349,10 @@ export default function AssistantPage() {
 									<li>
 										<button
 											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
-											onClick={handleNewChat}>
+											onClick={() => {
+												handleNewChat();
+												setShowSidebar(false); // Close sidebar after action
+											}}>
 											<Plus className="w-4 h-4" /> New Chat
 										</button>
 									</li>
@@ -360,33 +360,14 @@ export default function AssistantPage() {
 										<li>
 											<button
 												className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
-												onClick={() => setShowChatHistory(true)}>
+												onClick={() => {
+													setShowChatHistory(true);
+													setShowSidebar(false); // Close sidebar after action
+												}}>
 												<History className="w-4 h-4" /> Chat History
 											</button>
 										</li>
 									)}
-									<li>
-										<button
-											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
-											onClick={handleClearChat}>
-											<X className="w-4 h-4" /> Clear Chat
-										</button>
-									</li>
-									<li>
-										<button
-											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
-											// Add your help/support handler here
-										>
-											<Info className="w-4 h-4" /> Help & Support
-										</button>
-									</li>
-									<li>
-										<button
-											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
-											onClick={() => setShowModeSelector(!showModeSelector)}>
-											<Settings className="w-4 h-4" /> Settings
-										</button>
-									</li>
 								</ul>
 							</div>
 						</div>
