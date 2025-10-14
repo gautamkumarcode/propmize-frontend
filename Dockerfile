@@ -32,7 +32,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 # Copy next.config.js to ensure custom config is included
-COPY --from=builder /app/next.config.js ./next.config.js
+COPY --from=builder /app/next.config.ts ./next.config.ts
 
 # Optional: copy .env.production if you use it
 # COPY --from=builder /app/.env.production ./
