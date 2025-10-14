@@ -38,7 +38,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 	const joinRoom = (userId: string) => {
 		if (socket && isConnected) {
 			socket.emit("join", userId);
-			console.log(`Joined room for user: ${userId}`);
 		}
 	};
 
@@ -46,7 +45,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 	const leaveRoom = (userId: string) => {
 		if (socket && isConnected) {
 			socket.emit("leave", userId);
-			console.log(`Left room for user: ${userId}`);
 		}
 	};
 

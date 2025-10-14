@@ -196,7 +196,6 @@ export const useAddFollowUp = () => {
 					old ? { ...old, data: data.data } : data
 			);
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myLeads });
-			console.log("Follow-up added successfully!");
 		},
 		onError: (error: unknown) => {
 			console.error(
