@@ -77,12 +77,10 @@ export class FirebaseNotificationService {
 
 			const hasPermission = await this.requestPermission();
 			if (!hasPermission) {
-				console.warn("Notification permission denied");
 				return null;
 			}
 
 			const token = await getToken(this.messaging, { vapidKey });
-			console.log("FCM Token:", token);
 			return token;
 		} catch (error) {
 			console.error("Error getting FCM token:", error);
@@ -102,7 +100,6 @@ export class FirebaseNotificationService {
 			const { onMessage } = await import("firebase/messaging");
 
 			onMessage(this.messaging, (payload: MessagePayload) => {
-				console.log("Foreground message received:", payload);
 
 				const notification: NotificationPayload = {
 					title: payload.notification?.title || "E-State Platform",

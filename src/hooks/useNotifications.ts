@@ -16,21 +16,18 @@ export const useNotifications = () => {
 	// Create stable callback functions using useCallback
 	const handleAddNotification = useCallback(
 		(notification: NotificationTpes) => {
-			console.log("Received notification via socket:", notification);
 			setNotifications((prev) => [notification, ...prev]);
 		},
 		[]
 	);
 
 	const handleReadNotification = useCallback((id: string) => {
-		console.log("Received read notification via socket:", id);
 		setNotifications((prev) =>
 			prev.map((n) => (n._id === id ? { ...n, read: true } : n))
 		);
 	}, []);
 
 	const handleDeleteNotification = useCallback((id: string) => {
-		console.log("Received delete notification via socket:", id);
 		setNotifications((prev) => prev.filter((n) => n._id !== id));
 	}, []);
 
@@ -120,14 +117,12 @@ export const useNotifications = () => {
 	// Handle notification click
 	const handleNotificationClick = useCallback(
 		async (notification: NotificationTpes) => {
-			console.log(notification);
 			try {
 				if (!notification.read) {
 					await markAsRead(notification._id);
 				}
 				const actionUrl =
 					notification?.actionUrl || notification.metadata?.actionUrl;
-				console.log(actionUrl);
 				if (typeof actionUrl === "string" && actionUrl.length > 0) {
 					router.push(actionUrl);
 				}

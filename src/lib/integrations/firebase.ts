@@ -81,7 +81,6 @@ export class FirebaseNotificationService {
 			}
 
 			const token = await getToken(this.messaging, { vapidKey });
-			console.log("FCM Token:", token);
 			return token;
 		} catch (error) {
 			console.error("Error getting FCM token:", error);

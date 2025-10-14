@@ -180,10 +180,6 @@ export default function ChatHistoryModal({
 							// Automatically select the new chat and close modal
 							onSelectChat(newChatResponse.data._id);
 							onClose();
-							console.log(
-								"New chat created and selected:",
-								newChatResponse.data._id
-							);
 						}
 					} catch (error) {
 						console.error("Error creating new chat:", error);
@@ -191,7 +187,6 @@ export default function ChatHistoryModal({
 					}
 				}
 
-				console.log("Chat deleted successfully");
 			} catch (error) {
 				console.error("Error deleting chat:", error);
 				alert("Failed to delete chat");
