@@ -151,8 +151,6 @@ export const useUpdateLeadStatus = () => {
 			// Invalidate lead lists
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myLeads });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.leadAnalytics });
-
-			console.log("Lead status updated successfully!");
 		},
 		onError: (error: unknown) => {
 			console.error(
@@ -232,8 +230,6 @@ export const useConvertLead = () => {
 			);
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myLeads });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.leadAnalytics });
-
-			console.log("Lead converted successfully!");
 		},
 		onError: (error: unknown) => {
 			console.error(
