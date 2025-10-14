@@ -238,7 +238,6 @@ export const useUpdateProperty = () => {
 			queryClient.invalidateQueries({ queryKey: QueryKeys.properties });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myProperties });
 
-			console.log("Property updated successfully!");
 		},
 		onError: (error: unknown) => {
 			console.error(
