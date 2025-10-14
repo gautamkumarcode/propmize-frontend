@@ -254,7 +254,6 @@ export const useDeleteLead = () => {
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myLeads });
 			queryClient.invalidateQueries({ queryKey: QueryKeys.myInquiries });
 
-			console.log("Lead deleted successfully!");
 		},
 		onError: (error: unknown) => {
 			console.error(
