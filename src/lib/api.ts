@@ -13,7 +13,7 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 // API Configuration
 const API_BASE_URL =
-	process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+	process.env.NEXT_PUBLIC_API_URL || "https://api.propmize.com/api";
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({

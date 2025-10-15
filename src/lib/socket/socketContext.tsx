@@ -53,7 +53,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
 		if (token) {
 			const newSocket = io(
-				process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5001",
+				process.env.NEXT_PUBLIC_SOCKET_URL || "https://api.propmize.com",
 				{
 					auth: {
 						token,
