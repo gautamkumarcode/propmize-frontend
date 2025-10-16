@@ -15,7 +15,6 @@ import {
 	Bot,
 	Calendar,
 	ChevronDown,
-	Heart,
 	Home,
 	Info,
 	Loader2,
@@ -76,7 +75,7 @@ export default function AIChatWindow({
 		// Check if user is at the bottom
 		const checkScrollPosition = () => {
 			if (!container) return;
-			const threshold = 100; // pixels from bottom
+			const threshold = 50; // pixels from bottom
 			const isNearBottom =
 				container.scrollHeight - container.scrollTop - container.clientHeight <=
 				threshold;
@@ -84,21 +83,21 @@ export default function AIChatWindow({
 		};
 
 		container.addEventListener("scroll", checkScrollPosition);
-
-		// Auto-scroll only if:
-		// 1. User is already at the bottom, OR
-		// 2. New messages arrived (not just typing indicator)
-		const shouldScroll = isAtBottom || messages.length > lastMessageCount;
-
-		if (shouldScroll) {
-			messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-		}
-
-		setLastMessageCount(messages.length);
+		checkScrollPosition(); // Check initial position
 
 		return () => {
 			container.removeEventListener("scroll", checkScrollPosition);
 		};
+	}, []);
+
+	// Auto-scroll when new messages arrive or typing changes
+	useEffect(() => {
+		if (isAtBottom || messages.length > lastMessageCount || isTyping) {
+			setTimeout(() => {
+				messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+			}, 100);
+		}
+		setLastMessageCount(messages.length);
 	}, [messages, isTyping, isAtBottom, lastMessageCount]);
 
 	const handleStartNewChat = async () => {
@@ -153,187 +152,206 @@ export default function AIChatWindow({
 		return (
 			<div
 				key={msg._id || index}
-				className={`flex gap-2 md:gap-3 ${
+				className={`flex gap-3 ${
 					isUser ? "justify-end" : "justify-start"
-				} mb-3 md:mb-4 px-2 md:px-0`}>
-				<div
-					className={`max-w-[85%] md:max-w-[80%] ${
-						isUser ? "order-first" : ""
-					}`}>
-					<Card
-						className={`${isUser ? "bg-blue-600 text-white" : "bg-gray-50"} ${
-							isUser ? "border-blue-600" : "border-gray-200"
+				} mb-4`}>
+				{/* AI Avatar */}
+				{!isUser && (
+					<div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-1">
+						<Image src={logo} alt="Ai logo" width={20} height={20} />
+					</div>
+				)}
+
+				<div className={`max-w-[70%] ${isUser ? "order-first" : ""}`}>
+					<div
+						className={`rounded-2xl px-4 py-3 ${
+							isUser
+								? "bg-blue-600 text-white rounded-br-md"
+								: "bg-white text-gray-900 rounded-bl-md shadow-sm border"
 						}`}>
-						<CardContent className="p-3 md:p-4">
+						<div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
 							<p className="text-sm whitespace-pre-wrap break-words">
 								{msg.content}
 							</p>
+						</div>
+					</div>
 
-							{msg.properties && msg.properties.length > 0 && (
-								<div className="mt-3 space-y-3">
-									<p
-										className={`text-xs font-medium ${
-											isUser ? "text-blue-100" : "text-gray-500"
-										}`}>
-										Suggested Properties:
-									</p>
-									{msg.properties.map((property, idx) => (
-										<Card
-											key={property._id || idx}
-											className="cursor-pointer hover:shadow-lg transition-all border border-gray-100 rounded-xl overflow-hidden max-w-2xl">
-											<CardContent className="p-0">
-												{/* Image Section */}
-												<div className="relative h-36 md:h-52 w-full">
-													<img
-														src={
-															property?.images && property.images[0]
-																? property.images[0]
-																: "/api/placeholder/160/120"
-														}
-														alt={property.title}
-														className="h-full w-full object-cover"
-													/>
-													<div className="absolute top-2 left-2 flex gap-1">
-														<Badge variant="featured" className="text-xs">
-															FEATURED
-														</Badge>
-														<Badge
-															variant="price"
-															className="bg-green-600 text-white text-xs shadow-md">
-															{formatPrice(property.price)}
-														</Badge>
-													</div>
-													<button
-														onClick={() =>
-															handlePropertyAction(
-																{ type: "save-property" },
-																property._id
-															)
-														}
-														className="absolute top-2 right-2 p-1.5 bg-white/80 hover:bg-white rounded-full shadow-md">
-														<Heart className="w-4 h-4 text-red-500" />
-													</button>
-												</div>
-
-												{/* Content */}
-												<div className="p-3">
-													<h4 className="font-semibold text-sm text-gray-900 truncate">
-														{property.title}
-													</h4>
-													<p className="text-xs text-gray-600 flex items-center gap-1 truncate mt-1">
-														<MapPin className="w-3 h-3 flex-shrink-0 text-blue-500" />
-														{[property?.address?.area, property?.address?.city]
-															.filter(Boolean)
-															.join(", ")}
-													</p>
-
-													{/* Badges */}
-													<div className="flex gap-2 mt-2">
-														<Badge
-															variant="secondary"
-															className="text-xs capitalize">
-															{property.type}
-														</Badge>
-														{property.size && (
-															<Badge variant="outline" className="text-xs">
-																{property.size}
-															</Badge>
-														)}
-													</div>
-
-													{/* Actions */}
-													<div className="flex gap-2 mt-3">
-														<Button
-															size="sm"
-															variant="default"
-															onClick={() => onPropertyClick?.(property._id)}
-															className="text-xs h-8 flex-1">
-															<Home className="w-4 h-4 mr-1" />
-															View Details
-														</Button>
-													</div>
-												</div>
-											</CardContent>
-										</Card>
-									))}
-								</div>
-							)}
-
-							{msg.actions && msg.actions.length > 0 && (
-								<div className="mt-3 space-y-2">
-									<p
-										className={`text-xs font-medium ${
-											isUser ? "text-blue-100" : "text-gray-500"
-										}`}>
-										Quick Actions:
-									</p>
-									<div className="flex flex-wrap gap-1 md:gap-2">
-										{msg.actions.map((action: MessageAction, idx: number) => (
-											<Button
-												key={idx}
-												size="sm"
-												variant={isUser ? "secondary" : "outline"}
-												onClick={() =>
-													handlePropertyAction({
-														...action,
-														type: action.type as AIAction["type"],
-													})
+					{/* Property Cards */}
+					{msg.properties && msg.properties.length > 0 && (
+						<div className="mt-3 space-y-3">
+							<p
+								className={`text-xs font-medium ${
+									isUser ? "text-blue-100" : "text-gray-500"
+								} mb-2`}>
+								Suggested Properties:
+							</p>
+							{msg.properties.map((property, idx) => (
+								<Card
+									key={property._id || idx}
+									className="cursor-pointer hover:shadow-lg transition-all border border-gray-100 rounded-xl overflow-hidden">
+									<CardContent className="p-0">
+										{/* Image Section */}
+										<div className="relative h-36 md:h-52 w-full">
+											<img
+												src={
+													property?.images && property.images[0]
+														? property.images[0]
+														: "/api/placeholder/160/120"
 												}
-												className={`text-xs h-7 ${
-													isUser
-														? "bg-white text-blue-600 hover:bg-white/90"
-														: ""
-												}`}>
-												{action.type === "schedule-viewing" && (
-													<Calendar className="w-3 h-3 mr-1" />
-												)}
-												{action.type === "contact-agent" && (
-													<Phone className="w-3 h-3 mr-1" />
-												)}
-												{action.type === "request-info" && (
-													<Info className="w-3 h-3 mr-1" />
-												)}
-												<span className="truncate">
-													{action.type
-														.replace("-", " ")
-														.replace(/\b\w/g, (l: string) => l.toUpperCase())}
-												</span>
-											</Button>
-										))}
-									</div>
-								</div>
-							)}
+												alt={property.title}
+												className="h-full w-full object-cover"
+											/>
+											<div className="absolute top-2  flex gap-1 justify-between w-full">
+												<Badge variant="featured" className="text-xs">
+													FEATURED
+												</Badge>
+												<Badge
+													variant="price"
+													className="bg-green-600 text-white text-xs shadow-md">
+													{formatPrice(property.price)}
+												</Badge>
+											</div>
+											{/* <button
+												onClick={() =>
+													handlePropertyAction(
+														{ type: "save-property" },
+														property._id
+													)
+												}
+												className="absolute top-2 right-2 p-1.5 bg-white/80 hover:bg-white rounded-full shadow-md">
+												<Heart className="w-4 h-4 text-red-500" />
+											</button> */}
+										</div>
 
-							{msg.suggestions && msg.suggestions.length > 0 && (
-								<div className="mt-3 space-y-2">
-									<p
-										className={`text-xs font-medium ${
-											isUser ? "text-blue-100" : "text-gray-500"
+										{/* Content */}
+										<div className="p-3">
+											<h4 className="font-semibold text-sm text-gray-900 truncate">
+												{property.title}
+											</h4>
+											<p className="text-xs text-gray-600 flex items-center gap-1 truncate mt-1">
+												<MapPin className="w-3 h-3 flex-shrink-0 text-blue-500" />
+												{typeof property?.address === "string"
+													? property.address
+													: property?.address?.area ||
+													  property?.address?.city ||
+													  "Location not specified"}
+											</p>
+
+											{/* Badges */}
+											<div className="flex gap-2 mt-2">
+												{property.views !== undefined && (
+													<Badge variant="outline" className="text-xs">
+														{property.views} views
+													</Badge>
+												)}
+												{property.likes !== undefined && (
+													<Badge variant="outline" className="text-xs">
+														{property.likes} likes
+													</Badge>
+												)}
+
+												{property.size && (
+													<Badge variant="outline" className="text-xs">
+														{property.size}
+													</Badge>
+												)}
+											</div>
+
+											{/* Actions */}
+											<div className="flex gap-2 mt-3">
+												<Button
+													size="sm"
+													variant="default"
+													onClick={() => onPropertyClick?.(property._id)}
+													className="text-xs h-8 flex-1">
+													<Home className="w-4 h-4 mr-1" />
+													View Details
+												</Button>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							))}
+						</div>
+					)}
+
+					{/* Action Buttons */}
+					{msg.actions && msg.actions.length > 0 && (
+						<div className="mt-3 space-y-2">
+							<p
+								className={`text-xs font-medium ${
+									isUser ? "text-blue-100" : "text-gray-500"
+								}`}>
+								Quick Actions:
+							</p>
+							<div className="flex flex-wrap gap-2">
+								{msg.actions.map((action: MessageAction, idx: number) => (
+									<Button
+										key={idx}
+										size="sm"
+										variant={isUser ? "secondary" : "outline"}
+										onClick={() =>
+											handlePropertyAction({
+												...action,
+												type: action.type as AIAction["type"],
+											})
+										}
+										className={`text-xs h-7 ${
+											isUser ? "bg-white text-blue-600 hover:bg-white/90" : ""
 										}`}>
-										Quick Replies:
-									</p>
-									<div className="flex flex-wrap gap-1 md:gap-2">
-										{msg.suggestions.map((suggestion: string, idx: number) => (
-											<Button
-												key={idx}
-												size="sm"
-												variant={isUser ? "ghost" : "outline"}
-												onClick={() => setMessage(suggestion)}
-												className={`text-xs h-7 border max-w-full ${
-													isUser
-														? "border-blue-500/20 text-blue-100 hover:bg-blue-500/10"
-														: "border-gray-200 hover:bg-gray-100"
-												}`}>
-												<span className="truncate">{suggestion}</span>
-											</Button>
-										))}
-									</div>
-								</div>
-							)}
-						</CardContent>
-					</Card>
+										{action.type === "schedule-viewing" && (
+											<Calendar className="w-3 h-3 mr-1" />
+										)}
+										{action.type === "contact-agent" && (
+											<Phone className="w-3 h-3 mr-1" />
+										)}
+										{action.type === "request-info" && (
+											<Info className="w-3 h-3 mr-1" />
+										)}
+										<span className="truncate">
+											{action.type
+												.replace("-", " ")
+												.replace(/\b\w/g, (l: string) => l.toUpperCase())}
+										</span>
+									</Button>
+								))}
+							</div>
+						</div>
+					)}
 
-					<div className="text-xs text-gray-500 mt-1 text-right px-1">
+					{/* Suggestion Buttons */}
+					{msg.suggestions && msg.suggestions.length > 0 && (
+						<div className="mt-3 space-y-2">
+							<p
+								className={`text-xs font-medium ${
+									isUser ? "text-blue-100" : "text-gray-500"
+								}`}>
+								Quick Replies:
+							</p>
+							<div className="flex flex-wrap gap-2">
+								{msg.suggestions.map((suggestion: string, idx: number) => (
+									<Button
+										key={idx}
+										size="sm"
+										variant={isUser ? "ghost" : "outline"}
+										onClick={() => setMessage(suggestion)}
+										className={`text-xs h-7 border max-w-full ${
+											isUser
+												? "border-blue-500/20 text-blue-100 hover:bg-blue-500/10"
+												: "border-gray-200 hover:bg-gray-100"
+										}`}>
+										<span className="truncate">{suggestion}</span>
+									</Button>
+								))}
+							</div>
+						</div>
+					)}
+
+					{/* Timestamp */}
+					<div
+						className={`text-xs text-gray-400 mt-2 ${
+							isUser ? "text-right" : "text-left"
+						}`}>
 						{(() => {
 							const date = new Date(msg.timestamp || msg.createdAt);
 							const hours = date.getHours().toString().padStart(2, "0");
@@ -342,6 +360,13 @@ export default function AIChatWindow({
 						})()}
 					</div>
 				</div>
+
+				{/* User Avatar */}
+				{isUser && (
+					<div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 mt-1">
+						<span className="text-white text-sm font-medium">U</span>
+					</div>
+				)}
 			</div>
 		);
 	};
@@ -360,35 +385,31 @@ export default function AIChatWindow({
 	}
 
 	return (
-		<div className="flex-1 flex flex-col h-full relative">
-			{/* Scroll to bottom button */}
-			{!isAtBottom && (
-				<Button
-					onClick={scrollToBottom}
-					className="absolute bottom-25 right-4 z-10 rounded-full w-10 h-10 p-0 shadow-lg bg-blue-100 animate-bounce border-gray-300">
-					<ChevronDown className="w-8 h-8 text-xl text-gray-900" />
-				</Button>
-			)}
-
-			{/* Messages */}
-			<div className="overflow-y-auto flex-1" ref={messagesContainerRef}>
-				<div className="p-2 md:p-4 space-y-0">
+		<div className="flex flex-col h-full max-h-screen relative bg-gray-50">
+			{/* Messages Container */}
+			<div
+				className="flex-1 overflow-y-auto scroll-smooth"
+				ref={messagesContainerRef}
+				style={{ height: "calc(100vh - 120px)" }}>
+				<div className="p-4 space-y-4 min-h-full flex flex-col">
 					{/* New chat state */}
 					{isNewChat && !isLoading && (
-						<div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center px-4">
-							<div className="w-12 h-12 md:w-16 md:h-16 mb-4 bg-blue-50 rounded-full flex items-center justify-center">
-								<Bot className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
+						<div className="flex-1 flex flex-col items-center justify-center text-center px-4">
+							<div className="w-16 h-16 mb-6 bg-blue-50 rounded-full flex items-center justify-center">
+								<Bot className="w-8 h-8 text-blue-500" />
 							</div>
-							<h3 className="font-medium mb-2 text-sm md:text-base">
+							<h3 className="font-semibold mb-3 text-lg text-gray-900">
 								Start a new conversation
 							</h3>
-							<p className="text-xs md:text-sm text-gray-600 max-w-xs mb-4">
+							<p className="text-sm text-gray-600 max-w-sm mb-6 leading-relaxed">
 								Your AI assistant is ready to help with your property search.
+								Ask anything about properties, locations, or get personalized
+								recommendations.
 							</p>
-							<Button onClick={handleStartNewChat} className="mb-4">
+							<Button onClick={handleStartNewChat} className="mb-6 px-6">
 								Start Chat
 							</Button>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
+							<div className="grid grid-cols-1 gap-3 w-full max-w-lg">
 								{[
 									"Show me 3BHK apartments in Mumbai",
 									"What are trending areas in Bangalore?",
@@ -403,7 +424,7 @@ export default function AIChatWindow({
 											setMessage(suggestion);
 											handleStartNewChat().then(() => handleSendMessage());
 										}}
-										className="text-xs h-8 px-2 text-left">
+										className="text-sm h-10 px-4 text-left justify-start hover:bg-blue-50">
 										<span className="truncate">{suggestion}</span>
 									</Button>
 								))}
@@ -413,14 +434,14 @@ export default function AIChatWindow({
 
 					{/* Empty chat state (after starting but no messages yet) */}
 					{!isNewChat && messages.length === 0 && !isTyping && (
-						<div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center px-4">
-							<div className="w-12 h-12 md:w-16 md:h-16 mb-4 bg-blue-50 rounded-full flex items-center justify-center">
-								<Bot className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
+						<div className="flex-1 flex flex-col items-center justify-center text-center px-4">
+							<div className="w-16 h-16 mb-6 bg-blue-50 rounded-full flex items-center justify-center">
+								<Bot className="w-8 h-8 text-blue-500" />
 							</div>
-							<h3 className="font-medium mb-2 text-sm md:text-base">
+							<h3 className="font-semibold mb-3 text-lg text-gray-900">
 								Welcome back!
 							</h3>
-							<p className="text-xs md:text-sm text-gray-600 max-w-xs mb-4">
+							<p className="text-sm text-gray-600 max-w-sm leading-relaxed">
 								Continue your property search or ask a new question.
 							</p>
 						</div>
@@ -431,30 +452,22 @@ export default function AIChatWindow({
 
 					{/* Typing indicator */}
 					{isTyping && (
-						<div className="flex gap-2 md:gap-3 mb-4 px-2 md:px-0">
-							<div className="w-6 h-6 md:w-8 md:h-8  rounded-full flex items-center justify-center">
-								<Image
-									src={logo}
-									alt="AI"
-									width={20}
-									height={20}
-									className="object-contain"
-								/>
+						<div className="flex gap-3 mb-4">
+							<div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+								<Bot className="w-4 h-4 text-blue-600" />
 							</div>
-							<Card className="bg-gray-50 max-w-[85%] md:max-w-[80%]">
-								<CardContent className="p-3">
-									<div className="flex items-center gap-2">
-										<div className="flex gap-1">
-											<div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-											<div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-											<div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-										</div>
-										<span className="text-xs text-gray-500">
-											Propmize is thinking...
-										</span>
+							<div className="bg-white rounded-2xl rounded-bl-md px-4 py-3 shadow-sm border max-w-[70%]">
+								<div className="flex items-center gap-3">
+									<div className="flex gap-1">
+										<div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+										<div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+										<div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
 									</div>
-								</CardContent>
-							</Card>
+									<span className="text-xs text-gray-500">
+										Propmize is thinking...
+									</span>
+								</div>
+							</div>
 						</div>
 					)}
 
@@ -462,32 +475,43 @@ export default function AIChatWindow({
 				</div>
 			</div>
 
+			{/* Scroll to bottom button */}
+			{!isAtBottom && messages.length > 0 && (
+				<Button
+					onClick={scrollToBottom}
+					className="absolute bottom-20 right-4 z-10 rounded-full w-10 h-10 p-0 shadow-lg bg-white hover:bg-gray-50 border">
+					<ChevronDown className="w-4 h-4 text-gray-600" />
+				</Button>
+			)}
+
 			{/* Input Area */}
-			<div className="border-t p-2 md:p-3 bg-white flex-shrink-0">
-				<div className="relative">
-					<Input
-						value={message}
-						onChange={(e) => setMessage(e.target.value)}
-						onKeyPress={handleKeyPress}
-						placeholder={
-							isNewChat
-								? "Click 'Start Chat' button to begin chatting..."
-								: "Ask me about properties, locations, or get recommendations..."
-						}
-						className="pr-10 text-sm md:text-base h-10 md:h-12 focus:ring-0 focus:outline-none"
-						disabled={isSendingMessage || isNewChat}
-					/>
-					<Button
-						onClick={handleSendMessage}
-						disabled={!message.trim() || isSendingMessage || isNewChat}
-						size="icon"
-						className="absolute right-1 top-1/2 transform -translate-y-1/2 w-8 h-8 md:w-10 md:h-10">
-						{isSendingMessage ? (
-							<Loader2 className="w-4 h-4 animate-spin" />
-						) : (
-							<Send className="w-3 h-3 md:w-4 md:h-4" />
-						)}
-					</Button>
+			<div className="border-t bg-white p-4 flex-shrink-0">
+				<div className="flex gap-3 items-end max-w-4xl mx-auto">
+					<div className="flex-1 relative">
+						<Input
+							value={message}
+							onChange={(e) => setMessage(e.target.value)}
+							onKeyPress={handleKeyPress}
+							placeholder={
+								isNewChat
+									? "Click 'Start Chat' button to begin chatting..."
+									: "Type your message..."
+							}
+							className="pr-12 text-sm h-12 rounded-full border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+							disabled={isSendingMessage || isNewChat}
+						/>
+						<Button
+							onClick={handleSendMessage}
+							disabled={!message.trim() || isSendingMessage || isNewChat}
+							size="icon"
+							className="absolute right-1 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full">
+							{isSendingMessage ? (
+								<Loader2 className="w-4 h-4 animate-spin" />
+							) : (
+								<Send className="w-4 h-4" />
+							)}
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -34,15 +34,19 @@ export interface PropertySuggestion {
 	_id: string;
 	title: string;
 	price: number;
-	address: {
-		city?: string;
-		area?: string;
-	};
+	address:
+		| string
+		| {
+				city?: string;
+				area?: string;
+		  };
 	type: string;
 	area?: string;
 	size?: string;
 	images?: string[];
 	image?: string;
+	likes?: number;
+	views?: number;
 }
 
 export interface AISearchFilters {
