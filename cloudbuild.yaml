@@ -1,0 +1,29 @@
+steps:
+  # 1️⃣ Install dependencies using cache
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["ci"]
+    id: "install-deps"
+    waitFor: ["-"]
+    volumes:
+      - name: "npm-cache"
+        path: "/workspace/.npm"
+
+  # 2️⃣ Build the Next.js app with build-time vars
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["run", "build"]
+    env:
+      - "NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}"
+      - "NEXT_PUBLIC_GOOGLE_CLIENT_ID=${_NEXT_PUBLIC_GOOGLE_CLIENT_ID}"
+    waitFor: ["install-deps"]
+
+  # 3️⃣ Build Docker image and push to registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/frontend-app", "."]
+    waitFor: ["install-deps"]
+
+images:
+  - "gcr.io/$PROJECT_ID/frontend-app"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: "E2_HIGHCPU_8"

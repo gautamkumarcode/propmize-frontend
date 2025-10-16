@@ -1,15 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { triggerToast } from "@/components/ui/Toaster";
 
 import apiClient from "@/lib/api";
@@ -19,9 +10,9 @@ import type { CredentialResponse } from "@react-oauth/google";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { ChevronDown, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 
 export interface AuthModalProps {
 	isOpen: boolean;
@@ -59,15 +50,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
 	const { login, setUserMode } = useAuthStore();
 	const router = useRouter();
-	const [step, setStep] = useState<OtpStep>({
-		phone: "",
-		otp: "",
-		isOtpSent: false,
-		role: "",
-		recievedOtp: "",
-	});
-	const [isNewUser, setIsNewUser] = useState(false);
-	const [loading, setLoading] = useState(false);
+	// const [step, setStep] = useState<OtpStep>({
+	// 	phone: "",
+	// 	otp: "",
+	// 	isOtpSent: false,
+	// 	role: "",
+	// 	recievedOtp: "",
+	// });
+	// const [isNewUser, setIsNewUser] = useState(false);
+	// const [loading, setLoading] = useState(false);
 
 	// Handle redirect after successful authentication
 	const handlePostAuthRedirect = () => {
@@ -150,121 +141,121 @@ const AuthModal: React.FC<AuthModalProps> = ({
 	});
 
 	// Send OTP mutation
-	const handleSendOtp = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!step.phone) {
-			triggerToast({
-				title: "Validation Error",
-				description: "Enter phone number",
-				variant: "destructive",
-			});
-			return;
-		}
-		//check for valid phone number
-		const phoneRegex = /^[6-9]\d{9}$/;
-		if (!phoneRegex.test(step.phone)) {
-			triggerToast({
-				title: "Validation Error",
-				description: "Enter a valid phone number",
-				variant: "destructive",
-			});
-			return;
-		}
-		setLoading(true);
-		try {
-			const res = await apiClient.post("/auth/send-otp", {
-				phone: step.phone,
-			});
-			setIsNewUser(res.data.data.isNewUser);
-			setStep((prev) => ({
-				...prev,
-				isOtpSent: true,
-				recievedOtp: res.data.data.otp,
-			}));
-			triggerToast({
-				title: "OTP sent",
-				description: "Check your SMS for the OTP.",
-				variant: "success",
-			});
+	// const handleSendOtp = async (e: React.FormEvent) => {
+	// 	e.preventDefault();
+	// 	if (!step.phone) {
+	// 		triggerToast({
+	// 			title: "Validation Error",
+	// 			description: "Enter phone number",
+	// 			variant: "destructive",
+	// 		});
+	// 		return;
+	// 	}
+	// 	//check for valid phone number
+	// 	const phoneRegex = /^[6-9]\d{9}$/;
+	// 	if (!phoneRegex.test(step.phone)) {
+	// 		triggerToast({
+	// 			title: "Validation Error",
+	// 			description: "Enter a valid phone number",
+	// 			variant: "destructive",
+	// 		});
+	// 		return;
+	// 	}
+	// 	setLoading(true);
+	// 	try {
+	// 		const res = await apiClient.post("/auth/send-otp", {
+	// 			phone: step.phone,
+	// 		});
+	// 		setIsNewUser(res.data.data.isNewUser);
+	// 		setStep((prev) => ({
+	// 			...prev,
+	// 			isOtpSent: true,
+	// 			recievedOtp: res.data.data.otp,
+	// 		}));
+	// 		triggerToast({
+	// 			title: "OTP sent",
+	// 			description: "Check your SMS for the OTP.",
+	// 			variant: "success",
+	// 		});
 
-			if (res.data.success !== true) {
-				triggerToast({
-					title: "Error",
-					description: "Failed to send OTP",
-					variant: "destructive",
-				});
-				// OTP sent successfully
-			}
-		} catch (error: unknown) {
-			const axiosError = error as AxiosError;
-			const errorData = axiosError.response?.data;
-			const errorMessage =
-				typeof errorData === "object" &&
-				errorData !== null &&
-				"error" in errorData
-					? (errorData as { error: string }).error
-					: "Failed to send OTP";
-			triggerToast({
-				title: "Error",
-				description: errorMessage,
-				variant: "destructive",
-			});
-		}
-		setLoading(false);
-	};
+	// 		if (res.data.success !== true) {
+	// 			triggerToast({
+	// 				title: "Error",
+	// 				description: "Failed to send OTP",
+	// 				variant: "destructive",
+	// 			});
+	// 			// OTP sent successfully
+	// 		}
+	// 	} catch (error: unknown) {
+	// 		const axiosError = error as AxiosError;
+	// 		const errorData = axiosError.response?.data;
+	// 		const errorMessage =
+	// 			typeof errorData === "object" &&
+	// 			errorData !== null &&
+	// 			"error" in errorData
+	// 				? (errorData as { error: string }).error
+	// 				: "Failed to send OTP";
+	// 		triggerToast({
+	// 			title: "Error",
+	// 			description: errorMessage,
+	// 			variant: "destructive",
+	// 		});
+	// 	}
+	// 	setLoading(false);
+	// };
 
 	// Verify OTP mutation
-	const handleVerifyOtp = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!step.otp) {
-			triggerToast({
-				title: "Validation Error",
-				description: "Enter OTP",
-				variant: "destructive",
-			});
-			return;
-		}
-		setLoading(true);
-		const payload = {
-			phone: step.phone,
-			otp: step.otp,
-			...(isNewUser && { role: step.role }),
-		};
+	// const handleVerifyOtp = async (e: React.FormEvent) => {
+	// 	e.preventDefault();
+	// 	if (!step.otp) {
+	// 		triggerToast({
+	// 			title: "Validation Error",
+	// 			description: "Enter OTP",
+	// 			variant: "destructive",
+	// 		});
+	// 		return;
+	// 	}
+	// 	setLoading(true);
+	// 	const payload = {
+	// 		phone: step.phone,
+	// 		otp: step.otp,
+	// 		...(isNewUser && { role: step.role }),
+	// 	};
 
-		try {
-			const response = await apiClient.post("/auth/verify-otp", payload);
+	// 	try {
+	// 		const response = await apiClient.post("/auth/verify-otp", payload);
 
-			const { user, tokens } = response.data.data;
-			login(user, tokens.accessToken, tokens.refreshToken);
-			queryClient.invalidateQueries({ queryKey: ["user"] });
-			triggerToast({
-				title: "Login successful",
-				description: `Welcome, ${user.name || user.phone}!`,
-				variant: "success",
-			});
-			await aiChatService.clearGuestSession(); // Clear guest session and chat on login/signup
-			if (redirectTo) {
-				if (redirectTo.startsWith("/seller")) setUserMode("seller");
-				else if (redirectTo.startsWith("/buyer")) setUserMode("buyer");
-				setTimeout(() => router.push(redirectTo), 100);
-			}
-			onClose();
-		} catch (error: unknown) {
-			const errorMessage =
-				error instanceof AxiosError
-					? (error.response?.data as { error?: string })?.error ||
-					  (typeof error.response?.data === "string"
-							? error.response.data
-							: "Invalid OTP")
-					: "Invalid OTP";
-			triggerToast({
-				title: "Error",
-				description: errorMessage,
-				variant: "destructive",
-			});
-		}
-		setLoading(false);
-	};
+	// 		const { user, tokens } = response.data.data;
+	// 		login(user, tokens.accessToken, tokens.refreshToken);
+	// 		queryClient.invalidateQueries({ queryKey: ["user"] });
+	// 		triggerToast({
+	// 			title: "Login successful",
+	// 			description: `Welcome, ${user.name || user.phone}!`,
+	// 			variant: "success",
+	// 		});
+	// 		await aiChatService.clearGuestSession(); // Clear guest session and chat on login/signup
+	// 		if (redirectTo) {
+	// 			if (redirectTo.startsWith("/seller")) setUserMode("seller");
+	// 			else if (redirectTo.startsWith("/buyer")) setUserMode("buyer");
+	// 			setTimeout(() => router.push(redirectTo), 100);
+	// 		}
+	// 		onClose();
+	// 	} catch (error: unknown) {
+	// 		const errorMessage =
+	// 			error instanceof AxiosError
+	// 				? (error.response?.data as { error?: string })?.error ||
+	// 				  (typeof error.response?.data === "string"
+	// 						? error.response.data
+	// 						: "Invalid OTP")
+	// 				: "Invalid OTP";
+	// 		triggerToast({
+	// 			title: "Error",
+	// 			description: errorMessage,
+	// 			variant: "destructive",
+	// 		});
+	// 	}
+	// 	setLoading(false);
+	// };
 
 	const handleSuccess = async (response: CredentialResponse) => {
 		if (!response.credential) {
@@ -321,7 +312,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 							/>
 						</GoogleOAuthProvider>
 
-						<div className="flex items-center gap-3 pt-2">
+						{/* <div className="flex items-center gap-3 pt-2">
 							<hr className="flex-grow border-gray-300" />
 							<span className="text-gray-500">or</span>
 							<hr className="flex-grow border-gray-300" />
@@ -430,7 +421,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 									Change phone number
 								</Button>
 							</form>
-						)}
+						)} */}
 					</CardContent>
 				</Card>
 			</div>
