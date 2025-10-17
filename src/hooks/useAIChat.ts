@@ -209,11 +209,25 @@ export const useAIChat = () => {
 export const useAIChatData = (chatId: string | null) => {
 	return useQuery({
 		queryKey: ["ai-chat", chatId],
-		queryFn: () => (chatId ? aiChatService.getAIChat(chatId) : null),
+		queryFn: async () => {
+			console.log("Fetching chat data for ID:", chatId);
+			if (!chatId) return null;
+
+			try {
+				const result = await aiChatService.getAIChat(chatId);
+				console.log("Chat data fetched successfully:", result);
+				return result;
+			} catch (error) {
+				console.error("Error fetching chat data:", error);
+				throw error;
+			}
+		},
 		enabled: !!chatId,
-		staleTime: 30000, // Consider data fresh for 30 seconds
-		refetchOnWindowFocus: false, // Prevent refetching on window focus
-		refetchOnReconnect: false, // Prevent refetching on reconnect
+		staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+		gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
+		refetchOnMount: false, // Don't refetch on mount if data exists
 		retry: (failureCount: number, error: unknown) => {
 			// Don't retry rate limit errors
 			if (error && typeof error === "object" && "response" in error) {
@@ -234,7 +248,11 @@ export const useAIChats = (
 	return useQuery({
 		queryKey: ["ai-chats", page, limit, status],
 		queryFn: () => aiChatService.getUserAIChats(page, limit, status),
-		staleTime: 60000, // Consider data fresh for 1 minute
+		staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+		gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+		refetchOnWindowFocus: false,
+		refetchOnReconnect: false,
+		refetchOnMount: false, // Don't refetch on mount if data exists
 	});
 };
 
@@ -253,7 +271,6 @@ export const useAIPropertySearch = () => {
 	return useMutation({
 		mutationFn: ({
 			searchQuery,
-			chatId,
 		}: {
 			searchQuery: {
 				query: string;
@@ -284,6 +301,23 @@ export const useAIChatState = (initialChatId?: string) => {
 
 	const { data: chatData, isLoading } = useAIChatData(chatId);
 	const aiChat = useAIChat();
+	const queryClient = useQueryClient();
+
+	// Handle initialChatId changes
+	useEffect(() => {
+		console.log(
+			"useAIChatState: initialChatId changed:",
+			initialChatId,
+			"current:",
+			chatId
+		);
+		if (initialChatId && initialChatId !== chatId) {
+			console.log("useAIChatState: Updating chatId to:", initialChatId);
+			setChatId(initialChatId);
+			// Clear messages immediately when switching chats
+			setMessages([]);
+		}
+	}, [initialChatId, chatId]);
 
 	useEffect(() => {
 		if (chatId) {
@@ -292,13 +326,27 @@ export const useAIChatState = (initialChatId?: string) => {
 			localStorage.removeItem("ai_current_chat");
 		}
 	}, [chatId]);
-	
+
 	// Update messages when chat data changes
 	useEffect(() => {
-		if (chatData?.data?.messages) {
+		console.log("Chat data changed for chatId:", chatId, "data:", chatData);
+		if (chatData?.success && chatData?.data?.messages) {
+			console.log(
+				"Setting messages:",
+				chatData.data.messages.length,
+				"messages"
+			);
 			setMessages(chatData.data.messages);
+		} else if (chatData?.success && chatData?.data && !chatData.data.messages) {
+			// Handle case where chat exists but has no messages
+			console.log("Chat exists but no messages, setting empty array");
+			setMessages([]);
+		} else if (!chatData && chatId) {
+			// Clear messages if no chat data but we have a chatId (loading state)
+			console.log("No chat data for chatId, clearing messages");
+			setMessages([]);
 		}
-	}, [chatData]);
+	}, [chatData, chatId]);
 
 	const startNewChat = useCallback(
 		async (
@@ -364,9 +412,20 @@ export const useAIChatState = (initialChatId?: string) => {
 		[chatId, aiChat]
 	);
 
+	const handleSetChatId = useCallback(
+		(newChatId: string | null) => {
+			console.log("handleSetChatId called with:", newChatId);
+			if (newChatId !== chatId) {
+				setChatId(newChatId);
+				setMessages([]); // Clear messages immediately
+			}
+		},
+		[chatId]
+	);
+
 	return {
 		chatId,
-		setChatId,
+		setChatId: handleSetChatId,
 		messages,
 		isTyping,
 		context,

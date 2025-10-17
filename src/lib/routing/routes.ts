@@ -57,7 +57,7 @@ export const routes: Record<string, Route> = {
 	},
 	recent: {
 		path: "/recent",
-		name: "Recently Viewed",
+		name: "Recent",
 		description: "Recently viewed properties",
 		layout: "buyer",
 		protected: true,
@@ -226,7 +226,7 @@ export const buyerNavItems: NavigationItem[] = [
 	{ route: routes.saved, icon: "Heart" },
 	{ route: routes.recent, icon: "Eye" },
 	{ route: routes.contacted, icon: "Phone" },
-	{ route: routes.newProjects, icon: "Building" },
+	// { route: routes.newProjects, icon: "Building" },
 	{ route: routes.guide, icon: "BookOpen" },
 	{ route: routes.support, icon: "HelpCircle" },
 ];
@@ -269,6 +269,6 @@ export const buyerBottomNavItems: NavigationItem[] = [
 	{ route: routes.saved, icon: "Heart" },
 	// Use a unique route for chat/messages, or remove duplicate
 	{ route: routes.buyerAssistant, icon: "MessageSquare", isHighlighted: true },
-	{ route: routes.newProjects, icon: "Building" },
+	{ route: routes.recent, icon: "Eye" },
 	{ route: routes.properties, icon: "Building" },
 ];

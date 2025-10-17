@@ -25,3 +25,10 @@ dist
 # Git
 .git
 .gitignore
+
+.next/cache
+node_modules
+.git
+.env
+Dockerfile
+deploy-frontend.sh

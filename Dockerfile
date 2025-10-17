@@ -1,44 +1,60 @@
 # =========================
-# Stage 1: Build
+# Stage 1: Dependencies
 # =========================
-FROM node:18-alpine AS builder
-
-# Set working directory
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Install dependencies separately for caching
 COPY package*.json ./
-RUN npm install
+RUN npm ci --legacy-peer-deps && npm cache clean --force
 
-# Copy all files including next.config.js
+# =========================
+# Stage 2: Builder
+# =========================
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copy cached dependencies
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build the Next.js app
+# Build-time environment variables
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_WS_URL
+ARG NEXT_PUBLIC_SOCKET_URL
+ARG NEXT_PUBLIC_API_URL_IMG
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
+# Expose them to the build
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_PUBLIC_API_URL_IMG=$NEXT_PUBLIC_API_URL_IMG
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
+# Build Next.js app
 RUN npm run build
 
 # =========================
-# Stage 2: Production
+# Stage 3: Runner
 # =========================
-FROM node:18-alpine
-
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Install only production dependencies
-COPY package*.json ./
-RUN npm install --production
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV HOST=0.0.0.0
 
-# Copy the built Next.js app from builder
-COPY --from=builder /app/.next ./.next
+# Copy only essential runtime files
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package*.json ./
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/next.config.* ./
 
-# Copy next.config.js to ensure custom config is included
-COPY --from=builder /app/next.config.ts ./next.config.ts
+# Reduce image size (optional)
+RUN rm -rf node_modules/.cache && npm prune --omit=dev
 
-# Optional: copy .env.production if you use it
-# COPY --from=builder /app/.env.production ./
-
-# Expose the port Cloud Run expects
-EXPOSE 3000
-
-# Start the app
+# Expose and run
+EXPOSE 8080
 CMD ["npm", "start"]

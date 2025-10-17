@@ -1,6 +1,5 @@
 "use client";
 
-import LogoImage from "@/assests/logo1.png";
 import NotificationDropdown from "@/components/custom/notifications/NotificationDropdown";
 import { toast } from "@/hooks/use-toast";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -16,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import LogoImage from "../../../../public/logo.png";
 
 interface NavbarProps {
 	activeTab?: "properties" | "chat" | "analytics";
@@ -154,16 +154,22 @@ export default function Navbar({
 						{/* <h1
 							onClick={() => navigation.goBuyerDashboard()}
 							className="text-2xl font-bold text-blue-600 cursor-pointer"> */}
-						<Image
-							onClick={() =>
-								mode === "seller"
-									? router.push("/seller")
-									: router.push("/buyer/assistant")
-							}
-							src={LogoImage}
-							alt="Propmize Logo"
-							className="h-12 w-auto cursor-pointer object-contain text-green-600"
-						/>
+
+						<div className="flex items-center gap-2 ml-4">
+							<Image
+								src={LogoImage}
+								alt="Propmize Logo"
+								className="cursor-pointer object-contain"
+								width={30}
+								height={30}
+								onClick={() =>
+									mode === "seller"
+										? router.push("/seller")
+										: router.push("/buyer/assistant")
+								}
+							/>
+							<p className="text-blue-600 font-bold text-xl">Propmize</p>
+						</div>
 						{/* </h1> */}
 					</div>
 

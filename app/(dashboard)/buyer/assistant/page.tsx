@@ -1,15 +1,14 @@
 "use client";
 
 import AIChatWindow from "@/components/custom/chat/AIChatWindow";
-import ChatHistoryModal from "@/components/custom/chat/ChatHistoryModal";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/providers/AuthProvider";
 import { aiChatService } from "@/services/aiChatService";
-import { ChevronRight, History, Plus, X } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import { ChatSidebar } from "@/components/custom/chat/ChatSidebar";
 import logo from "../../../../public/logo.png";
 
 export default function AssistantPage() {
@@ -22,17 +21,30 @@ export default function AssistantPage() {
 	const [showSidebar, setShowSidebar] = useState(false);
 	const [chatId, setChatId] = useState<string | null>(null);
 	const [isInitializing, setIsInitializing] = useState(true);
-	const [showChatHistory, setShowChatHistory] = useState(false);
 
 	// Initialize chat when component mounts
 	const initializeChat = useCallback(async () => {
+		console.log("initializeChat called, isInitializing:", isInitializing);
+		if (!isInitializing) return; // Prevent multiple initializations
+
+		// Check localStorage first
+		const storedChatId = localStorage.getItem("ai_current_chat");
+		if (storedChatId) {
+			console.log("Found stored chat ID:", storedChatId);
+			setChatId(storedChatId);
+			setIsInitializing(false);
+			return;
+		}
+
 		if (user) {
 			// Logged-in user: check for existing chat history
 			try {
 				const history = await aiChatService.getUserAIChats(1, 1, "active");
 				if (history.success && history.data.chats.length > 0) {
-					setChatId(history.data.chats[0]._id);
-					localStorage.setItem("ai_current_chat", history.data.chats[0]._id);
+					const latestChatId = history.data.chats[0]._id;
+					console.log("Found latest chat:", latestChatId);
+					setChatId(latestChatId);
+					localStorage.setItem("ai_current_chat", latestChatId);
 					setIsInitializing(false);
 					return;
 				}
@@ -41,18 +53,9 @@ export default function AssistantPage() {
 			}
 		}
 
-		// Guest or no chat history: fallback to localStorage or create new chat
-		const storedChatId = localStorage.getItem("ai_current_chat");
-		if (storedChatId) {
-			setChatId(storedChatId);
-			setIsInitializing(false);
-			return;
-		}
-		if (chatId) {
-			setIsInitializing(false);
-			return;
-		}
+		// No existing chat found, create new one
 		try {
+			console.log("Creating new chat");
 			const response = await aiChatService.startAIChat(chatMode, {
 				showModeSpecificContent: false,
 				...(user && {
@@ -68,11 +71,13 @@ export default function AssistantPage() {
 		} finally {
 			setIsInitializing(false);
 		}
-	}, [chatMode, user, chatId]);
+	}, [chatMode, user, isInitializing]);
 
 	useEffect(() => {
-		initializeChat();
-	}, [initializeChat]);
+		if (isInitializing && !chatId) {
+			initializeChat();
+		}
+	}, [initializeChat, isInitializing, chatId]);
 
 	const chatModes = [
 		{
@@ -132,15 +137,14 @@ export default function AssistantPage() {
 	};
 
 	const handleSelectChat = async (selectedChatId: string) => {
-		setIsInitializing(true);
+		console.log("handleSelectChat: Selecting chat:", selectedChatId);
+		if (selectedChatId === chatId) {
+			console.log("handleSelectChat: Same chat selected, ignoring");
+			return;
+		}
+
 		setChatId(selectedChatId);
 		localStorage.setItem("ai_current_chat", selectedChatId);
-		setIsInitializing(false);
-	};
-
-	const handleClearChat = async () => {
-		// Create a new chat to effectively clear the current one
-		await handleNewChat();
 	};
 
 	const handlePropertyClick = (propertyId: string) => {
@@ -307,7 +311,7 @@ export default function AssistantPage() {
 			{/* Chat Window - Takes remaining height */}
 			<div className="flex-1 min-h-0 mb-6">
 				<AIChatWindow
-					key={chatId} // Force re-render when chatId changes
+					key={chatId || "new-chat"} // Force re-render when chatId changes
 					initialChatId={chatId || undefined}
 					onNewChat={handleNewChat}
 					onPropertyClick={handlePropertyClick}
@@ -316,71 +320,21 @@ export default function AssistantPage() {
 						// Handle various actions like save, contact, etc.
 					}}
 				/>
-				{showSidebar && (
-					<div className="fixed inset-0 z-40">
-						{/* Backdrop - clicking this will close the sidebar */}
-						<div
-							className="fixed inset-0 bg-black/20 backdrop-blur-sm"
-							onClick={() => setShowSidebar(false)}
-						/>
-
-						{/* Sidebar */}
-						<div className="fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-50 flex flex-col">
-							<div className="flex items-center justify-between p-4 border-b">
-								<div className="flex items-center gap-2">
-									<Image
-										src={logo}
-										alt="Propmize Logo"
-										width={30}
-										height={30}
-									/>
-									<p className="text-blue-600 font-semibold">Propmize</p>
-								</div>
-								<Button
-									variant="ghost"
-									size="icon"
-									onClick={() => setShowSidebar(false)}
-									aria-label="Close Sidebar">
-									<X className="w-5 h-5" />
-								</Button>
-							</div>
-							<div className="p-4 flex-1 overflow-y-auto">
-								<ul className="space-y-2">
-									<li>
-										<button
-											className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
-											onClick={() => {
-												handleNewChat();
-												setShowSidebar(false); // Close sidebar after action
-											}}>
-											<Plus className="w-4 h-4" /> New Chat
-										</button>
-									</li>
-									{user && (
-										<li>
-											<button
-												className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-800"
-												onClick={() => {
-													setShowChatHistory(true);
-													setShowSidebar(false); // Close sidebar after action
-												}}>
-												<History className="w-4 h-4" /> Chat History
-											</button>
-										</li>
-									)}
-								</ul>
-							</div>
-						</div>
-					</div>
-				)}
 			</div>
 
+			<ChatSidebar
+				showSidebar={showSidebar}
+				setShowSidebar={setShowSidebar}
+				handleNewChat={handleNewChat}
+				handleSelectChat={handleSelectChat}
+			/>
+
 			{/* Chat History Modal */}
-			<ChatHistoryModal
-				isOpen={showChatHistory}
+			{/* <ChatHistoryModal
+				isOpen={false}
 				onClose={() => setShowChatHistory(false)}
 				onSelectChat={handleSelectChat}
-			/>
+			/> */}
 		</div>
 	);
 }

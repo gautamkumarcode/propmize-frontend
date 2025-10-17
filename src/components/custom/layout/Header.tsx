@@ -1,7 +1,6 @@
 "use client";
 
 import Navbar from "@/components/custom/navbar/Navbar";
-import { useNavigation } from "@/hooks/useNavigation";
 import { iconMap } from "@/lib/routing/iconMap";
 import { NavigationItem } from "@/lib/routing/routes";
 import { X } from "lucide-react";
@@ -27,7 +26,6 @@ const Header: React.FC<HeaderProps> = ({
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [showBottomNav, setShowBottomNav] = useState(true);
 	const pathname = usePathname();
-	const navigation = useNavigation();
 
 	// Determine which navigation items to use based on mode
 	const currentNavItems = navItems;

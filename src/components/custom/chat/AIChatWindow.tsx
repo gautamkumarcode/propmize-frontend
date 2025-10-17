@@ -57,12 +57,33 @@ export default function AIChatWindow({
 		setChatId: setAIChatId,
 	} = useAIChatState(initialChatId);
 
-	// Initialize chat only once
+	// Debug log for messages
 	useEffect(() => {
-		if (initialChatId) {
+		console.log(
+			"AIChatWindow: Messages updated:",
+			messages.length,
+			"messages for chatId:",
+			chatId
+		);
+	}, [messages, chatId]);
+
+	// Handle initialChatId changes
+	useEffect(() => {
+		console.log(
+			"AIChatWindow: initialChatId changed to:",
+			initialChatId,
+			"current chatId:",
+			chatId,
+			"isLoading:",
+			isLoading
+		);
+
+		if (initialChatId && initialChatId !== chatId) {
+			console.log("AIChatWindow: Setting new chat ID:", initialChatId);
 			setAIChatId(initialChatId);
 			setIsNewChat(false);
-		} else if (!chatId && !isLoading) {
+		} else if (!initialChatId && !chatId && !isLoading) {
+			console.log("AIChatWindow: Starting new chat");
 			setIsNewChat(true);
 		}
 	}, [initialChatId, chatId, isLoading, setAIChatId]);
@@ -72,10 +93,9 @@ export default function AIChatWindow({
 		const container = messagesContainerRef.current;
 		if (!container) return;
 
-		// Check if user is at the bottom
 		const checkScrollPosition = () => {
 			if (!container) return;
-			const threshold = 50; // pixels from bottom
+			const threshold = 50;
 			const isNearBottom =
 				container.scrollHeight - container.scrollTop - container.clientHeight <=
 				threshold;
@@ -83,7 +103,7 @@ export default function AIChatWindow({
 		};
 
 		container.addEventListener("scroll", checkScrollPosition);
-		checkScrollPosition(); // Check initial position
+		checkScrollPosition();
 
 		return () => {
 			container.removeEventListener("scroll", checkScrollPosition);
@@ -146,7 +166,9 @@ export default function AIChatWindow({
 		setIsAtBottom(true);
 	};
 
+	// Rest of your renderMessage function and JSX remains the same...
 	const renderMessage = (msg: AIMessage, index: number) => {
+		// ... your existing renderMessage implementation
 		const isUser = msg.role === "user";
 
 		return (
@@ -211,16 +233,6 @@ export default function AIChatWindow({
 													{formatPrice(property.price)}
 												</Badge>
 											</div>
-											{/* <button
-												onClick={() =>
-													handlePropertyAction(
-														{ type: "save-property" },
-														property._id
-													)
-												}
-												className="absolute top-2 right-2 p-1.5 bg-white/80 hover:bg-white rounded-full shadow-md">
-												<Heart className="w-4 h-4 text-red-500" />
-											</button> */}
 										</div>
 
 										{/* Content */}

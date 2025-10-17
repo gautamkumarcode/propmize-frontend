@@ -20,15 +20,11 @@ import { useProfile, useUpdateProfile } from "@/lib/react-query/hooks/useAuth";
 import { useAuthStore } from "@/store/app-store";
 import { User } from "@/types";
 import {
-	Bell,
 	Camera,
 	Edit3,
-	Eye,
-	Heart,
 	Loader2,
 	Mail,
 	MapPin,
-	MessageSquare,
 	Phone,
 	Save,
 	Shield,
@@ -298,10 +294,10 @@ export default function Profile() {
 				</div>
 
 				<Tabs defaultValue="profile" className="w-full">
-					<TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
+					<TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
 						<TabsTrigger value="profile">Profile</TabsTrigger>
 						<TabsTrigger value="preferences">Preferences</TabsTrigger>
-						<TabsTrigger value="activity">Activity</TabsTrigger>
+						{/* <TabsTrigger value="activity">Activity</TabsTrigger> */}
 					</TabsList>
 
 					<TabsContent value="profile">
@@ -795,7 +791,7 @@ export default function Profile() {
 						</div>
 					</TabsContent>
 
-					<TabsContent value="activity">
+					{/* <TabsContent value="activity">
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 							<Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
 								<CardContent className="p-6">
@@ -892,7 +888,7 @@ export default function Profile() {
 								</div>
 							</CardContent>
 						</Card>
-					</TabsContent>
+					</TabsContent> */}
 				</Tabs>
 			</div>
 		</div>
