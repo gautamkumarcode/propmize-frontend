@@ -125,7 +125,6 @@ export const useAppStore = create<AppStore>()(
 	)
 );
 
-// Export individual hooks for easier usage
 export const useAuthStore = () => {
 	const state = useAppStore();
 	return {
@@ -143,17 +142,29 @@ export const useAuthStore = () => {
 					localStorage.setItem("refreshToken", refreshToken);
 				}
 			}
-			state.setUser(user);
-			state.setAuthenticated(true);
+
+			console.log("User to be set:", user);
+
+			// Update both values in a single state update
+			useAppStore.setState({
+				user: user,
+				isAuthenticated: true,
+			});
 		},
 		logout: () => {
 			// Remove tokens from localStorage
 			if (typeof window !== "undefined") {
 				localStorage.removeItem("accessToken");
 				localStorage.removeItem("refreshToken");
+				localStorage.removeItem("propmize_guest_id");
+				localStorage.removeItem("ai_current_chat");
 			}
-			state.setUser(null);
-			state.setAuthenticated(false);
+
+			// Update both values in a single state update
+			useAppStore.setState({
+				user: null,
+				isAuthenticated: false,
+			});
 		},
 	};
 };

@@ -33,13 +33,13 @@ interface RegisterData {
 	password: string;
 }
 
-interface OtpStep {
-	phone: string;
-	otp: string;
-	isOtpSent: boolean;
-	role: string;
-	recievedOtp: string;
-}
+// interface OtpStep {
+// 	phone: string;
+// 	otp: string;
+// 	isOtpSent: boolean;
+// 	role: string;
+// 	recievedOtp: string;
+// }
 
 const AuthModal: React.FC<AuthModalProps> = ({
 	isOpen,
@@ -47,7 +47,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
 	redirectTo,
 }) => {
 	const queryClient = useQueryClient();
-
 	const { login, setUserMode } = useAuthStore();
 	const router = useRouter();
 	// const [step, setStep] = useState<OtpStep>({
@@ -276,7 +275,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 			await aiChatService.clearGuestSession();
 			triggerToast({
 				title: "Login successful",
-				description: `Welcome, ${user.name || user.phone}!`,
+				description: `Welcome, ${user.name || user.email}!`,
 				variant: "success",
 			});
 			handlePostAuthRedirect();

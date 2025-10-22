@@ -1,3 +1,4 @@
+import { useAppStore } from "@/store/app-store";
 import apiClient from "../api";
 import {
 	ApiResponse,
@@ -140,7 +141,9 @@ export class AuthService {
 	 */
 	static isAuthenticated(): boolean {
 		const token = safeLocalStorage.getItem("accessToken");
-		const hasValidToken = !!token && token !== "null" && token !== "undefined";
+		const { isAuthenticated } = useAppStore.getState();
+
+		const hasValidToken = isAuthenticated;
 
 		// Clean up invalid tokens
 		if (!hasValidToken && token) {

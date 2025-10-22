@@ -5,6 +5,7 @@ import PropertyCardLoader from "@/components/custom/property/PropertyCardLoader"
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRecentlyViewedProperties } from "@/lib/react-query/hooks/useProperties";
+import { useAuthStore } from "@/store/app-store";
 import { PropertyResponse } from "@/types";
 import { Eye } from "lucide-react";
 
@@ -12,6 +13,24 @@ export default function Recent() {
 	const { data: recentPropertiesData, isLoading } =
 		useRecentlyViewedProperties();
 	const recentProperties: PropertyResponse[] = recentPropertiesData?.data || [];
+
+	const { isAuthenticated } = useAuthStore();
+
+	if (!isAuthenticated) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-gray-50">
+				<Card className="p-8 text-center">
+					<Eye className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+					<h3 className="text-xl font-semibold text-gray-900 mb-2">
+						Please Log In to View Recently Viewed Properties
+					</h3>
+					<p className="text-gray-600 mb-6">
+						You need to be logged in to see your recently viewed properties.
+					</p>
+				</Card>
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen bg-gray-50 ">

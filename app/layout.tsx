@@ -1,3 +1,4 @@
+import { Providers } from "@/lib";
 import { Metadata } from "next/dist/lib/metadata/types/metadata-interface";
 import { Geist, Geist_Mono } from "next/font/google";
 import React from "react";
@@ -32,7 +33,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				{children}
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useSellerAllPropertyAnalytics } from "@/lib/react-query/hooks/useAnalytics";
+import { useAuthStore } from "@/store/app-store";
 import {
 	BarChart3,
 	Calendar,
@@ -40,25 +41,43 @@ interface PropertyAnalytics {
 	status: "Active" | "Pending" | "Sold";
 }
 
+type WeeklyDay = {
+	day: string;
+	views: number;
+	inquiries: number;
+};
+type MarketInsight = {
+	title: string;
+	value: string | number;
+	insight: string;
+	recommendation: string;
+};
 export default function SellerAnalytics() {
 	const [selectedPeriod, setSelectedPeriod] = useState("30d");
 	const [selectedProperty, setSelectedProperty] = useState<string>("all");
-
-	// Use real-time analytics hook
 	const { data: propertyAnalytic } =
 		useSellerAllPropertyAnalytics(selectedPeriod);
 
-	type WeeklyDay = {
-		day: string;
-		views: number;
-		inquiries: number;
-	};
-	type MarketInsight = {
-		title: string;
-		value: string | number;
-		insight: string;
-		recommendation: string;
-	};
+	const { isAuthenticated } = useAuthStore();
+
+	if (!isAuthenticated) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-gray-50">
+				<Card className="p-8 text-center">
+					<Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+					<h3 className="text-xl font-semibold text-gray-900 mb-2">
+						Please Log In to View Seller Analytics
+					</h3>
+					<p className="text-gray-600 mb-6">
+						You need to be logged in to see your seller analytics dashboard.
+					</p>
+				</Card>
+			</div>
+		);
+	}
+
+	// Use real-time analytics hook
+
 	const propertyAnalytics = propertyAnalytic?.propertyAnalytics || [];
 	const overallStats = propertyAnalytic?.overallStats || [];
 	const weeklyData = propertyAnalytic?.periodData || [];

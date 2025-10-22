@@ -1,9 +1,9 @@
-import { useAuth } from "@/lib/providers/AuthProvider";
 import {
 	AIChatContext,
 	aiChatService,
 	AIMessage,
 } from "@/services/aiChatService";
+import { useAppStore } from "@/store/app-store";
 import { APIError } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
@@ -21,9 +21,9 @@ interface UserInfo {
 // Custom hook for AI Chat functionality (supports both guests and authenticated users)
 export const useAIChat = () => {
 	const queryClient = useQueryClient();
-	const { user } = useAuth();
+	const { user } = useAppStore();
 	const [currentChatId, setCurrentChatId] = useState<string | null>(null);
-	const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+	const [_userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
 	// Determine if user is guest on mount
 	useEffect(() => {
@@ -210,12 +210,10 @@ export const useAIChatData = (chatId: string | null) => {
 	return useQuery({
 		queryKey: ["ai-chat", chatId],
 		queryFn: async () => {
-			console.log("Fetching chat data for ID:", chatId);
 			if (!chatId) return null;
 
 			try {
 				const result = await aiChatService.getAIChat(chatId);
-				console.log("Chat data fetched successfully:", result);
 				return result;
 			} catch (error) {
 				console.error("Error fetching chat data:", error);
@@ -301,20 +299,10 @@ export const useAIChatState = (initialChatId?: string) => {
 
 	const { data: chatData, isLoading } = useAIChatData(chatId);
 	const aiChat = useAIChat();
-	const queryClient = useQueryClient();
 
-	// Handle initialChatId changes
 	useEffect(() => {
-		console.log(
-			"useAIChatState: initialChatId changed:",
-			initialChatId,
-			"current:",
-			chatId
-		);
 		if (initialChatId && initialChatId !== chatId) {
-			console.log("useAIChatState: Updating chatId to:", initialChatId);
 			setChatId(initialChatId);
-			// Clear messages immediately when switching chats
 			setMessages([]);
 		}
 	}, [initialChatId, chatId]);
@@ -329,21 +317,11 @@ export const useAIChatState = (initialChatId?: string) => {
 
 	// Update messages when chat data changes
 	useEffect(() => {
-		console.log("Chat data changed for chatId:", chatId, "data:", chatData);
 		if (chatData?.success && chatData?.data?.messages) {
-			console.log(
-				"Setting messages:",
-				chatData.data.messages.length,
-				"messages"
-			);
 			setMessages(chatData.data.messages);
 		} else if (chatData?.success && chatData?.data && !chatData.data.messages) {
-			// Handle case where chat exists but has no messages
-			console.log("Chat exists but no messages, setting empty array");
 			setMessages([]);
 		} else if (!chatData && chatId) {
-			// Clear messages if no chat data but we have a chatId (loading state)
-			console.log("No chat data for chatId, clearing messages");
 			setMessages([]);
 		}
 	}, [chatData, chatId]);

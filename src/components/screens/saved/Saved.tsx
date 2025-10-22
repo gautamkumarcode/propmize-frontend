@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import { useLikedProperties } from "@/lib";
+import { useAuthStore } from "@/store/app-store";
 import { Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Saved() {
 	const { data: savedProperties = [], isLoading: _isLoading } =
 		useLikedProperties();
+	const { isAuthenticated } = useAuthStore();
 
 	const router = useRouter();
 
@@ -22,6 +24,22 @@ export default function Saved() {
 	// 	// Contact logic here
 	// 	console.log("Contacting for property:", propertyId);
 	// };
+
+	if (!isAuthenticated) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-gray-50">
+				<Card className="p-8 text-center">
+					<Heart className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+					<h3 className="text-xl font-semibold text-gray-900 mb-2">
+						Please Log In to View Saved Properties
+					</h3>
+					<p className="text-gray-600 mb-6">
+						You need to be logged in to see your saved properties.
+					</p>
+				</Card>
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen bg-gray-50 ">

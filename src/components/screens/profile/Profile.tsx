@@ -36,7 +36,7 @@ import { useEffect, useState } from "react";
 
 export default function Profile() {
 	const [isEditing, setIsEditing] = useState(false);
-	const { user, isAuthenticated, userMode } = useAuthStore();
+	const { user, isAuthenticated } = useAuthStore();
 	const { data: profileData, isLoading, error } = useProfile();
 	const updateProfileMutation = useUpdateProfile();
 	const { setUser } = useAuthStore();

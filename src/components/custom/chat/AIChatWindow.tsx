@@ -57,33 +57,12 @@ export default function AIChatWindow({
 		setChatId: setAIChatId,
 	} = useAIChatState(initialChatId);
 
-	// Debug log for messages
-	useEffect(() => {
-		console.log(
-			"AIChatWindow: Messages updated:",
-			messages.length,
-			"messages for chatId:",
-			chatId
-		);
-	}, [messages, chatId]);
 
-	// Handle initialChatId changes
 	useEffect(() => {
-		console.log(
-			"AIChatWindow: initialChatId changed to:",
-			initialChatId,
-			"current chatId:",
-			chatId,
-			"isLoading:",
-			isLoading
-		);
-
 		if (initialChatId && initialChatId !== chatId) {
-			console.log("AIChatWindow: Setting new chat ID:", initialChatId);
 			setAIChatId(initialChatId);
 			setIsNewChat(false);
 		} else if (!initialChatId && !chatId && !isLoading) {
-			console.log("AIChatWindow: Starting new chat");
 			setIsNewChat(true);
 		}
 	}, [initialChatId, chatId, isLoading, setAIChatId]);

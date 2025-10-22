@@ -4,9 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { useAuth } from "@/lib/providers/AuthProvider";
 import { useCreateLead } from "@/lib/react-query/hooks/useLeads";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/app-store";
 import { PropertyResponse } from "@/types";
 import { AxiosError } from "axios";
 import {
@@ -72,7 +72,7 @@ export default function PropertyCard({
 	className = "",
 }: PropertyCardProps) {
 	const toggleLikeMutation = useToggleLike();
-	const { user } = useAuth();
+	const { user } = useAppStore();
 	const [imageError, setImageError] = useState(false);
 	const [imageLoading, setImageLoading] = useState(true);
 

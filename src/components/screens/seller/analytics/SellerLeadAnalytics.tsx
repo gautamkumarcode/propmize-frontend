@@ -9,6 +9,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useLeadAnalytics } from "@/lib/react-query/hooks/useLeads";
+import { useAuthStore } from "@/store/app-store";
 import { BarChart, CircleDollarSign, TrendingUp, Users } from "lucide-react";
 import React from "react";
 
@@ -17,9 +18,26 @@ export default function SellerLeadAnalytics() {
 		"week" | "month" | "quarter" | "year"
 	>("month");
 
+	const { isAuthenticated } = useAuthStore();
 	const { data, isLoading, isError } = useLeadAnalytics({ period });
 
 	const leadStats = data?.data;
+
+	if (!isAuthenticated) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-gray-50">
+				<Card className="p-8 text-center">
+					<Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+					<h3 className="text-xl font-semibold text-gray-900 mb-2">
+						Please Log In to View Lead Analytics
+					</h3>
+					<p className="text-gray-600 mb-6">
+						You need to be logged in to see your lead analytics.
+					</p>
+				</Card>
+			</div>
+		);
+	}
 
 	if (isLoading) {
 		return (

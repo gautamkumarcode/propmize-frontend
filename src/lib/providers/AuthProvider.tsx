@@ -1,5 +1,6 @@
 "use client";
 
+import { useAppStore } from "@/store/app-store";
 import React, { createContext, ReactNode, useContext, useEffect } from "react";
 import { User } from "../../types";
 import { useProfile } from "../react-query/hooks/useAuth";
@@ -21,25 +22,68 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-	const { data: user, isLoading, isError, refetch } = useProfile();
+	// Use Zustand store as primary source
+	const {
+		user: storeUser,
+		isAuthenticated: storeIsAuthenticated,
+		setUser,
+		setAuthenticated,
+	} = useAppStore();
 
-	const isAuthenticated = !!user && AuthService.isAuthenticated();
+	const { data: user, isLoading, isError, refetch, isFetching } = useProfile();
 
+	// Check if we have tokens but no user data
+	const hasTokens =
+		typeof window !== "undefined" &&
+		(!!localStorage.getItem("accessToken") ||
+			!!localStorage.getItem("refreshToken"));
 
-
-	// Cleanup tokens on error
+	// Sync Zustand store with React Query data
 	useEffect(() => {
-		if (isError && !isLoading) {
+		if (user) {
+			// Only update if the user data has actually changed
+			if (JSON.stringify(storeUser) !== JSON.stringify(user)) {
+				setUser(user);
+				setAuthenticated(true);
+			}
+		} else if (!isLoading && !isFetching && !user && hasTokens) {
+			// We have tokens but no user - this might indicate an auth issue
+			console.warn("Tokens present but no user data received");
+		} else if (!isLoading && !isFetching && !user && !hasTokens) {
+			// No tokens and no user - clear auth state
+			setUser(null);
+			setAuthenticated(false);
+		}
+	}, [
+		user,
+		isLoading,
+		isFetching,
+		storeUser,
+		setUser,
+		setAuthenticated,
+		hasTokens,
+	]);
+
+	// Cleanup on error
+	useEffect(() => {
+		if (isError && !isLoading && !isFetching) {
 			console.log("Cleaning up tokens due to auth error");
 			safeLocalStorage.removeItem("accessToken");
 			safeLocalStorage.removeItem("refreshToken");
+			setUser(null);
+			setAuthenticated(false);
 		}
-	}, [isError, isLoading]);
+	}, [isError, isLoading, isFetching, setUser, setAuthenticated]);
+
+	// Determine the final authentication state
+	const finalIsAuthenticated =
+		storeIsAuthenticated && !!storeUser && AuthService.isAuthenticated();
+	const finalUser = storeUser;
 
 	const contextValue: AuthContextType = {
-		user: user || null,
-		isLoading,
-		isAuthenticated,
+		user: finalUser,
+		isLoading: isLoading || isFetching,
+		isAuthenticated: finalIsAuthenticated,
 		isError,
 		refetch,
 	};
@@ -49,7 +93,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	);
 }
 
-// Hook to use auth context
 export function useAuth() {
 	const context = useContext(AuthContext);
 	if (!context) {
@@ -58,7 +101,6 @@ export function useAuth() {
 	return context;
 }
 
-// Higher-order component for protecting routes
 export function withAuth<P extends object>(Component: React.ComponentType<P>) {
 	return function AuthenticatedComponent(props: P) {
 		const { isAuthenticated, isLoading } = useAuth();
@@ -72,7 +114,6 @@ export function withAuth<P extends object>(Component: React.ComponentType<P>) {
 		}
 
 		if (!isAuthenticated) {
-			// Redirect to login or show login component
 			return (
 				<div className="flex items-center justify-center min-h-screen">
 					<div className="text-center">
@@ -89,7 +130,6 @@ export function withAuth<P extends object>(Component: React.ComponentType<P>) {
 	};
 }
 
-// Hook for role-based access control
 export function useRoleGuard(allowedRoles: ("buyer" | "seller" | "admin")[]) {
 	const { user, isAuthenticated } = useAuth();
 

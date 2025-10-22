@@ -1,6 +1,5 @@
 import AppLayout from "@/components/custom/layout/AppLayout";
 import { Toaster } from "@/components/ui/Toaster";
-import { Providers } from "@/lib";
 import NextTopLoader from "nextjs-toploader";
 
 export default function RootLayout({
@@ -24,9 +23,8 @@ export default function RootLayout({
 				zIndex={1600}
 			/>
 			<Toaster />
-			<Providers>
-				<AppLayout>{children}</AppLayout>
-			</Providers>
+
+			<AppLayout>{children}</AppLayout>
 		</div>
 	);
 }

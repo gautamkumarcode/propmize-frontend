@@ -1,5 +1,6 @@
 "use client";
 
+import AuthModal from "@/components/custom/auth-modal/AuthModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiClient } from "@/lib";
 import { useAuthStore } from "@/store/app-store";
@@ -26,22 +27,28 @@ export default function LandingPage() {
 
 	const { user, isAuthenticated, setUser, setUserMode } = useAuthStore();
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	const handleServiceSelection = async (
 		service: string,
 		mode?: "buyer" | "seller"
 	) => {
 		setSelectedService(service);
-		setIsLoading(true);
+
+		// Only show loading for seller mode or if authentication is required
+		if (mode === "seller" && (!isAuthenticated || !user?._id)) {
+			setIsLoading(true);
+		}
 
 		if (mode && isAuthenticated && user?._id) {
+			setUserMode(mode);
+
 			try {
 				const response = await apiClient.put(`/users/${user._id}/role`, {
 					role: mode,
 				});
 				if (response.data.success) {
 					setUser({ ...user, role: mode });
-					setUserMode(mode);
 				}
 			} catch (error) {
 				console.log("API error:", error);
@@ -49,11 +56,15 @@ export default function LandingPage() {
 		} else if (mode) {
 			setUserMode(mode);
 		}
+
+		// Navigate immediately for buyer, handle seller auth separately
 		if (mode === "seller") {
 			router.push("/seller");
 		} else {
+			// Buyer mode - no authentication required
 			router.push("/buyer/assistant");
 		}
+
 		setIsLoading(false);
 	};
 
@@ -122,13 +133,14 @@ export default function LandingPage() {
 				{/* Service Cards */}
 				<div className="relative z-10 grid gap-6 sm:gap-8 md:grid-cols-2 w-full max-w-5xl">
 					{services.map((service, index) => (
-						<Card
+						<button
 							key={service.id}
-							className={`group relative cursor-pointer transition-all duration-500 rounded-2xl sm:rounded-3xl bg-card/80 backdrop-blur-md border-border/50 hover:shadow-2xl hover:scale-[1.02] overflow-hidden animate-fadeInUp ${
+							className={`group relative w-full text-left border-blue-800 cursor-pointer transition-all duration-500 rounded-2xl sm:rounded-3xl bg-card/80 backdrop-blur-md shadow-2xl hover:scale-[1.02] overflow-hidden animate-fadeInUp bg-gradient-to-br from-blue-300 via-blue-400 to-blue-500 ${
 								selectedService === service.id ? "ring-2 ring-primary/50" : ""
 							}`}
 							style={{ animationDelay: `${index * 0.2}s` }}
-							onClick={() => handleServiceSelection(service.id, service.mode)}>
+							onClick={() => handleServiceSelection(service.id, service.mode)}
+							disabled={isLoading && selectedService === service.id}>
 							{/* Gradient Background */}
 							<div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -137,10 +149,10 @@ export default function LandingPage() {
 								<div className="h-full w-full rounded-2xl sm:rounded-3xl bg-card/90 backdrop-blur-md"></div>
 							</div>
 
-							<CardContent className="relative p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between z-10 gap-4 sm:gap-6">
+							<div className="relative p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between z-10 gap-4 sm:gap-6">
 								<div className="flex items-center space-x-4 sm:space-x-6 flex-1">
 									<div
-										className={`p-3 sm:p-4 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-300 group-hover:scale-110 flex-shrink-0 ${
+										className={`p-3 sm:p-4 lg:p-5 text-white rounded-xl sm:rounded-2xl transition-all duration-300 group-hover:scale-110 flex-shrink-0 ${
 											service.id === "search"
 												? "bg-primary/10 text-primary"
 												: "bg-secondary/10 text-secondary"
@@ -148,7 +160,7 @@ export default function LandingPage() {
 										<service.icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8" />
 									</div>
 									<div className="min-w-0 flex-1">
-										<h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 sm:mb-2 group-hover:text-primary transition-colors duration-300">
+										<h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-1 sm:mb-2 group-hover:text-primary transition-colors duration-300 text-gray-900">
 											{service.title}
 										</h3>
 										<p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
@@ -157,14 +169,19 @@ export default function LandingPage() {
 									</div>
 								</div>
 								<div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 flex-shrink-0 self-center sm:self-auto">
-									<ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 group-hover:translate-x-1 transition-transform duration-300" />
+									{isLoading && selectedService === service.id ? (
+										<Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-white" />
+									) : (
+										<ArrowRight className="h-5 w-5 sm:h-6 sm:w-6 group-hover:translate-x-1 transition-transform duration-300 text-white" />
+									)}
 								</div>
-							</CardContent>
-						</Card>
+							</div>
+						</button>
 					))}
 				</div>
 			</section>
 
+			{/* Rest of your components remain the same */}
 			{/* Features Section */}
 			<section className="py-16 sm:py-20 lg:py-32 bg-muted/30 relative overflow-hidden">
 				{/* Background Elements */}
@@ -301,6 +318,8 @@ export default function LandingPage() {
 					</div>
 				</div>
 			</section>
+
+			<AuthModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
 
 			{/* Footer */}
 			<footer className="bg-card border-t border-border py-12 sm:py-16">

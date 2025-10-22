@@ -1,5 +1,6 @@
 "use client";
 
+import AuthModal from "@/components/custom/auth-modal/AuthModal";
 import useNavigation from "@/hooks/useNavigation";
 import { useAuth } from "@/lib";
 import { useSellerDashboard } from "@/lib/react-query/hooks/useAnalytics";
@@ -15,21 +16,13 @@ import {
 
 export default function SellerDashboard() {
 	const { goToAddProperty } = useNavigation();
-	const { data: dashboardData, isLoading, isError } = useSellerDashboard();
 
+	const { data: dashboardData, isLoading } = useSellerDashboard();
 	const { user } = useAuth();
-
-	if (!user) {
-		return (
-			<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
-				<p>Please log in to view your dashboard.</p>
-			</div>
-		);
-	}
 
 	if (isLoading) {
 		return (
-			<div className="space-y-6">
+			<div className="space-y-6 pt-4 px-4">
 				<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
 					<h1 className="text-2xl font-bold mb-2">Loading...</h1>
 					<p className="text-blue-100">Fetching your dashboard data</p>
@@ -41,17 +34,6 @@ export default function SellerDashboard() {
 							className="bg-white rounded-lg p-6 shadow-sm border h-32 animate-pulse"
 						/>
 					))}
-				</div>
-			</div>
-		);
-	}
-
-	if (isError) {
-		return (
-			<div className="space-y-6">
-				<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
-					<h1 className="text-2xl font-bold mb-2">Error</h1>
-					<p className="text-blue-100">Failed to load dashboard data</p>
 				</div>
 			</div>
 		);
@@ -88,8 +70,11 @@ export default function SellerDashboard() {
 		},
 	];
 
+	if (!user) {
+		return <AuthModal isOpen={true} onClose={() => {}} />;
+	}
 	return (
-		<div className="space-y-6 pt-4 px-4 ">
+		<div className="space-y-6 pt-4 px-4">
 			{/* Header */}
 			<div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-6 text-white">
 				<h1 className="text-2xl font-bold mb-2">Welcome back!</h1>
