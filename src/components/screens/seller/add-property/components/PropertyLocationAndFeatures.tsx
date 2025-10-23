@@ -31,7 +31,6 @@ const featureBooleans = [
 	{ name: "poojaRoom", label: "Pooja Room" },
 	{ name: "studyRoom", label: "Study Room" },
 	{ name: "storeRoom", label: "Store Room" },
-	{ name: "garden", label: "Garden" },
 	{ name: "swimmingPool", label: "Swimming Pool" },
 	{ name: "gym", label: "Gym" },
 	{ name: "lift", label: "Lift" },
@@ -50,10 +49,6 @@ const featureFacings = [
 ];
 
 const AMENITIES_OPTIONS = [
-	"Gym",
-	"Swimming Pool",
-	"Lift",
-	"Security",
 	"Power Backup",
 	"Garden",
 	"Children's Play Area",
@@ -204,7 +199,7 @@ export default function PropertyLocationAndFeatures({
 										<Input
 											placeholder="Enter Flooring Type (e.g. Marble, Tile, Wood)"
 											{...field}
-											className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+											className="w-full rounded-lg border bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition border-gray-300"
 										/>
 									</FormControl>
 									<FormMessage />
@@ -224,7 +219,7 @@ export default function PropertyLocationAndFeatures({
 										<Input
 											placeholder="Enter Water Supply (e.g. Municipal, Borewell)"
 											{...field}
-											className="w-full rounded-lg border border-input bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+											className="w-full rounded-lg border border-gray-300 bg-background h-[40px] px-3 py-2 text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
 										/>
 									</FormControl>
 									<FormMessage />

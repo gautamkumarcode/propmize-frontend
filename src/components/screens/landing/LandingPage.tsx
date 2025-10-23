@@ -135,7 +135,7 @@ export default function LandingPage() {
 					{services.map((service, index) => (
 						<button
 							key={service.id}
-							className={`group relative w-full text-left border-blue-800 cursor-pointer transition-all duration-500 rounded-2xl sm:rounded-3xl bg-card/80 backdrop-blur-md shadow-2xl hover:scale-[1.02] overflow-hidden animate-fadeInUp bg-gradient-to-br from-blue-300 via-blue-400 to-blue-500 ${
+							className={`group relative w-full text-left border-blue-800 cursor-pointer transition-all duration-500 rounded-2xl sm:rounded-3xl bg-card/80 backdrop-blur-md shadow-2xl hover:scale-[1.02] overflow-hidden animate-fadeInUp bg-gradient-to-br from-[#0066FF]  to-[#02E2FE] ${
 								selectedService === service.id ? "ring-2 ring-primary/50" : ""
 							}`}
 							style={{ animationDelay: `${index * 0.2}s` }}
@@ -154,16 +154,16 @@ export default function LandingPage() {
 									<div
 										className={`p-3 sm:p-4 lg:p-5 text-white rounded-xl sm:rounded-2xl transition-all duration-300 group-hover:scale-110 flex-shrink-0 ${
 											service.id === "search"
-												? "bg-primary/10 text-primary"
-												: "bg-secondary/10 text-secondary"
+												? "bg-primary/10 "
+												: "bg-secondary/10 "
 										}`}>
 										<service.icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8" />
 									</div>
 									<div className="min-w-0 flex-1">
-										<h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-1 sm:mb-2 group-hover:text-primary transition-colors duration-300 text-gray-900">
+										<h3 className="text-lg sm:text-xl lg:text-2xl font-bold mb-1 sm:mb-2 group-hover:text-primary transition-colors duration-300 text-white">
 											{service.title}
 										</h3>
-										<p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+										<p className="text-white text-sm sm:text-base leading-relaxed">
 											{service.subtitle}
 										</p>
 									</div>

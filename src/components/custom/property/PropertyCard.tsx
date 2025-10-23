@@ -78,8 +78,6 @@ export default function PropertyCard({
 
 	const createLeadMutation = useCreateLead();
 
-	const isOwner = user && property.seller?.toString() === user._id;
-
 	// Check if the current user has liked this property
 	const isLikedByUser = React.useMemo(() => {
 		if (!user || !property?.likedBy) return false;
@@ -129,8 +127,6 @@ export default function PropertyCard({
 					contactMethod: "any", // Default to 'any'
 					phone: user?.phone || undefined,
 				},
-				// You might want to add more details here, like buyer's contact from user object
-				// or open a modal for a custom message
 			},
 			{
 				onSuccess: () => {
@@ -150,6 +146,72 @@ export default function PropertyCard({
 				},
 			}
 		);
+	};
+
+	const handleWhatsAppClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const phoneNumber = property.contact?.whatsapp;
+		if (!phoneNumber) {
+			toast({
+				title: "Info",
+				description: "WhatsApp number is not available.",
+				variant: "default",
+			});
+			return;
+		}
+		if (user?.phone === phoneNumber) {
+			toast({
+				title: "Info",
+				description: "You cannot call your own number.",
+				variant: "default",
+			});
+			return;
+		}
+		if (!user?.phone || !user?.name || !user?.email || !user?.address?.city) {
+			toast({
+				title: "Authentication Required",
+				description: "Please fill the personal details to contact the seller.",
+				variant: "destructive",
+			});
+			return;
+		} else {
+			handleContactSeller(e);
+			window.open(`https://wa.me/${phoneNumber}`, "_blank");
+		}
+	};
+
+	const handlePhoneClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const phoneNumber = property.contact?.phone;
+		if (!phoneNumber) {
+			toast({
+				title: "Info",
+				description: "Phone number is not available.",
+				variant: "default",
+			});
+			return;
+		}
+		if (user?.phone === phoneNumber) {
+			toast({
+				title: "Info",
+				description: "You cannot call your own number.",
+				variant: "default",
+			});
+			return;
+		}
+		if (!user?.phone || !user?.name || !user?.email || !user?.address?.city) {
+			toast({
+				title: "Authentication Required",
+				description: "Please fill the personal details to contact the seller.",
+				variant: "destructive",
+			});
+			return;
+		} else {
+			handleContactSeller(e);
+			window.open(`tel:91${phoneNumber}`, "_blank");
+		}
 	};
 
 	const handleImageError = () => {
@@ -191,7 +253,7 @@ export default function PropertyCard({
 							}
 							alt={property.title}
 							fill
-							className="object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-2xl"
+							className="object-contain group-hover:scale-105 transition-transform duration-500 rounded-t-2xl"
 							onError={handleImageError}
 							onLoad={handleImageLoad}
 							unoptimized
@@ -282,18 +344,6 @@ export default function PropertyCard({
 								{property.address.area}, {property.address.city}
 							</span>
 						</div>
-
-						{/* Property Specs */}
-						{/* <div className="grid grid-cols-4 gap-3 mb-4">
-							{propertySpecs.map((spec) => (
-								<div key={spec.key} className="flex items-center ">
-									<spec.icon className="h-4 w-4 mr-2 text-blue-500 flex-shrink-0" />
-									<span className="text-sm text-gray-700">{spec.value}</span>
-								</div>
-							))}
-						</div> */}
-
-						{/* Furnishing Status */}
 					</CardContent>
 
 					{/* Footer */}
@@ -322,10 +372,7 @@ export default function PropertyCard({
 												variant="outline"
 												size="sm"
 												className="w-full text-xs h-9"
-												onClick={(e) => {
-													e.preventDefault();
-													window.location.href = `tel:${property.contact?.phone}`;
-												}}>
+												onClick={handlePhoneClick}>
 												<Phone className="h-3.5 w-3.5 mr-1.5" />
 												Call
 											</Button>
@@ -334,14 +381,8 @@ export default function PropertyCard({
 											<Button
 												variant="outline"
 												size="sm"
-												className="w-full text-xs h-9 text-green-600 border-green-200 hover:bg-green-50"
-												onClick={(e) => {
-													e.preventDefault();
-													window.open(
-														`https://wa.me/${property.contact?.whatsapp}`,
-														"_blank"
-													);
-												}}>
+												className="w-full text-xs h-9 text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700"
+												onClick={handleWhatsAppClick}>
 												<MessageCircle className="h-3.5 w-3.5 mr-1.5" />
 												WhatsApp
 											</Button>
@@ -358,17 +399,6 @@ export default function PropertyCard({
 										Sign in to view contact details
 									</p>
 								</div>
-							)}
-
-							{user && !isOwner && (
-								<Button
-									className="w-full mt-3"
-									onClick={handleContactSeller}
-									disabled={createLeadMutation.isPending}>
-									{createLeadMutation.isPending
-										? "Sending Inquiry..."
-										: "Contact Seller"}
-								</Button>
 							)}
 						</div>
 					</CardFooter>

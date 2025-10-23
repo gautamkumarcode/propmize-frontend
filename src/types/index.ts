@@ -55,6 +55,15 @@ export interface PropertyResponse {
 		value: number;
 		unit: string;
 	};
+	buildUpArea?: {
+		value: number;
+		unit: string;
+	};
+	superBuildUpArea?: {
+		value: number;
+		unit: string;
+	};
+
 	parking?: number;
 	balconies?: number;
 	floor?: number;

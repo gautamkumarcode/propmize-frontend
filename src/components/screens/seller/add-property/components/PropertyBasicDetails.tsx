@@ -28,7 +28,6 @@ interface StepProps {
 
 export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 	const propertyType = form.watch("propertyType");
-	const listingType = form.watch("listingType");
 
 	// State for extra area fields
 	const [showBuiltUp, setShowBuiltUp] = useState<boolean>(false);
@@ -47,11 +46,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 		{ value: "rent", label: "For Rent" },
 		{ value: "lease", label: "For Lease" },
 	];
-	const currencyOptions = [
-		{ value: "INR", label: "INR" },
-		{ value: "USD", label: "USD" },
-		{ value: "EUR", label: "EUR" },
-	];
+
 	const areaUnits = [
 		{ value: "sqft", label: "Sq. Ft." },
 		{ value: "sqm", label: "Sq. M." },
@@ -266,7 +261,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 					<div className="flex gap-2 items-center mt-2 md:col-span-3">
 						<FormField
 							control={form.control}
-							name="builtUpArea.value"
+							name="buildUpArea.value"
 							render={({ field }) => (
 								<FormItem className="flex-1">
 									<FormLabel className="text-sm font-semibold text-gray-700">
@@ -281,7 +276,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 						/>
 						<FormField
 							control={form.control}
-							name="builtUpArea.unit"
+							name="buildUpArea.unit"
 							render={({ field }) => (
 								<FormItem className="w-[120px]">
 									<FormLabel className="text-sm font-semibold text-gray-700">
@@ -323,7 +318,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 							aria-label="Remove Built-up Area"
 							onClick={() => {
 								setShowBuiltUp(false);
-								form.setValue("builtUpArea.value", "");
+								form.setValue("buildUpArea.value", "");
 							}}>
 							<span className="sr-only">Remove</span>×
 						</Button>
@@ -335,7 +330,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 					<div className="flex gap-2 items-center mt-2 md:col-span-3">
 						<FormField
 							control={form.control}
-							name="superBuiltUpArea.value"
+							name="superBuildUpArea.value"
 							render={({ field }) => (
 								<FormItem className="flex-1">
 									<FormLabel className="text-sm font-semibold text-gray-700">
@@ -350,7 +345,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 						/>
 						<FormField
 							control={form.control}
-							name="superBuiltUpArea.unit"
+							name="superBuildUpArea.unit"
 							render={({ field }) => (
 								<FormItem className="w-[120px]">
 									<FormLabel className="text-sm font-semibold text-gray-700">
@@ -392,7 +387,7 @@ export default function PropertyBasicDetails({ form, isEditMode }: StepProps) {
 							aria-label="Remove Super Built-up Area"
 							onClick={() => {
 								setShowSuperBuiltUp(false);
-								form.setValue("superBuiltUpArea.value", "");
+								form.setValue("superBuildUpArea.value", "");
 							}}>
 							<span className="sr-only">Remove</span>×
 						</Button>

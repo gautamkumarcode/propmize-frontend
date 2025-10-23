@@ -33,8 +33,8 @@ export const getPropertyDefaultValues = (): PropertyFormData => ({
 	age: "",
 	images: [],
 	amenities: [],
-	builtUpArea: { value: "", unit: "sqft" },
-	superBuiltUpArea: { value: "", unit: "sqft" },
+	buildUpArea: { value: "", unit: "sqft" },
+	superBuildUpArea: { value: "", unit: "sqft" },
 	address: {
 		street: "",
 		area: "",
@@ -156,6 +156,15 @@ export default function PropertyForm({
 						existingProperty.area.unit
 					)
 						? existingProperty.area.unit
+						: "sqft") as "sqft" | "sqm" | "acre" | "hectare",
+				},
+				buildUpArea: {
+					value: existingProperty.buildUpArea?.value?.toString() || "",
+					unit: (existingProperty.buildUpArea &&
+					["sqft", "sqm", "acre", "hectare"].includes(
+						existingProperty.buildUpArea.unit
+					)
+						? existingProperty.buildUpArea.unit
 						: "sqft") as "sqft" | "sqm" | "acre" | "hectare",
 				},
 				bedrooms: existingProperty.bedrooms?.toString() || "",
@@ -384,7 +393,6 @@ export default function PropertyForm({
 	};
 
 	const listingType = form.watch("listingType");
-	const propertyType = form.watch("propertyType");
 
 	// Get the correct step configuration based on listing type
 	const currentStepConfig = stepConfig[currentStep - 1];
@@ -394,7 +402,7 @@ export default function PropertyForm({
 
 	const createProperty = useCreateProperty();
 	const updateProperty = useUpdateProperty();
-	const [submittedData, setSubmittedData] =
+	const [_submittedData, setSubmittedData] =
 		React.useState<PropertyFormData | null>(null);
 	const [validationFailed, setValidationFailed] = React.useState(false);
 
@@ -419,6 +427,8 @@ export default function PropertyForm({
 				listingType: payloadObj.listingType ?? data.listingType,
 				currency: payloadObj.currency ?? data.currency,
 				area: payloadObj.area ?? data.area,
+				buildUpArea: payloadObj.buildUpArea ?? data.buildUpArea,
+				superBuildUpArea: payloadObj.superBuildUpArea ?? data.superBuildUpArea,
 				bedrooms: payloadObj.bedrooms ?? data.bedrooms,
 				bathrooms: payloadObj.bathrooms ?? data.bathrooms,
 				balconies: payloadObj.balconies ?? data.balconies,

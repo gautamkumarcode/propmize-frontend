@@ -15,7 +15,7 @@ interface WhatsAppButtonProps {
 
 export default function WhatsAppButton({
 	propertyData,
-	phoneNumber = "919795411108", // Default number
+	phoneNumber = "918580677390", // Default number
 }: WhatsAppButtonProps) {
 	const [isLoading, setIsLoading] = useState(false);
 

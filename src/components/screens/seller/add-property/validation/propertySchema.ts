@@ -145,7 +145,7 @@ export const propertySchema = z.object({
 		.optional(),
 
 	notes: z.string().optional(),
-	builtUpArea: z
+	buildUpArea: z
 		.object({
 			value: z
 				.string()
@@ -154,7 +154,7 @@ export const propertySchema = z.object({
 			unit: z.enum(["sqft", "sqm", "acre", "hectare"]),
 		})
 		.optional(),
-	superBuiltUpArea: z
+	superBuildUpArea: z
 		.object({
 			value: z
 				.string()
