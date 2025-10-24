@@ -17,9 +17,11 @@ import {
 	Square,
 	User,
 } from "lucide-react";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import logo from "../../../../public/logo.png";
 
 export default function Contacted() {
 	const [currentPage, setCurrentPage] = useState(1);
@@ -72,7 +74,20 @@ export default function Contacted() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-50">
+
+		<>
+			<Head>
+				<title>Contacted Owners | Propmize</title>
+				<meta 
+					name="description" 
+					content="Manage your contacted property owners, track responses, and communicate with sellers directly through Propmize." 
+				/>
+				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+				<meta name="keywords" content="contacted owners, property inquiries, real estate contacts, seller communication, property management" />
+				<link rel="icon" href={logo.src} />
+			</Head>
+			
+				<div className="min-h-screen bg-gray-50">
 			<div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
 				<div className="space-y-6">
 					{/* Header */}
@@ -291,6 +306,7 @@ export default function Contacted() {
 					)}
 				</div>
 			</div>
-		</div>
+		</div></>
+	
 	);
 }

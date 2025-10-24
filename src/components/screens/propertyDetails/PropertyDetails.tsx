@@ -4,13 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { triggerToast } from "@/components/ui/Toaster";
 import { toast } from "@/hooks/use-toast";
-import {
-	PropertyResponse,
-	useAuth,
-	useCreateLead,
-	useProperty,
-	useToggleLike,
-} from "@/lib";
+import { PropertyResponse, useAuth, useCreateLead, useToggleLike } from "@/lib";
 import { AxiosError } from "axios";
 import {
 	Bath,
@@ -48,18 +42,23 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 
-const PropertyDetails = () => {
+type PropertyDetailsProps = {
+	initialPropertyData: PropertyResponse | null;
+};
+
+const PropertyDetails = ({ initialPropertyData }: PropertyDetailsProps) => {
 	const params = useParams();
 	const { user } = useAuth();
-	const { data: propertyData, isLoading } = useProperty(
-		(params.id ?? "") as string
-	);
-
+	// const { data: propertyData, isLoading } = useProperty(
+	// 	(params.id ?? "") as string
+	// );
+	const isLoading = false;
+	const propertiesData = initialPropertyData;
 	const toggleLikeMutation = useToggleLike();
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [imageError, setImageError] = useState(false);
 
-	const property: PropertyResponse | null = propertyData || null;
+	const property: PropertyResponse | null = propertiesData || null;
 	const createLeadMutation = useCreateLead();
 
 	const isLikedByUser = useMemo(() => {
@@ -847,7 +846,7 @@ const PropertyDetails = () => {
 											Expires On
 										</h3>
 										<p className="font-semibold text-gray-900 text-base">
-											{new Date(property.expiresAt).toLocaleDateString()}
+											{new Date(property.createdAt).toLocaleDateString("en-US")}
 										</p>
 									</div>
 								)}

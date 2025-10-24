@@ -12,7 +12,7 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
 }
 
 // API Configuration
-const API_BASE_URL =
+export const API_BASE_URL =
 	process.env.NEXT_PUBLIC_API_URL || "https://api.propmize.com/api";
 
 // Create axios instance

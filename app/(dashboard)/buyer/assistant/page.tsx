@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { ChatSidebar } from "@/components/custom/chat/ChatSidebar";
 import { useAppStore } from "@/store/app-store";
+import Head from "next/head";
 import logo from "../../../../public/logo.png";
 
 export default function AssistantPage() {
@@ -283,69 +284,85 @@ export default function AssistantPage() {
 	}
 
 	return (
-		<div className="inset-x-0 bg-white flex flex-col mx-auto max-w-7xl h-[85vh] lg:h-[90vh] overflow-scroll relative">
-			{/* Header */}
-			<div className="border-b bg-gray-200 flex-shrink-0 flex justify-end absolute z-30 left-0 rounded-br-2xl">
-				{user && (
-					<ChevronRight
-						className="w-8 h-8 text-xl text-gray-900 cursor-pointer"
-						onClick={() => setShowSidebar(true)}
-					/>
-				)}
+		<>
+			<Head>
+				<title>Propmize Assistant</title>
+				<meta
+					name="description"
+					content="AI-powered real estate assistant for property search and recommendations"
+				/>
+				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+				<meta
+					name="keywords"
+					content="real estate, property search, AI assistant, property recommendations"
+				/>
+				<link rel="icon" href={logo.src} />
+			</Head>
 
-				{showModeSelector && user && (
-					<div className="mt-4 p-4 bg-gray-100 rounded-xl border border-gray-200">
-						<p className="text-sm font-medium text-gray-700 mb-3">
-							Select Chat Mode:
-						</p>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-							{chatModes.map((mode) => (
-								<button
-									key={mode.mode}
-									onClick={() => {
-										handleModeChange(mode.mode);
-										setShowModeSelector(false);
-									}}
-									className={`p-3 text-left text-sm rounded-lg border transition-all duration-200
+			<div className="inset-x-0 bg-white flex flex-col mx-auto max-w-7xl h-[85vh] lg:h-[90vh] overflow-scroll relative">
+				{/* Header */}
+				<div className="border-b bg-gray-200 flex-shrink-0 flex justify-end absolute z-30 left-0 rounded-br-2xl">
+					{user && (
+						<ChevronRight
+							className="w-8 h-8 text-xl text-gray-900 cursor-pointer"
+							onClick={() => setShowSidebar(true)}
+						/>
+					)}
+
+					{showModeSelector && user && (
+						<div className="mt-4 p-4 bg-gray-100 rounded-xl border border-gray-200">
+							<p className="text-sm font-medium text-gray-700 mb-3">
+								Select Chat Mode:
+							</p>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+								{chatModes.map((mode) => (
+									<button
+										key={mode.mode}
+										onClick={() => {
+											handleModeChange(mode.mode);
+											setShowModeSelector(false);
+										}}
+										className={`p-3 text-left text-sm rounded-lg border transition-all duration-200
 										${
 											chatMode === mode.mode
 												? "bg-blue-50 border-blue-400 text-blue-800 shadow-sm"
 												: "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300"
 										}`}>
-									<div className="font-semibold text-gray-800 mb-1">
-										{mode.title}
-									</div>
-									<div className="text-xs text-gray-600">
-										{mode.description}
-									</div>
-								</button>
-							))}
+										<div className="font-semibold text-gray-800 mb-1">
+											{mode.title}
+										</div>
+										<div className="text-xs text-gray-600">
+											{mode.description}
+										</div>
+									</button>
+								))}
+							</div>
 						</div>
-					</div>
+					)}
+				</div>
+
+				{/* Chat Window */}
+				<div className="flex-1 min-h-0 mb-6">
+					<AIChatWindow
+						key={chatId || "new-chat"}
+						initialChatId={user ? chatId || undefined : undefined}
+						onNewChat={handleNewChat}
+						onPropertyClick={handlePropertyClick}
+						onActionClick={(action) => {
+							console.log("Action clicked:", action);
+						}}
+					/>
+				</div>
+
+				{user && (
+					<ChatSidebar
+						showSidebar={showSidebar}
+						setShowSidebar={setShowSidebar}
+						handleNewChat={handleNewChat}
+						handleSelectChat={handleSelectChat}
+					/>
 				)}
 			</div>
-
-			{/* Chat Window */}
-			<div className="flex-1 min-h-0 mb-6">
-				<AIChatWindow
-					key={chatId || "new-chat"}
-					initialChatId={user ? chatId || undefined : undefined}
-					onNewChat={handleNewChat}
-					onPropertyClick={handlePropertyClick}
-					onActionClick={(action) => {
-						console.log("Action clicked:", action);
-					}}
-				/>
-			</div>
-
-			{user && (
-				<ChatSidebar
-					showSidebar={showSidebar}
-					setShowSidebar={setShowSidebar}
-					handleNewChat={handleNewChat}
-					handleSelectChat={handleSelectChat}
-				/>
-			)}
-		</div>
+		</>
 	);
 }
