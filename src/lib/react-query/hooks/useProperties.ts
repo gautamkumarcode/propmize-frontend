@@ -90,6 +90,7 @@ export const useMyProperties = (filters: PropertyFilters = {}) => {
 		queryFn: () => PropertyService.getMyProperties(filters),
 		select: (data) => data.data,
 		staleTime: 5 * 60 * 1000, // 5 minutes
+		refetchInterval: 10 * 60 * 1000, // 10 minutes
 	});
 };
 

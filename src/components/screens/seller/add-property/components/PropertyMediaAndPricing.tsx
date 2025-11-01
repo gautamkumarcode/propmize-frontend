@@ -36,7 +36,6 @@ export default function PropertyMediaAndPricing({
 		{ name: "maintenanceCharges", label: "Maintenance Charges" },
 		{ name: "securityDeposit", label: "Security Deposit" },
 	];
-	// Define pricing fields based on listing type
 
 	const [selectedImages, setSelectedImages] = useState<File[]>([]);
 	const [dragActive, setDragActive] = useState(false);
@@ -64,6 +63,22 @@ export default function PropertyMediaAndPricing({
 		const newImages = selectedImages.filter((_, i) => i !== index);
 		setSelectedImages(newImages);
 		form.setValue("images", newImages);
+	};
+
+	// Get image URL for display - handles both File objects and string URLs
+	const getImageUrl = (image: File | string): string => {
+		if (typeof image === "string") {
+			return image; // Return the URL string for existing images
+		}
+		return URL.createObjectURL(image); // Create object URL for new files
+	};
+
+	// Get image name for display
+	const getImageName = (image: File | string): string => {
+		if (typeof image === "string") {
+			return image.split("/").pop() || "image"; // Extract filename from URL
+		}
+		return image.name; // Get name from File object
 	};
 
 	return (
@@ -126,11 +141,13 @@ export default function PropertyMediaAndPricing({
 							</div>
 						</FormControl>
 						<div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-							{form.watch("images")?.map((file, index) => (
-								<div key={file.name + index} className="relative group">
+							{form.watch("images")?.map((image, index) => (
+								<div
+									key={getImageName(image) + index}
+									className="relative group">
 									<img
-										src={URL.createObjectURL(file)}
-										alt={file.name}
+										src={getImageUrl(image)}
+										alt={getImageName(image)}
 										className="h-48 w-full object-contain rounded-lg border shadow-sm"
 									/>
 									<button
@@ -153,7 +170,7 @@ export default function PropertyMediaAndPricing({
 										</svg>
 									</button>
 									<span className="absolute bottom-2 left-2 bg-black/60 text-xs text-white px-2 py-1 rounded">
-										{file.name}
+										{getImageName(image)}
 									</span>
 								</div>
 							))}
@@ -221,49 +238,6 @@ export default function PropertyMediaAndPricing({
 						</div>
 					</div>
 				))}
-
-			{/* Price Negotiable Field */}
-			{/* <div className="flex items-center gap-8">
-				<FormField
-					control={form.control}
-					name="pricing.priceNegotiable"
-					render={({ field }) => (
-						<FormItem className="flex items-center space-x-2">
-							<FormLabel className="text-sm font-semibold text-gray-700">
-								Price Negotiable <span style={{ color: "red" }}>*</span>
-							</FormLabel>
-							<input
-								type="checkbox"
-								checked={field.value || false}
-								onChange={(e) => field.onChange(e.target.checked)}
-								className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded aria-[checked]:bg-blue-600"
-							/>
-						</FormItem>
-					)}
-				/>
-			</div> */}
-			{/* 
-			{propertyType !== "plot" && (
-				<FormField
-					control={form.control}
-					name="legalInfo.ownershipType"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel className="text-sm font-semibold text-gray-700">
-								Ownership Type <span style={{ color: "red" }}>*</span>
-							</FormLabel>
-							<FormControl>
-								<Input
-									placeholder="e.g., Freehold, Leasehold"
-									{...field}
-									className="h-[40px] px-3 py-2 text-sm"
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-			)} */}
 
 			<FormField
 				control={form.control}

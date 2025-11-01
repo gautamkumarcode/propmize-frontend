@@ -28,7 +28,7 @@ export default function ReviewStep({ form, isEditMode }: StepProps) {
 	// Map file objects to their URLs
 	const mappedFiles = values?.images?.map((file) => {
 		if (isEditMode) {
-			return `${process.env.NEXT_PUBLIC_API_URL_IMG}/${file}`;
+			return `${file}`;
 		}
 		return URL.createObjectURL(file);
 	});

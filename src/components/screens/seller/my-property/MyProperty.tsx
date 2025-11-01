@@ -13,6 +13,7 @@ const MyProperty = () => {
 		data: myPropertyData,
 		isLoading,
 		isError,
+		refetch,
 	} = useMyProperties({ page: 1, limit: 10 });
 
 	const deleteProperty = useDeleteProperty();
@@ -21,7 +22,8 @@ const MyProperty = () => {
 	const [selectedProperty, setSelectedProperty] =
 		useState<PropertyResponse | null>(null);
 
-	const handleEditClick = (property: PropertyResponse) => {
+	const handleEditClick = (property: PropertyResponse, e: React.MouseEvent) => {
+		e.stopPropagation(); // Stop event propagation
 		router.push(`/seller/add-property?mode=edit&id=${property._id}`);
 	};
 
@@ -29,7 +31,11 @@ const MyProperty = () => {
 		router.push("/seller/add-property?mode=create");
 	};
 
-	const handleDeleteClick = (property: PropertyResponse) => {
+	const handleDeleteClick = (
+		property: PropertyResponse,
+		e: React.MouseEvent
+	) => {
+		e.stopPropagation(); // Stop event propagation
 		setSelectedProperty(property);
 		setShowModal(true);
 	};
@@ -37,6 +43,8 @@ const MyProperty = () => {
 	const handleConfirmDelete = () => {
 		// Call your delete property mutation here, e.g.:
 		deleteProperty.mutate(selectedProperty?._id as string);
+		refetch();
+		// Optionally, you can also refetch the properties list after deletion
 		setShowModal(false);
 		setSelectedProperty(null);
 	};
@@ -44,6 +52,10 @@ const MyProperty = () => {
 	const handleCancelDelete = () => {
 		setShowModal(false);
 		setSelectedProperty(null);
+	};
+
+	const handleCardClick = (propertyId: string) => {
+		router.push(`/property/${propertyId}`);
 	};
 
 	if (isLoading)
@@ -70,7 +82,6 @@ const MyProperty = () => {
 		);
 
 	const properties = myPropertyData || [];
-
 
 	return (
 		<div className="container mx-auto px-4 py-8 pb-20">
@@ -128,44 +139,17 @@ const MyProperty = () => {
 					{properties.map((property: PropertyResponse) => (
 						<div
 							key={property._id}
-							onClick={() => router.push(`/property/${property._id}`)}
-							className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+							onClick={() => handleCardClick(property._id)}
+							className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
 							{/* ...existing property card code... */}
 							<div className="relative h-[20rem]">
 								<Image
 									src={property.images[0] || "/images/placeholder.png"}
 									alt={property.title}
 									className="w-full h-48 object-cover"
-									// onError={(e) => {
-									// 	e.currentTarget.style.display = "none";
-									// 	const fallback = e.currentTarget
-									// 		.nextElementSibling as HTMLElement;
-									// 	if (fallback) fallback.classList.remove("hidden");
-									// }}
 									fill
 									unoptimized
 								/>
-								{/* <div className="hidden absolute inset-0 bg-gray-200  items-center justify-center">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										className="h-12 w-12 text-gray-400"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor">
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-										/>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M9 22V12h6v10"
-										/>
-									</svg>
-								</div> */}
 								<div className="absolute top-3 right-3">
 									<span
 										className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -289,9 +273,9 @@ const MyProperty = () => {
 									</div>
 								</div>
 
-								<div className="flex space-x-2">
+								<div className="flex space-x-2 z-40">
 									<button
-										onClick={() => handleEditClick(property)}
+										onClick={(e) => handleEditClick(property, e)}
 										className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -309,7 +293,7 @@ const MyProperty = () => {
 										Edit
 									</button>
 									<button
-										onClick={() => handleDeleteClick(property)}
+										onClick={(e) => handleDeleteClick(property, e)}
 										className="p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
